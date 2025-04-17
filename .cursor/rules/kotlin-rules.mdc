@@ -1,0 +1,105 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Kotlin Functional Programming Style Guide
+
+This guide defines a set of coding conventions for Kotlin projects that embrace functional programming principles. It is intended as a Cursor rules file to guide AI-generated Kotlin code. The emphasis is on writing clear, idiomatic Kotlin in a **functional style**, using the Arrow library for functional constructs. The guidelines favor immutability, pure functions, and explicit types like `Option` and `Either` over nulls or exceptions. The style is practical and avoids overly abstract patterns, focusing instead on clarity and maintainability.
+
+## Naming Conventions
+
+- **Packages:** Use all-lowercase names without underscores (e.g. `com.example.project`). Organize packages by feature or domain, ensuring names are meaningful.
+- **Classes & Objects:** Use **PascalCase** for class, object, and interface names (e.g. `UserService`, `OrderRepository`). Do not prefix interfaces with `I` – use descriptive names instead.
+- **Functions & Properties:** Use **camelCase** for function and property names (e.g. `calculateTotal()`, `userName`). Function names should typically be **verbs** or verb phrases when performing actions or computations.
+- **Constants:** For compile-time constants (`const val`), use **UPPER_SNAKE_CASE** (e.g. `MAX_RETRIES`). For read-only `val` properties that aren’t true compile-time constants, prefer camelCase but make them `val` to indicate immutability.
+- **Descriptive Names:** Choose clear, descriptive names over brevity. Avoid abbreviations unless they are well-known (e.g. `HTML` is fine, but `usrCfg` is unclear). For example, use `customerList` instead of `custList`.
+- **Type Parameters:** Use single capital letters like `T, U, V` for generic type parameters unless a more descriptive letter aids understanding (e.g. `Key, Value` in a map).
+- **Test Naming:** *(If applicable)* Use descriptive test function names, possibly with backticks for readability (e.g. `` `adding item increases count` ``), although this guide focuses on production code style.
+
+## Functional Style
+
+Embrace a **functional programming** mindset: write code that is declarative, composable, and minimizes side effects. Key principles include immutability, purity, and expression-oriented design.
+
+- **Immutability:** Declare variables and properties with `val` by default. Avoid `var` unless mutation is absolutely necessary.
+- **Pure Functions:** Prefer pure functions that given the same input always return the same output and cause no side effects.
+- **Expressions Over Statements:** Favor Kotlin’s expression syntax:
+
+```kotlin
+val result = if (condition) "yes" else "no"
+```
+
+- **Avoid Imperative Loops:** Use higher‑order functions (`map`, `filter`, `fold`, `flatMap` …) instead of `for`/`while`.
+
+## Null Safety
+
+Avoid raw nulls. Represent optional data with Arrow’s `Option<T>`.
+
+```kotlin
+val maybeUser: Option<User> = findUser("Alice")
+val greeting = maybeUser
+    .map { "Hello, ${it.name}!" }
+    .getOrElse { "User not found." }
+```
+
+Never use `!!`. Convert Java nulls at the boundary with `Option.fromNullable(...)`.
+
+## Error Handling
+
+Use `Either<L, R>` (or `Validated`) instead of exceptions for expected errors.
+
+```kotlin
+fun divide(a: Int, b: Int): Either<String, Int> =
+    if (b == 0) "Division by zero".left()
+    else (a / b).right()
+```
+
+Chain with `flatMap`, accumulate with `Validated`.
+
+## Effects and Side‑Effects
+
+Wrap effectful code in Arrow `IO` and run it at the application edge:
+
+```kotlin
+fun fetchData(): IO<NetworkError, Data> = IO.effect {
+    api.getData()   // may throw IOException
+}.mapError { NetworkError(it.message) }
+```
+
+Avoid marking core functions `suspend` or launching coroutines directly.
+
+## File Structure & Organization
+
+- Group tightly‑coupled classes in one file (e.g. a `data class` + its repository).
+- Name files after the primary concept (`OrderDomain.kt`, `UserRepository.kt`).
+- Favor feature‑based packages over technical layers.
+
+## Formatting & Linting
+
+- **Indentation:** 4 spaces.
+- **Line length:** 100 (120 hard max).
+- **Trailing commas:** Enabled for multiline lists/params.
+- **Braces:** Same line; always use in `if/else/when` unless expression form.
+- Enforce ktlint + Detekt (warnings as errors).
+- Optimize imports; no wildcards.
+
+Example of well‑formatted code:
+
+```kotlin
+class OrderService(
+    private val repo: OrderRepository,
+    private val payment: PaymentClient,
+) {
+    fun process(order: Order): Either<OrderError, Receipt> =
+        either {
+            ensure(order.isValid) { OrderError.Validation }
+            val pay = payment.charge(order.amount).bind()
+            repo.save(order).bind()
+            Receipt(order.id, pay.id)
+        }
+}
+```
+
+---
+
+Following these rules keeps code **pure, expressive, and safe**, while remaining practical and familiar to Kotlin developers.
