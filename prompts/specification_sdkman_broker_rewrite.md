@@ -2,11 +2,10 @@
 
 *Functional Kotlin rewrite specification — final consolidated version*
 
-## Purpose 
-
-* Re‑implement **sdkman‑broker** in **Kotlin + Arrow** on **Ktor**, with **KMongo** adapters (and Postgres‑ready SPI).
-* The legacy broker can be found at https://github.com/sdkman/sdkman-broker.
-* Every bullet is a strict, self‑contained requirement.
+> **Purpose** 
+> Re‑implement **sdkman‑broker** in **Kotlin + Arrow** on **Ktor**, with **KMongo** adapters (and Postgres‑ready SPI).
+> The legacy broker can be found at https://github.com/sdkman/sdkman-broker.
+> Every bullet is a strict, self‑contained requirement.
 
 ---
 
@@ -97,12 +96,9 @@ routing {
 
 ---
 
-## 6 Testing (Kotest BDD)
+## 6 Testing (Kotest)
 
-* Files end `*Spec`; use `BehaviorSpec` with `given/When/Then("should ...")`.  
-* Testcontainers‑Mongo for repository tests.  
-* Ktor test engine for HTTP.  
-* Property tests for resolver & checksum ordering.
+Follow the cursor rules stipulated in testing-rules.mdc
 
 ---
 
