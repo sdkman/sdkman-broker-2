@@ -1,0 +1,27 @@
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.sublime-*
+.classpath
+.project
+.settings/
+bin/
+
+# Temp files
+*~
+*.log
+*.swp
+*.tmp
+.DS_Store
+
+# Application
+application-*.properties 
