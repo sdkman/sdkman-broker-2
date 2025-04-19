@@ -10,15 +10,16 @@ Generate an application that implements the **smallest possible slice** of funct
 ## Stack
 
 Use the following tech stack to implement the app:
-
-* Kotlin
+* JDK 21
+* Kotlin (latest stable)
 * Arrow
+* Ktor
 * KMongo
 * Kotest
 * TestContainers
-* Gradle
+* Gradle (latest 8.x)
 
-It should re-implement the health check following exactly what is described in the @legacy_broker_services.md file, including URL, response codes etc.
+It should re-implement the health check following exactly what is described in the @legacy_broker_service.md file, including URL, response codes etc.
 
 ## Carefully observe all the following Cursor rules:
 
@@ -34,4 +35,31 @@ It should re-implement the health check following exactly what is described in t
 * Acceptance test to run against the application, running on a fixed port on `localhost`
 * Use test data as described in the @legacy_broker_service.md
 * We'll migrate to a different database in the future, so keep the persistence layer flexible with an SPI.
+* Add an `.sdkmanrc` file to peg the JDK version
 
+## BDD
+
+We won't be using Cucumber, but this sums up the expected behaviour:
+
+```gherkin
+Feature: Alive
+	Scenario: Database is healthy
+		Given an initialised database
+		When a GET request is made for "/health/alive"
+		Then the service response status is 200
+
+	Scenario: Database is inconsistent
+		Given an uninitialised database
+		When a GET request is made for "/health/alive"
+		Then the service response status is 503
+
+	Scenario: Database is inaccessible
+		Given an inaccessible database
+		When a GET request is made for "/health/alive"
+		Then the service response status is 503
+```
+
+## Acceptance Criteria
+
+* All tests must pass when running `./gradlew check`
+* We have a simple application, fit for deployment

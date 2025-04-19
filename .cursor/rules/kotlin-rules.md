@@ -25,6 +25,9 @@ alwaysApply: false
 | **Explicit Error Handling** | Use Arrow's `Either`, `Option`, `Validated` instead of nulls or exceptions |
 | **Composition** | Build complex logic by composing smaller, focused functions |
 
+
+**Favour SIMPLE solutions of COMPLEX ones!!!**
+
 ---
 
 ## 2 Project Structure
