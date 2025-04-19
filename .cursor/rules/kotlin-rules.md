@@ -144,7 +144,18 @@ data class Email private constructor(val value: String) {
 * Keep functions small and focused on a single responsibility
 * Prefer pure functions that don't cause side effects
 * Use default parameters instead of function overloading
-* Prefer using expression bodies over Java-style blocks with `return`
+* Always specify explicit return types for public functions and methods
+* Prefer expression bodies over block bodies for simple functions:
+
+```kotlin
+// Prefer:
+fun transform(input: String): Int = input.length
+
+// Instead of:
+fun transform(input: String): Int {
+    return input.length
+}
+```
 
 ### 5.2 Higher-Order Functions
 
