@@ -11,14 +11,19 @@ import org.bson.Document
  * Integration tests for MongoAppRepository
  */
 class MongoAppRepositoryIntegrationSpec : ShouldSpec({
-    val mongo = MongoContainer()
     
     // Register the test listener
-    listener(mongo)
+    listener(MongoContainer)
+    
+    beforeTest {
+        MongoContainer.startContainer()
+        MongoContainer.dropApplicationCollection()
+    }
     
     should("retrieve the app record when it exists") {
         // given: a repository connected to the test MongoDB
-        val repository = MongoAppRepository(mongo.database)
+        MongoContainer.setupApplicatonData()
+        val repository = MongoAppRepository(MongoContainer.database)
         
         // when: retrieving the app
         val result = repository.findApp()
@@ -35,8 +40,7 @@ class MongoAppRepositoryIntegrationSpec : ShouldSpec({
     
     should("return AppNotFound error when app record doesn't exist") {
         // given: a fresh database with the app collection emptied
-        mongo.database.getCollection("application").deleteMany(Document())
-        val repository = MongoAppRepository(mongo.database)
+        val repository = MongoAppRepository(MongoContainer.database)
         
         // when: retrieving the app
         val result = repository.findApp()

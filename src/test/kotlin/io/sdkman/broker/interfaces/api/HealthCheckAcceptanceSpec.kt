@@ -2,6 +2,7 @@ package io.sdkman.broker.interfaces.api
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -11,20 +12,26 @@ import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.infra.mongo.MongoAppRepository
 import io.sdkman.broker.test.MongoContainer
 import kotlinx.serialization.json.Json
+import org.bson.Document
 
 /**
  * Acceptance tests for the health check endpoint
  */
 class HealthCheckAcceptanceSpec : ShouldSpec({
     
-    val mongo = MongoContainer()
-    
     // Register the test listener
-    listener(mongo)
+    listener(MongoContainer)
+
+    beforeTest {
+        MongoContainer.startContainer()
+        MongoContainer.dropApplicationCollection()
+    }
     
-    should("return status UP when the application is healthy") {
-        // given: an application with MongoDB containing a healthy app record
-        val repository = MongoAppRepository(mongo.database)
+    should("return status UP when the database is healthy") {
+        // given: an initialised database
+        MongoContainer.setupApplicatonData()
+        
+        val repository = MongoAppRepository(MongoContainer.database)
         val healthService = HealthService(repository)
         val healthHandler = HealthHandler(healthService)
         
@@ -45,15 +52,11 @@ class HealthCheckAcceptanceSpec : ShouldSpec({
         }
     }
     
-    should("return status DOWN when the application is not healthy") {
-        // given: an application with MongoDB containing an app with wrong status
-        // First, update the app to have NOT_OK status
-        mongo.database.getCollection("application").updateOne(
-            org.bson.Document(),
-            org.bson.Document("\$set", org.bson.Document("alive", "NOT_OK"))
-        )
+    should("return status DOWN when the database is inconsistent") {
+        // given: an uninitialised database (no application collection)
+        // Do NOT set up application data
         
-        val repository = MongoAppRepository(mongo.database)
+        val repository = MongoAppRepository(MongoContainer.database)
         val healthService = HealthService(repository)
         val healthHandler = HealthHandler(healthService)
         
@@ -71,7 +74,34 @@ class HealthCheckAcceptanceSpec : ShouldSpec({
             val responseText = response.bodyAsText()
             val responseJson = Json.decodeFromString<Map<String, String>>(responseText)
             responseJson["status"] shouldBe "DOWN"
-            responseJson["reason"] shouldBe "Application is not healthy"
+            responseJson["reason"] shouldBe "Application record not found"
+        }
+    }
+    
+    should("return status DOWN when the database is inaccessible") {
+        // given: an inaccessible database
+        // First stop the running MongoDB container
+        MongoContainer.stopContainer()
+        
+        val repository = MongoAppRepository(MongoContainer.database)
+        val healthService = HealthService(repository)
+        val healthHandler = HealthHandler(healthService)
+        
+        // when: making a request to the /health endpoint
+        testApplication {
+            application {
+                configureTestApplication(healthHandler)
+            }
+            
+            val response = client.get("/health")
+            
+            // then: response should be 503 with status DOWN
+            response.status shouldBe HttpStatusCode.InternalServerError
+            
+            val responseText = response.bodyAsText()
+            val responseJson = Json.decodeFromString<Map<String, String>>(responseText)
+            responseJson["status"] shouldBe "DOWN"
+            responseJson["reason"]?.shouldContain("Database error") ?: throw AssertionError("Missing error reason")
         }
     }
 }) 
