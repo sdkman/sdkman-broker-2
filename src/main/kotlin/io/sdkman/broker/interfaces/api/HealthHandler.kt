@@ -34,7 +34,7 @@ class HealthHandler(private val healthService: HealthService) {
             mapOf("status" to "DOWN", "reason" to error.message)
         )
         is DomainError.RepositoryError -> call.respond(
-            HttpStatusCode.InternalServerError,
+            HttpStatusCode.ServiceUnavailable,
             mapOf("status" to "DOWN", "reason" to "Database error: ${error.cause.message}")
         )
     }

@@ -80,7 +80,6 @@ class HealthCheckAcceptanceSpec : ShouldSpec({
     
     should("return status DOWN when the database is inaccessible") {
         // given: an inaccessible database
-        // First stop the running MongoDB container
         MongoContainer.stopContainer()
         
         val repository = MongoAppRepository(MongoContainer.database)
@@ -96,12 +95,12 @@ class HealthCheckAcceptanceSpec : ShouldSpec({
             val response = client.get("/health")
             
             // then: response should be 503 with status DOWN
-            response.status shouldBe HttpStatusCode.InternalServerError
+            response.status shouldBe HttpStatusCode.ServiceUnavailable
             
             val responseText = response.bodyAsText()
             val responseJson = Json.decodeFromString<Map<String, String>>(responseText)
             responseJson["status"] shouldBe "DOWN"
-            responseJson["reason"]?.shouldContain("Database error") ?: throw AssertionError("Missing error reason")
+            responseJson["reason"] shouldContain "Database error"
         }
     }
 }) 
