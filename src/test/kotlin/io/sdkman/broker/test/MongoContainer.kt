@@ -23,7 +23,7 @@ object MongoContainer : TestListener {
     // Use MongoDB 5.0 for tests
     val container = MongoDBContainer(DockerImageName.parse("mongo:5.0"))
     
-    private var mongoClient: MongoClient = startContainer()
+    private val mongoClient: MongoClient = startContainer()
     
     val database: MongoDatabase
         get() = mongoClient.getDatabase("sdkman")
