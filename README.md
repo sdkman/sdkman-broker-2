@@ -69,4 +69,16 @@ GET /health
 
 Response:
 - 200 OK: `{"status":"UP"}` when healthy
-- 503 Service Unavailable: `{"status":"DOWN","reason":"..."}` when unhealthy 
+- 503 Service Unavailable: `{"status":"DOWN","reason":"..."}` when unhealthy
+
+## Deployment
+
+This project uses GitHub Actions for CI/CD:
+
+- Pull requests and non-main branches are tested automatically
+- Merges to `main` trigger an automatic release process:
+  - Creates a Git tag with the current version if it doesn't exist
+  - Builds a Docker image and pushes it to Digital Ocean Container Registry
+  - The image is tagged with the version number, commit hash, and "latest"
+
+The version is managed by the Axion Release Plugin based on Git tags. 
