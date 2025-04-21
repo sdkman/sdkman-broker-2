@@ -79,7 +79,7 @@ jib {
         image = "eclipse-temurin:21-jre-alpine"
     }
     to {
-        image = "sdkman/broker"
+        image = "registry.digitalocean.com/sdkman/sdkman-broker"
         tags = setOf(version.toString(), "latest")
     }
     container {
