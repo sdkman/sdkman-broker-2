@@ -1,11 +1,27 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
     application
+    id("pl.allegro.tech.build.axion-release") version "1.18.18"
 }
 
 group = "io.sdkman"
-version = "1.0.0-SNAPSHOT"
+// Use Axion Release Plugin to manage version
+version = scmVersion.version
+
+// Configure the plugin
+scmVersion {
+    tag {
+        prefix = "v"
+        versionSeparator = ""
+    }
+    checks {
+        uncommittedChanges = true
+        aheadOfRemote = true
+    }
+}
 
 repositories {
     mavenCentral()
