@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.serialization") version "1.9.22"
     application
     id("pl.allegro.tech.build.axion-release") version "1.18.18"
+    id("com.google.cloud.tools.jib") version "3.4.1"
 }
 
 group = "io.sdkman"
@@ -70,4 +71,27 @@ tasks.withType<Test> {
 
 application {
     mainClass.set("io.sdkman.broker.ApplicationKt")
+}
+
+// Configure Jib for Docker image building
+jib {
+    from {
+        image = "eclipse-temurin:21-jre-alpine"
+    }
+    to {
+        image = "sdkman/broker"
+        tags = setOf(version.toString(), "latest")
+    }
+    container {
+        ports = listOf("8080")
+        mainClass = application.mainClass.get()
+        jvmFlags = listOf("-Xms256m", "-Xmx512m")
+        // Add these environment variables as defaults, but they can be overridden at runtime
+        environment = mapOf(
+            "MONGODB_URI" to "mongodb://localhost:27017",
+            "MONGODB_DATABASE" to "sdkman"
+        )
+        // A sensible default for production containers
+        user = "1000"
+    }
 } 
