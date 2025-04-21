@@ -24,6 +24,7 @@ alwaysApply: false
 | **Pure Functions** | Functions with no side effects that return the same output for the same input |
 | **Explicit Error Handling** | Use Arrow's `Either`, `Option`, `Validated` instead of nulls or exceptions |
 | **Composition** | Build complex logic by composing smaller, focused functions |
+| **No Exception Throwing** | Never use try/catch blocks; always use Arrow's `Either.catch {}` for exception handling |
 
 
 **Favour SIMPLE solutions of COMPLEX ones!!!**
@@ -107,14 +108,35 @@ fun findUser(id: String): Option<User>
 
 * Use `Either<E, A>` for operations that can fail with typed errors
 * Use `Validated<E, A>` when accumulating multiple errors
+* Always use `Either.catch` for exception handling; never use try/catch blocks
+* All exceptions must be captured and converted to domain errors
 * Avoid throwing exceptions; make failures explicit in the return type:
 
 ```kotlin
+// NEVER do this:
+try {
+    parseData(input)
+} catch (e: Exception) {
+    handleError(e)
+}
+
+// ALWAYS do this:
+Either.catch { 
+    parseData(input) 
+}.mapLeft { e -> 
+    DomainError.ParseError(e) 
+}
+
+// Or with a helper function:
 fun validateAndParse(input: String): Either<ValidationError, ParsedData> =
     if (!isValid(input)) {
         ValidationError(input).left()
     } else {
-        parse(input).right()
+        Either.catch { 
+            parse(input) 
+        }.mapLeft { e -> 
+            ValidationError("Parse error: ${e.message}") 
+        }
     }
 ```
 
