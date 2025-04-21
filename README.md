@@ -82,3 +82,13 @@ This project uses GitHub Actions for CI/CD:
   - The image is tagged with the version number, commit hash, and "latest"
 
 The version is managed by the Axion Release Plugin based on Git tags. 
+
+### Checking the Current Version
+
+To check the current version of the application, run:
+
+```
+./gradlew currentVersion
+```
+
+This will display the current version as determined by the Axion Release Plugin. 
