@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write  # Needed to push Git tags
+
 jobs:
   build:
     name: "Release"
@@ -27,6 +30,26 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
           
+      - name: Create version tag
+        id: tag_version
+        run: |
+          # Get the current version from Axion
+          current_version=$(./gradlew currentVersion -q | grep "Project version" | awk '{print $3}' | sed 's/-SNAPSHOT//')
+          
+          # Create tag if it doesn't exist
+          if ! git rev-parse "v$current_version" >/dev/null 2>&1; then
+            echo "Creating new tag v$current_version"
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git tag -a "v$current_version" -m "Release version $current_version"
+            git push origin "v$current_version"
+            echo "version=$current_version" >> $GITHUB_OUTPUT
+          else
+            echo "Tag v$current_version already exists, using commit hash for Docker tag"
+            version=$(git rev-parse --short=8 HEAD)
+            echo "version=$version" >> $GITHUB_OUTPUT
+          fi
+          
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
@@ -38,5 +61,9 @@ jobs:
           
       - name: Build and publish Docker image
         run: |
-          version=$(git rev-parse --short=8 HEAD)
-          ./gradlew jib -Djib.to.tags=$version,latest 
+          version="${{ steps.tag_version.outputs.version }}"
+          commit_hash=$(git rev-parse --short=8 HEAD)
+          
+          # Always tag with commit hash and latest
+          # If we created a version tag, also tag with that version
+          ./gradlew jib -Djib.to.tags=$commit_hash,$version,latest 
