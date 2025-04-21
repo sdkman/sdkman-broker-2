@@ -12,7 +12,6 @@ import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.infra.mongo.MongoAppRepository
 import io.sdkman.broker.test.MongoContainer
 import kotlinx.serialization.json.Json
-import org.bson.Document
 
 /**
  * Acceptance tests for the health check endpoint
@@ -29,7 +28,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec({
     
     should("return status UP when the database is healthy") {
         // given: an initialised database
-        MongoContainer.setupApplicatonData()
+        MongoContainer.setupApplicationData()
         
         val repository = MongoAppRepository(MongoContainer.database)
         val healthService = HealthService(repository)

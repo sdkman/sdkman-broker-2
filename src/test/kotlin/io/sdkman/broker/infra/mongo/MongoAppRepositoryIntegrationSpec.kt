@@ -2,10 +2,8 @@ package io.sdkman.broker.infra.mongo
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeTypeOf
 import io.sdkman.broker.domain.error.DomainError
 import io.sdkman.broker.test.MongoContainer
-import org.bson.Document
 
 /**
  * Integration tests for MongoAppRepository
@@ -22,7 +20,7 @@ class MongoAppRepositoryIntegrationSpec : ShouldSpec({
     
     should("retrieve the app record when it exists") {
         // given: a repository connected to the test MongoDB
-        MongoContainer.setupApplicatonData()
+        MongoContainer.setupApplicationData()
         val repository = MongoAppRepository(MongoContainer.database)
         
         // when: retrieving the app
@@ -30,12 +28,13 @@ class MongoAppRepositoryIntegrationSpec : ShouldSpec({
         
         // then: should get the test app with status OK
         result.isRight() shouldBe true
-        val app = result.getOrNull()
-        app?.alive shouldBe "OK"
-        app?.stableCliVersion shouldBe "5.19.0"
-        app?.betaCliVersion shouldBe "latest+b8d230b"
-        app?.stableNativeCliVersion shouldBe "0.7.4"
-        app?.betaNativeCliVersion shouldBe "0.7.4"
+        result.map { app ->
+            app.alive shouldBe "OK"
+            app.stableCliVersion shouldBe "5.19.0"
+            app.betaCliVersion shouldBe "latest+b8d230b"
+            app.stableNativeCliVersion shouldBe "0.7.4"
+            app.betaNativeCliVersion shouldBe "0.7.4"
+        }
     }
     
     should("return AppNotFound error when app record doesn't exist") {

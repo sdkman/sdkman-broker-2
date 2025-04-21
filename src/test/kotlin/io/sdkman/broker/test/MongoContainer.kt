@@ -4,11 +4,7 @@ import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoDatabase
 import io.kotest.core.listeners.TestListener
-import io.kotest.core.test.TestCase
-import io.kotest.core.test.TestResult
 import org.bson.Document
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.utility.DockerImageName
 
@@ -18,11 +14,9 @@ import org.testcontainers.utility.DockerImageName
  */
 object MongoContainer : TestListener {
 
-    private val logger: Logger = LoggerFactory.getLogger(MongoContainer::class.java)
-    
     // Use MongoDB 5.0 for tests
-    val container = MongoDBContainer(DockerImageName.parse("mongo:5.0"))
-    
+    private val container = MongoDBContainer(DockerImageName.parse("mongo:5.0"))
+
     private val mongoClient: MongoClient = startContainer()
     
     val database: MongoDatabase
@@ -31,7 +25,7 @@ object MongoContainer : TestListener {
     /**
      * Insert application data needed for health check
      */
-    fun setupApplicatonData() {
+    fun setupApplicationData() {
         val appCollection = database.getCollection("application")
         appCollection.drop()
         database.createCollection("application")
@@ -52,7 +46,7 @@ object MongoContainer : TestListener {
         val appCollection = database.getCollection("application")
         appCollection.drop()
     }
-    
+
     /**
      * Starts the container and reconnects the client
      */
