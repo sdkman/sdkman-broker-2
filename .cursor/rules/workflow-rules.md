@@ -28,6 +28,7 @@ alwaysApply: true
 - Explain the intent and impact of each proposed change
 - Wait for explicit approval before proceeding to the next step
 - If multiple solutions exist, present options rather than choosing one
+- Suggest a Git commit after each logical unit of work is completed
 
 ## 3. Error Handling
 
@@ -41,6 +42,13 @@ alwaysApply: true
 - Respect established naming conventions and architectural patterns
 - Look for similar implementations elsewhere in the codebase for guidance
 
+## 5. Version Control Integration
+
+- Propose Git commits after each meaningful change or logical unit of work
+- Suggest descriptive commit messages that follow conventional commits format
+- For larger changes, propose intermediate commits at logical points
+- Remind about uncommitted changes when appropriate
+
 ---
 
 ### TL;DR
@@ -48,4 +56,5 @@ alwaysApply: true
 1. **Explicit Confirmation**: Never make changes without user approval
 2. **Step-by-Step Approach**: Present one change at a time, waiting for confirmation
 3. **Context Awareness**: Follow existing project patterns and conventions
-4. **Targeted Solutions**: Propose specific changes rather than broad refactoring 
+4. **Targeted Solutions**: Propose specific changes rather than broad refactoring
+5. **Version Control**: Suggest commits after each logical unit of work 
