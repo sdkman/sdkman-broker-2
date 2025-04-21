@@ -1,8 +1,9 @@
 package io.sdkman.broker.infra.mongo
 
 import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
+import arrow.core.flatten
+import arrow.core.getOrElse
+import arrow.core.toOption
 import com.mongodb.client.MongoDatabase
 import io.sdkman.broker.domain.error.DomainError
 import io.sdkman.broker.domain.model.App
@@ -19,24 +20,15 @@ class MongoAppRepository(private val database: MongoDatabase) : AppRepository {
     /**
      * Finds the single application record in the MongoDB collection
      */
-    override fun findApp(): Either<DomainError, App> {
-        return try {
-            val collection = database.getCollection<Document>("application")
-            val doc = collection.findOne()
-            
-            if (doc == null) {
-                DomainError.AppNotFound().left()
-            } else {
+    override fun findApp(): Either<DomainError, App> = Either.catch {
+        database.getCollection<Document>("application").findOne().toOption()
+            .toEither<DomainError> { DomainError.AppNotFound() }.map { doc ->
                 App(
-                    alive = doc.getString("alive") ?: "",
-                    stableCliVersion = doc.getString("stableCliVersion") ?: "",
-                    betaCliVersion = doc.getString("betaCliVersion") ?: "",
-                    stableNativeCliVersion = doc.getString("stableNativeCliVersion") ?: "",
-                    betaNativeCliVersion = doc.getString("betaNativeCliVersion") ?: ""
-                ).right()
+                    alive = doc.getString("alive").toOption().getOrElse { "" },
+                    stableCliVersion = doc.getString("stableCliVersion").toOption().getOrElse { "" },
+                    betaCliVersion = doc.getString("betaCliVersion").toOption().getOrElse { "" },
+                    stableNativeCliVersion = doc.getString("stableNativeCliVersion").toOption().getOrElse { "" },
+                    betaNativeCliVersion = doc.getString("betaNativeCliVersion").toOption().getOrElse { "" })
             }
-        } catch (e: Exception) {
-            DomainError.RepositoryError(e).left()
-        }
-    }
-} 
+    }.mapLeft { e -> DomainError.RepositoryError(e) }.flatten()
+}
