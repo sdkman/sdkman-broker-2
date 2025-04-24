@@ -123,57 +123,22 @@ Document relationships between bounded contexts with specific patterns:
 
 ---
 
-## 4 Layered Architecture
+## 4 Domain Model Patterns
 
-Organize code into layers with dependencies flowing inward:
+These patterns help implement a rich domain model:
 
-### 4.1 Core Layers
+### 4.1 Model Integrity Patterns
 
-| Layer | Responsibility | Components |
-|-------|----------------|------------|
-| **Domain Layer** | Core business concepts, rules, and logic | Entities, Value Objects, Domain Events, Domain Services |
-| **Application Layer** | Directs workflows, orchestrates domain objects | Application Services, Use Cases, Command/Query Handlers |
-| **Infrastructure Layer** | Technical capabilities, external concerns | Repositories (impl), Messaging, Persistence, Security |
-| **Interface Layer** | Interaction with external systems/users | Controllers, Views, API endpoints, CLI, Event listeners |
+* **Assertion** - Guarantee state consistency through invariant checks
+* **Side-effect Free Functions** - Ensure predictable behavior  
+* **Intention-Revealing Interfaces** - Name elements to reflect their purpose
+* **Closure of Operations** - Operations on domain objects return same type
 
-### 4.2 Layer Interaction Principles
+### 4.2 Supple Design
 
-* **Dependency Rule**: Outer layers depend on inner layers, never the reverse
-* **Domain Isolation**: Domain layer has no dependencies on infrastructure or interface layers
-* **Ports & Adapters**: Define interfaces in inner layers, implementations in outer layers
-* **DTO Boundaries**: Use Data Transfer Objects at layer boundaries to avoid leaking domain objects
-
----
-
-## A Layered Implementation Approach
-
-A common architecture pattern implements DDD with these specific components:
-
-1. **Presentation Layer**
-   * **Controllers**: Handle HTTP requests and user input
-   * **Views/Templates**: Format data for presentation
-   * **DTOs**: Simplify data exchange with clients
-   * **Validation**: Input sanitization and validation
-
-2. **Application Layer**
-   * **Application Services**: Orchestrate domain operations
-   * **Commands/Queries**: Represent user intents
-   * **Assemblers/Mappers**: Transform between DTOs and domain objects
-   * **Security**: Authentication and authorization
-
-3. **Domain Layer**
-   * **Entities**: Business objects with identity and lifecycle
-   * **Value Objects**: Immutable objects defined by attributes
-   * **Domain Services**: Operations across multiple entities
-   * **Domain Events**: Record of significant occurrences
-   * **Repositories** (interfaces): Collection-like storage abstraction
-
-4. **Infrastructure Layer**
-   * **Repository Implementations**: Database access
-   * **ORM/Data Access**: Database mapping technology
-   * **Messaging**: Event publishing and subscription
-   * **External Services**: Integration with third-party systems
-   * **Persistence**: Database connections and transactions
+* **Intention-Revealing Interfaces** - Methods with names that reflect their purpose
+* **Conceptual Contours** - Split classes according to conceptual "seams"
+* **Standalone Classes** - Minimize dependencies between domain classes
 
 ---
 
@@ -182,6 +147,5 @@ A common architecture pattern implements DDD with these specific components:
 1. Start with **strategic design**: identify bounded contexts and their relationships.
 2. Develop a **ubiquitous language** with domain experts and reflect it in your code.
 3. Implement **tactical patterns** to express the model: entities, value objects, aggregates.
-4. Organize code in **layers**: domain, application, infrastructure, and interface.
-5. Use **repositories** for persistence and **domain services** for cross-entity operations.
-6. Capture state changes with **domain events** for traceability and integration.
+4. Use **repositories** for persistence and **domain services** for cross-entity operations.
+5. Capture state changes with **domain events** for traceability and integration.

@@ -459,6 +459,57 @@ indent_size = 2
 
 ---
 
+## 11 Kotlin-Specific Hexagonal Architecture
+
+### 11.1 Functional Error Handling
+
+* Use `Either<E, A>` for expressing operations that can fail
+* Define explicit error hierarchies for each layer
+* Map errors at adapter boundaries
+
+```kotlin
+interface UserRepository {
+    fun findById(id: String): Either<RepositoryError, User>
+}
+
+class UserService(private val repo: UserRepository) {
+    fun getUser(id: String): Either<DomainError, UserDto> =
+        repo.findById(id)
+            .mapLeft { it.toDomainError() }
+            .map { it.toDto() }
+}
+```
+
+### 11.2 Interface Default Methods
+
+* Use interface default methods for simple adapter logic
+* Keep complex logic in separate implementation classes
+
+```kotlin
+interface AuditLog {
+    fun log(event: AuditEvent): IO<LogError, Unit>
+    
+    // Default method for common case
+    fun logUserAction(user: String, action: String) = 
+        log(AuditEvent(user, action, Instant.now()))
+}
+```
+
+### 11.3 Sealed Classes for Ports
+
+* Use sealed classes/interfaces for modeling port behaviors
+* Leverage the compiler to ensure all cases are handled
+
+```kotlin
+sealed interface StorageResult<out T> {
+    data class Success<T>(val value: T) : StorageResult<T>
+    data class NotFound(val id: String) : StorageResult<Nothing>
+    data class Error(val exception: Throwable) : StorageResult<Nothing>
+}
+```
+
+---
+
 ### TL;DR
 
 1. **Immutability**: Use `val`, immutable collections, and data classes.
