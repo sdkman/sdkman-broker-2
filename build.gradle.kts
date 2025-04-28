@@ -6,6 +6,7 @@ plugins {
     application
     id("pl.allegro.tech.build.axion-release") version "1.18.18"
     id("com.google.cloud.tools.jib") version "3.4.1"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
 }
 
 group = "io.sdkman"
@@ -36,19 +37,19 @@ val arrowVersion = "1.2.1"
 dependencies {
     // Arrow for functional programming
     implementation("io.arrow-kt:arrow-core:$arrowVersion")
-    
+
     // Ktor server
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    
+
     // MongoDB
     implementation("org.litote.kmongo:kmongo:4.11.0")
-    
+
     // Logging
     implementation("ch.qos.logback:logback-classic:1.4.14")
-    
+
     // Testing
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
@@ -87,11 +88,24 @@ jib {
         mainClass = application.mainClass.get()
         jvmFlags = listOf("-Xms256m", "-Xmx512m")
         // Add these environment variables as defaults, but they can be overridden at runtime
-        environment = mapOf(
-            "MONGODB_URI" to "mongodb://localhost:27017",
-            "MONGODB_DATABASE" to "sdkman"
-        )
+        environment =
+            mapOf(
+                "MONGODB_URI" to "mongodb://localhost:27017",
+                "MONGODB_DATABASE" to "sdkman",
+            )
         // A sensible default for production containers
         user = "1000"
     }
-} 
+}
+
+// Configure ktlint
+ktlint {
+    version.set("1.0.1")
+    verbose.set(true)
+    android.set(false)
+    outputToConsole.set(true)
+    filter {
+        exclude("**/generated/**")
+        include("**/kotlin/**")
+    }
+}
