@@ -1,6 +1,6 @@
 package io.sdkman.broker.test
 
-import io.ktor.server.application.*
+import io.ktor.server.application.Application
 import io.sdkman.broker.interfaces.api.HealthHandler
 import io.sdkman.broker.interfaces.config.configureRoutes
 import io.sdkman.broker.interfaces.config.configureSerialization
@@ -11,7 +11,7 @@ import io.sdkman.broker.interfaces.config.configureSerialization
 fun Application.configureTestApplication(healthHandler: HealthHandler) {
     // Configure serialization
     configureSerialization()
-    
+
     // Configure routes
     configureRoutes(healthHandler)
-} 
+}

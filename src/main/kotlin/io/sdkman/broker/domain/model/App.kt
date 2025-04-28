@@ -9,5 +9,5 @@ data class App(
     val stableCliVersion: String,
     val betaCliVersion: String,
     val stableNativeCliVersion: String,
-    val betaNativeCliVersion: String
-) 
+    val betaNativeCliVersion: String,
+)

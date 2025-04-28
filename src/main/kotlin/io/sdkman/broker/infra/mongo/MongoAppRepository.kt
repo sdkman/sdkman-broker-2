@@ -16,19 +16,20 @@ import org.litote.kmongo.getCollection
  * MongoDB implementation of the AppRepository
  */
 class MongoAppRepository(private val database: MongoDatabase) : AppRepository {
-
     /**
      * Finds the single application record in the MongoDB collection
      */
-    override fun findApp(): Either<DomainError, App> = Either.catch {
-        database.getCollection<Document>("application").findOne().toOption()
-            .toEither<DomainError> { DomainError.AppNotFound() }.map { doc ->
-                App(
-                    alive = doc.getString("alive").toOption().getOrElse { "" },
-                    stableCliVersion = doc.getString("stableCliVersion").toOption().getOrElse { "" },
-                    betaCliVersion = doc.getString("betaCliVersion").toOption().getOrElse { "" },
-                    stableNativeCliVersion = doc.getString("stableNativeCliVersion").toOption().getOrElse { "" },
-                    betaNativeCliVersion = doc.getString("betaNativeCliVersion").toOption().getOrElse { "" })
-            }
-    }.mapLeft { e -> DomainError.RepositoryError(e) }.flatten()
+    override fun findApp(): Either<DomainError, App> =
+        Either.catch {
+            database.getCollection<Document>("application").findOne().toOption()
+                .toEither<DomainError> { DomainError.AppNotFound() }.map { doc ->
+                    App(
+                        alive = doc.getString("alive").toOption().getOrElse { "" },
+                        stableCliVersion = doc.getString("stableCliVersion").toOption().getOrElse { "" },
+                        betaCliVersion = doc.getString("betaCliVersion").toOption().getOrElse { "" },
+                        stableNativeCliVersion = doc.getString("stableNativeCliVersion").toOption().getOrElse { "" },
+                        betaNativeCliVersion = doc.getString("betaNativeCliVersion").toOption().getOrElse { "" },
+                    )
+                }
+        }.mapLeft { e -> DomainError.RepositoryError(e) }.flatten()
 }

@@ -13,15 +13,14 @@ import org.testcontainers.utility.DockerImageName
  * Provides a clean MongoDB instance for tests
  */
 object MongoContainer : TestListener {
-
     // Use MongoDB 5.0 for tests
     private val container = MongoDBContainer(DockerImageName.parse("mongo:5.0"))
 
     private val mongoClient: MongoClient = startContainer()
-    
+
     val database: MongoDatabase
         get() = mongoClient.getDatabase("sdkman")
-    
+
     /**
      * Insert application data needed for health check
      */
@@ -35,7 +34,7 @@ object MongoContainer : TestListener {
                 .append("stableCliVersion", "5.19.0")
                 .append("betaCliVersion", "latest+b8d230b")
                 .append("stableNativeCliVersion", "0.7.4")
-                .append("betaNativeCliVersion", "0.7.4")
+                .append("betaNativeCliVersion", "0.7.4"),
         )
     }
 
@@ -62,4 +61,4 @@ object MongoContainer : TestListener {
         mongoClient.close()
         container.stop()
     }
-} 
+}
