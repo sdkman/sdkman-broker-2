@@ -71,7 +71,7 @@ tasks.withType<Test> {
 }
 
 application {
-    mainClass.set("io.sdkman.broker.ApplicationKt")
+    mainClass.set("io.sdkman.broker.App")
 }
 
 // Configure Jib for Docker image building
