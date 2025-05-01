@@ -7,6 +7,7 @@ plugins {
     id("pl.allegro.tech.build.axion-release") version "1.18.18"
     id("com.google.cloud.tools.jib") version "3.4.1"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
 }
 
 group = "io.sdkman"
@@ -108,4 +109,28 @@ ktlint {
         exclude("**/generated/**")
         include("**/kotlin/**")
     }
+}
+
+// Configure Detekt
+detekt {
+    toolVersion = "1.23.8"
+    config = files("config/detekt/detekt.yml")
+    buildUponDefaultConfig = true
+    allRules = false
+    autoCorrect = true
+    baseline = file("config/detekt/baseline.xml")
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        txt.required.set(true)
+        sarif.required.set(true)
+    }
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
+    jvmTarget = "21"
+    baseline.set(file("config/detekt/baseline.xml"))
 }
