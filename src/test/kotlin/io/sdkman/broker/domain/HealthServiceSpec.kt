@@ -14,9 +14,9 @@ import io.sdkman.broker.application.service.HealthStatus
 import io.sdkman.broker.domain.model.Application
 import io.sdkman.broker.domain.repository.ApplicationRepository
 import io.sdkman.broker.domain.repository.RepositoryError
-import io.sdkman.broker.test.shouldBeLeft
-import io.sdkman.broker.test.shouldBeLeftAnd
-import io.sdkman.broker.test.shouldBeRight
+import io.sdkman.broker.support.shouldBeLeft
+import io.sdkman.broker.support.shouldBeLeftAnd
+import io.sdkman.broker.support.shouldBeRight
 
 /**
  * Unit test for the HealthService implementation.

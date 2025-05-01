@@ -7,10 +7,10 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.sdkman.broker.domain.model.Application
 import io.sdkman.broker.domain.repository.RepositoryError
-import io.sdkman.broker.test.MongoTestListener
-import io.sdkman.broker.test.shouldBeLeft
-import io.sdkman.broker.test.shouldBeLeftAnd
-import io.sdkman.broker.test.shouldBeRight
+import io.sdkman.broker.support.MongoTestListener
+import io.sdkman.broker.support.shouldBeLeft
+import io.sdkman.broker.support.shouldBeLeftAnd
+import io.sdkman.broker.support.shouldBeRight
 
 /**
  * Integration test for the MongoDB implementation of ApplicationRepository.

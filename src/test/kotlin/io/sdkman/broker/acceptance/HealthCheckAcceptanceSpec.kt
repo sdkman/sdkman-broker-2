@@ -5,9 +5,9 @@ import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import io.sdkman.broker.test.MongoTestListener
-import io.sdkman.broker.test.TestDependencyInjection
-import io.sdkman.broker.test.configureAppForTesting
+import io.sdkman.broker.support.MongoTestListener
+import io.sdkman.broker.support.TestDependencyInjection
+import io.sdkman.broker.support.configureAppForTesting
 
 /**
  * Acceptance tests for the health check endpoint based on BDD scenarios.

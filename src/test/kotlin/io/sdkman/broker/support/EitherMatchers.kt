@@ -1,4 +1,4 @@
-package io.sdkman.broker.test
+package io.sdkman.broker.support
 
 import arrow.core.Either
 import io.kotest.matchers.Matcher

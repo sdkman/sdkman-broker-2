@@ -1,4 +1,4 @@
-package io.sdkman.broker.test
+package io.sdkman.broker.support
 
 import com.mongodb.MongoClient
 import io.kotest.core.listeners.TestListener
@@ -39,5 +39,4 @@ object MongoTestListener : TestListener {
         System.setProperty("mongodb.uri", "mongodb://$host:$port")
         System.setProperty("mongodb.database", "sdkman")
     }
-    
 } 

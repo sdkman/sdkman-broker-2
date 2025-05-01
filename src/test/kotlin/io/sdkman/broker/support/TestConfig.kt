@@ -1,4 +1,4 @@
-package io.sdkman.broker.test
+package io.sdkman.broker.support
 
 import io.ktor.server.application.Application
 import io.sdkman.broker.application.service.HealthService

@@ -1,4 +1,4 @@
-package io.sdkman.broker.test
+package io.sdkman.broker.support
 
 import com.mongodb.MongoClient
 import com.mongodb.MongoClientURI
