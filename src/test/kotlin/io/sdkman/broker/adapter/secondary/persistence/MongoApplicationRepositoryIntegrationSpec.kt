@@ -8,6 +8,9 @@ import io.kotest.matchers.types.shouldBeTypeOf
 import io.sdkman.broker.domain.model.Application
 import io.sdkman.broker.domain.repository.RepositoryError
 import io.sdkman.broker.test.MongoTestListener
+import io.sdkman.broker.test.shouldBeLeft
+import io.sdkman.broker.test.shouldBeLeftAnd
+import io.sdkman.broker.test.shouldBeRight
 
 /**
  * Integration test for the MongoDB implementation of ApplicationRepository.
@@ -25,15 +28,9 @@ class MongoApplicationRepositoryIntegrationSpec : ShouldSpec({
         val result = repository.findApplication()
         
         // then
-        result.isRight() shouldBe true
-        result.fold(
-            { error -> throw RuntimeException("Repository error: $error") },
-            { applicationOption ->
-                Application.of("OK").fold(
-                    { error -> throw RuntimeException("Failed to create test application: $error") },
-                    { expectedApp -> applicationOption shouldBe Some(expectedApp) }
-                )
-            }
+        Application.of("OK").fold(
+            { error -> throw RuntimeException("Failed to create test application: $error") },
+            { expectedApp -> result shouldBeRight Some(expectedApp) }
         )
     }
     
@@ -44,13 +41,7 @@ class MongoApplicationRepositoryIntegrationSpec : ShouldSpec({
         val result = repository.findApplication()
         
         // then
-        result.isRight() shouldBe true
-        result.fold(
-            { error -> throw RuntimeException("Repository error: $error") },
-            { applicationOption ->
-                applicationOption shouldBe None
-            }
-        )
+        result shouldBeRight None
     }
     
     should("return an error when application record has invalid alive status") {
@@ -61,7 +52,6 @@ class MongoApplicationRepositoryIntegrationSpec : ShouldSpec({
         val result = repository.findApplication()
         
         // then
-        //TODO: Write Either matchers for Kotest
-        result.isLeft() shouldBe true
+        result shouldBeLeftAnd { it is RepositoryError.DatabaseError }
     }
 })

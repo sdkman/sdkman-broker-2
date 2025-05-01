@@ -13,6 +13,9 @@ import io.sdkman.broker.application.service.HealthStatus
 import io.sdkman.broker.domain.model.Application
 import io.sdkman.broker.domain.repository.ApplicationRepository
 import io.sdkman.broker.domain.repository.RepositoryError
+import io.sdkman.broker.test.shouldBeLeft
+import io.sdkman.broker.test.shouldBeLeftAnd
+import io.sdkman.broker.test.shouldBeRight
 
 /**
  * Unit test for the HealthService implementation.
@@ -32,12 +35,7 @@ class HealthServiceSpec : ShouldSpec({
         val result = service.checkHealth()
         
         // then
-        //TODO: Write Either matchers for Kotest
-        result.isRight() shouldBe true
-        result.fold(
-            { error -> throw IllegalStateException("Unexpected error: $error") },
-            { status -> status shouldBe HealthStatus.UP }
-        )
+        result shouldBeRight HealthStatus.UP
     }
     
     should("return ApplicationNotFound error when application record doesn't exist") {
@@ -49,12 +47,7 @@ class HealthServiceSpec : ShouldSpec({
         val result = service.checkHealth()
         
         // then
-        //TODO: Write Either matchers for Kotest
-        result.isLeft() shouldBe true
-        result.fold(
-            { error -> error shouldBe HealthCheckError.ApplicationNotFound },
-            { throw AssertionError("Expected Left but got Right with $it") }
-        )
+        result shouldBeLeft HealthCheckError.ApplicationNotFound
     }
     
     should("return DatabaseError when repository encounters a database error") {
@@ -67,12 +60,7 @@ class HealthServiceSpec : ShouldSpec({
         val result = service.checkHealth()
         
         // then
-        //TODO: Write Either matchers for Kotest
-        result.isLeft() shouldBe true
-        result.fold(
-            { error -> error::class shouldBe HealthCheckError.DatabaseError::class },
-            { throw AssertionError("Expected Left but got Right with $it") }
-        )
+        result shouldBeLeftAnd { it is HealthCheckError.DatabaseError }
     }
 })
 
