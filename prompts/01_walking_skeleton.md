@@ -3,6 +3,7 @@
 Generate an application that implements the **smallest possible slice** of functionality, namely the **health check** feature. This health check should be **deep** and span all layers of the application:
 
 * An acceptance test that calls the healthcheck endpoint
+* An entry point application called `App` in the `io.sdkman.broker` package
 * An HTTP handler that accepts a health check request
 * Delegates to the `ApplicationRepo` to fetch the single record in that collection
 * Reads the `alive` field and verifies that the value is `OK`
@@ -10,13 +11,14 @@ Generate an application that implements the **smallest possible slice** of funct
 ## Stack
 
 Use the following tech stack to implement the app:
-* JDK 21
+* JDK (and JVM) target version 21
 * Kotlin (latest stable)
 * Arrow
 * Ktor
-* KMongo
+* Kotlin MongoDB Driver
 * Kotest
 * TestContainers
+* MongoDB 3.2 **IMPORTANT: DON'T USE LATEST VERSION**
 * Gradle (latest 8.x)
 
 It should re-implement the health check following exactly what is described in the @legacy_broker_service.md file, including URL, response codes etc.
@@ -62,4 +64,5 @@ Feature: Alive
 ## Acceptance Criteria
 
 * All tests must pass when running `./gradlew check`
+* Static analysis must pass when running `./gradlew detekt`
 * We have a simple application, fit for deployment
