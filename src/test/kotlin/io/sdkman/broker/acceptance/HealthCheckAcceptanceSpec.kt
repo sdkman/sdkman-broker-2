@@ -5,8 +5,9 @@ import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import io.sdkman.broker.module
 import io.sdkman.broker.test.MongoTestListener
+import io.sdkman.broker.test.TestDependencyInjection
+import io.sdkman.broker.test.configureAppForTesting
 
 /**
  * Acceptance tests for the health check endpoint based on BDD scenarios.
@@ -17,6 +18,10 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
         listeners(MongoTestListener)
     }
     
+    override suspend fun afterSpec(spec: io.kotest.core.spec.Spec) {
+        TestDependencyInjection.close()
+    }
+    
     init {
         should("return 200 OK when database is healthy") {
             // given: an initialised database
@@ -24,7 +29,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
             
             // when: a GET request is made for "/health/alive"
             testApplication {
-                application { module() }
+                application { configureAppForTesting(TestDependencyInjection.healthService) }
                 val response = client.get("/health/alive")
                 
                 // then: the service response status is 200
@@ -37,7 +42,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
             
             // when: a GET request is made for "/health/alive"
             testApplication {
-                application { module() }
+                application { configureAppForTesting(TestDependencyInjection.healthService) }
                 val response = client.get("/health/alive")
                 
                 // then: the service response status is 503
@@ -51,7 +56,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
             
             // when: a GET request is made for "/health/alive"
             testApplication {
-                application { module() }
+                application { configureAppForTesting(TestDependencyInjection.healthService) }
                 val response = client.get("/health/alive")
                 
                 // then: the service response status is 503
@@ -65,7 +70,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
             
             // when: a GET request is made for "/health/alive"
             testApplication {
-                application { module() }
+                application { configureAppForTesting(TestDependencyInjection.healthService) }
                 val response = client.get("/health/alive")
                 
                 // then: the service response status is 503
