@@ -22,7 +22,7 @@ Use the following tech stack to implement the app:
 * Java MongoDB sync driver compatible with MongoDB 3.2
 * Gradle (latest 8.x)
 
-Do NOT attepmpt to use an Arrow testing library, rather create own custom assertions!
+Do NOT attepmpt to use an Arrow Kotest library, rather create own custom assertions!
 
 It should re-implement the health check following exactly what is described in the @legacy_broker_service.md file, including URL, response codes etc.
 
@@ -31,6 +31,7 @@ It should re-implement the health check following exactly what is described in t
 * follow the Kotlin style guide rules @kotlin-rules.md
 * follow the Kotlin Testing rules @testing-rules.md
 * follow the DDD guideline rules @ddd-rules.md
+* follow the Hexagonal Architecture rules @hexagonal-architecture-rules.md
 
 ## Extra considerations
 
@@ -40,11 +41,10 @@ It should re-implement the health check following exactly what is described in t
 * Acceptance test to run against the application, running on a fixed port on `localhost`
 * Use test data as described in the @legacy_broker_service.md
 * We'll migrate to a different database in the future, so keep the persistence layer flexible with an SPI.
-* Add an `.sdkmanrc` file to peg the JDK version
 
 ## BDD
 
-We won't be using Cucumber, but this sums up the expected behaviour:
+We won't be using Cucumber, but this sums up the expected behaviour to be tested in the acceptance test:
 
 ```gherkin
 Feature: Alive
@@ -53,13 +53,18 @@ Feature: Alive
 		When a GET request is made for "/health/alive"
 		Then the service response status is 200
 
+	Scenario: Database is empty
+		Given an uninitialised database with NO application record
+		When a GET request is made for "/health/alive"
+		Then the service response status is 503
+
 	Scenario: Database is inconsistent
-		Given an uninitialised database
+		Given an uninitialised database with an invalid application record
 		When a GET request is made for "/health/alive"
 		Then the service response status is 503
 
 	Scenario: Database is inaccessible
-		Given an inaccessible database
+		Given an inaccessible database due to connectivity issues
 		When a GET request is made for "/health/alive"
 		Then the service response status is 503
 ```
