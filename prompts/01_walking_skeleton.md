@@ -68,5 +68,4 @@ Feature: Alive
 
 * All tests must pass when running `./gradlew check`
 * All code is formatted properly with `./gradlew ktlintFormat`
-* Only once tests are passing, ensure that static analysis passes with `./gradlew detekt` without changing rules!
 * We have a simple application, fit for deployment
