@@ -8,9 +8,9 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.sdkman.broker.application.service.HealthService
+import io.sdkman.broker.configureTestApplication
 import io.sdkman.broker.infra.mongo.MongoAppRepository
 import io.sdkman.broker.test.MongoContainer
-import io.sdkman.broker.test.configureTestApplication
 import kotlinx.serialization.json.Json
 
 /**
