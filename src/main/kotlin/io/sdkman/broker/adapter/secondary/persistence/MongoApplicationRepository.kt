@@ -13,9 +13,6 @@ import io.sdkman.broker.domain.repository.ApplicationRepository
 import io.sdkman.broker.domain.repository.RepositoryError
 import org.bson.Document
 
-/**
- * MongoDB implementation of the ApplicationRepository interface.
- */
 class MongoApplicationRepository(private val database: MongoDatabase) : ApplicationRepository {
 
     companion object {

@@ -15,9 +15,6 @@ import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.config.AppConfig
 import kotlinx.serialization.json.Json
 
-/**
- * Main entry point for the SDKMAN Broker application.
- */
 fun main() {
     val config = AppConfig()
     
@@ -37,10 +34,6 @@ fun main() {
     }.start(wait = true)
 }
 
-/**
- * Configures the application with the provided services.
- * Used both in production and tests.
- */
 fun Application.configureApp(healthService: HealthService) {
     // Install plugins
     install(ContentNegotiation) {

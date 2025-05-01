@@ -7,10 +7,6 @@ import org.bson.Document
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.utility.DockerImageName
 
-/**
- * Shared MongoDB test container listener for tests.
- * Centralizes MongoDB setup, connection management and cleanup.
- */
 object MongoTestListener : TestListener {
     private val mongoContainer = MongoDBContainer(DockerImageName.parse("mongo:3.2"))
         .apply { start() }

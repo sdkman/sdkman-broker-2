@@ -12,15 +12,9 @@ import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthStatus
 import kotlinx.serialization.Serializable
 
-/**
- * Health check response data class.
- */
 @Serializable
 data class HealthResponse(val status: String, val reason: String? = null)
 
-/**
- * Configures health check routes for the Ktor application.
- */
 fun Application.healthRoutes(healthService: HealthService) {
     routing {
         get("/health/alive") {
@@ -33,9 +27,6 @@ fun Application.healthRoutes(healthService: HealthService) {
     }
 }
 
-/**
- * Handles successful health status by returning appropriate HTTP response.
- */
 private suspend fun ApplicationCall.handleHealthStatus(status: HealthStatus) {
     when (status) {
         HealthStatus.UP -> respond(HttpStatusCode.OK, HealthResponse("UP"))
@@ -43,9 +34,6 @@ private suspend fun ApplicationCall.handleHealthStatus(status: HealthStatus) {
     }
 }
 
-/**
- * Handles health check errors by returning appropriate HTTP error responses.
- */
 private suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
     val response = when (error) {
         is HealthCheckError.DatabaseUnavailable -> {

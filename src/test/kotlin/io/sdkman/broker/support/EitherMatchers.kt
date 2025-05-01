@@ -6,13 +6,7 @@ import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldNot
 
-/**
- * Custom matchers for Arrow's Either type to improve test readability.
- */
 
-/**
- * Asserts that an Either is Right and its value matches the expected value.
- */
 fun <L, R> beRight(expected: R): Matcher<Either<L, R>> = object : Matcher<Either<L, R>> {
     override fun test(value: Either<L, R>): MatcherResult {
         return when (value) {
@@ -30,9 +24,6 @@ fun <L, R> beRight(expected: R): Matcher<Either<L, R>> = object : Matcher<Either
     }
 }
 
-/**
- * Asserts that an Either is Right and its value satisfies the given predicate.
- */
 fun <L, R> beRightAnd(predicate: (R) -> Boolean): Matcher<Either<L, R>> = object : Matcher<Either<L, R>> {
     override fun test(value: Either<L, R>): MatcherResult {
         return when (value) {
@@ -50,9 +41,6 @@ fun <L, R> beRightAnd(predicate: (R) -> Boolean): Matcher<Either<L, R>> = object
     }
 }
 
-/**
- * Asserts that an Either is Left and its value matches the expected value.
- */
 fun <L, R> beLeft(expected: L): Matcher<Either<L, R>> = object : Matcher<Either<L, R>> {
     override fun test(value: Either<L, R>): MatcherResult {
         return when (value) {
@@ -70,9 +58,6 @@ fun <L, R> beLeft(expected: L): Matcher<Either<L, R>> = object : Matcher<Either<
     }
 }
 
-/**
- * Asserts that an Either is Left and its value satisfies the given predicate.
- */
 fun <L, R> beLeftAnd(predicate: (L) -> Boolean): Matcher<Either<L, R>> = object : Matcher<Either<L, R>> {
     override fun test(value: Either<L, R>): MatcherResult {
         return when (value) {
@@ -90,9 +75,6 @@ fun <L, R> beLeftAnd(predicate: (L) -> Boolean): Matcher<Either<L, R>> = object 
     }
 }
 
-/**
- * Extension functions for more natural syntax
- */
 infix fun <L, R> Either<L, R>.shouldBeRight(expected: R) = this should beRight(expected)
 infix fun <L, R> Either<L, R>.shouldNotBeRight(expected: R) = this shouldNot beRight(expected)
 infix fun <L, R> Either<L, R>.shouldBeLeft(expected: L) = this should beLeft(expected)

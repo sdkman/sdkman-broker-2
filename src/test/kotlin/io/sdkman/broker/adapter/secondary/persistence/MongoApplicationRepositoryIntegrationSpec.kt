@@ -12,9 +12,6 @@ import io.sdkman.broker.support.shouldBeLeft
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRight
 
-/**
- * Integration test for the MongoDB implementation of ApplicationRepository.
- */
 class MongoApplicationRepositoryIntegrationSpec : ShouldSpec({
     listener(MongoTestListener)
     

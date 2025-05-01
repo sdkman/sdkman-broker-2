@@ -7,9 +7,6 @@ import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.config.AppConfig
 
-/**
- * Test-specific dependency injection that uses the test MongoDB instance.
- */
 object TestDependencyInjection {
     private val config = AppConfig()
     private val mongoClient by lazy {

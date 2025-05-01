@@ -18,9 +18,6 @@ import io.sdkman.broker.support.shouldBeLeft
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRight
 
-/**
- * Unit test for the HealthService implementation.
- */
 class HealthServiceSpec : ShouldSpec({
     val applicationOK = Application.of("OK").fold(
         { error -> throw IllegalStateException("Failed to create test application: $error") },

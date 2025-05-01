@@ -9,9 +9,6 @@ import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
 
-/**
- * Acceptance tests for the health check endpoint based on BDD scenarios.
- */
 class HealthCheckAcceptanceSpec : ShouldSpec() {
     
     override suspend fun beforeSpec(spec: io.kotest.core.spec.Spec) {

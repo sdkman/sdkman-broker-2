@@ -3,9 +3,6 @@ package io.sdkman.broker.config
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 
-/**
- * Application configuration class that loads settings from HOCON configuration files.
- */
 class AppConfig {
     private val config: Config = ConfigFactory.load()
     

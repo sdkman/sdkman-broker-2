@@ -532,6 +532,106 @@ sealed interface StorageResult<out T> {
 
 ---
 
+## 12 Self-Documenting Code
+
+### 12.1 Clear Naming Over Comments
+
+* Code should be self-explanatory through thoughtful naming
+* Method, class, and variable names should clearly express their purpose and intent
+* **No JavaDoc-style comments** (`/** ... */`) are allowed in the codebase
+
+```kotlin
+// AVOID this:
+/**
+ * Processes the customer order by validating it and charging the payment
+ * @param orderId The ID of the order to process
+ * @return true if order was processed successfully
+ */
+fun process(orderId: String): Boolean
+
+// PREFER this:
+fun validateAndProcessCustomerOrder(orderId: String): Either<OrderProcessingError, ProcessedOrder>
+```
+
+### 12.2 Naming Guidelines
+
+* **Classes**: Use nouns that clearly describe the entity
+* **Methods**: Use verb phrases that describe the action
+* **Variables**: Use descriptive nouns that indicate purpose, not implementation
+* **Boolean variables/functions**: Use prefixes like `is`, `has`, or `should`
+
+```kotlin
+// AVOID:
+val s = "John Doe"
+fun proc(): Boolean
+
+// PREFER:
+val customerFullName = "John Doe"
+fun isEligibleForDiscount(): Boolean
+```
+
+### 12.3 Acceptable Comments
+
+* Use single-line comments (`//`) sparingly and only when:
+  * Explaining "why" rather than "what" or "how"
+  * Documenting non-obvious edge cases or constraints
+  * Marking TODOs for future improvements (with clear action items)
+
+```kotlin
+// REASONABLE comments:
+// Using 15 minutes (900 seconds) as timeout to comply with API rate limits
+val requestTimeout = 900
+
+// Force refresh token if less than 10 minutes remaining before expiry
+if (tokenExpiryTime - currentTime < 600) {
+    refreshAuthToken()
+}
+```
+
+### 12.4 Code Organization for Readability
+
+* Break complex methods into smaller, well-named helper methods
+* Group related functionality together
+* Place the most important code first in files and methods
+* Use meaningful parameter naming rather than comments:
+
+```kotlin
+// AVOID:
+fun sendEmail(recipient: String, subject: String, body: String, isHtml: Boolean)
+
+// PREFER:
+data class EmailContent(
+    val subject: String,
+    val body: String,
+    val isHtmlFormat: Boolean = false
+)
+fun sendEmailTo(recipient: String, content: EmailContent)
+```
+
+### 12.5 Functions as Documentation
+
+* Extract complex logic into well-named functions that serve as their own documentation
+* Function names should describe their full purpose and side effects
+* Single-responsibility functions reduce the need for comments
+
+```kotlin
+// AVOID:
+// Check if user is active and has admin privileges
+if (user.status == "ACTIVE" && user.role == "ADMIN") {
+    // ... logic here
+}
+
+// PREFER:
+fun isActiveAdministrator(user: User): Boolean =
+    user.status == "ACTIVE" && user.role == "ADMIN"
+
+if (isActiveAdministrator(user)) {
+    // ... logic here
+}
+```
+
+---
+
 ### TL;DR
 
 1. **Immutability**: Use `val`, immutable collections, and data classes.
@@ -542,5 +642,6 @@ sealed interface StorageResult<out T> {
 6. **Collection Operations**: Use functional operators (`map`, `filter`, `fold`) instead of loops.
 7. **Domain Modeling**: Use data classes, sealed classes, and value types for rich domain models.
 8. **Side Effects**: Isolate and manage side effects with Arrow's `IO`.
+9. **Self-Documenting Code**: Use clear naming conventions instead of comments; no JavaDoc-style comments allowed.
 
 Place this file with your other Cursor rules to guide AI-generated Kotlin code toward functional best practices.
