@@ -15,11 +15,14 @@ Use the following tech stack to implement the app:
 * Kotlin (latest stable)
 * Arrow
 * Ktor
-* Kotlin MongoDB Driver
+* Typesafe config with HOCON configuration
 * Kotest
 * TestContainers
 * MongoDB 3.2 **IMPORTANT: DON'T USE LATEST VERSION**
+* Java MongoDB sync driver compatible with MongoDB 3.2
 * Gradle (latest 8.x)
+
+Do NOT attepmpt to use an Arrow testing library, rather create own custom assertions!
 
 It should re-implement the health check following exactly what is described in the @legacy_broker_service.md file, including URL, response codes etc.
 
@@ -64,5 +67,6 @@ Feature: Alive
 ## Acceptance Criteria
 
 * All tests must pass when running `./gradlew check`
-* Static analysis must pass when running `./gradlew detekt`
+* All code is formatted properly with `./gradlew ktlintFormat`
+* Only once tests are passing, ensure that static analysis passes with `./gradlew detekt` without changing rules!
 * We have a simple application, fit for deployment
