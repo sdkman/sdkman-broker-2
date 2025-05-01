@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
@@ -5,7 +7,7 @@ plugins {
     id("pl.allegro.tech.build.axion-release") version "1.18.18"
     id("com.google.cloud.tools.jib") version "3.4.1"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
-    id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    id("io.gitlab.arturbosch.detekt") version "1.23.4"
 }
 
 group = "io.sdkman"
@@ -44,8 +46,8 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     // MongoDB
-    implementation("org.litote.kmongo:kmongo:4.11.0")
-
+    //TODO: Add MongoDB driver for MongoDB 3.2!!!
+    
     // Logging
     implementation("ch.qos.logback:logback-classic:1.4.14")
 
@@ -91,7 +93,7 @@ jib {
             mapOf(
                 "MONGODB_URI" to "mongodb://localhost:27017",
                 "MONGODB_DATABASE" to "sdkman",
-            )
+        )
         // A sensible default for production containers
         user = "1000"
     }
@@ -103,6 +105,7 @@ ktlint {
     verbose.set(true)
     android.set(false)
     outputToConsole.set(true)
+    ignoreFailures.set(false)
     filter {
         exclude("**/generated/**")
         include("**/kotlin/**")
@@ -111,12 +114,11 @@ ktlint {
 
 // Configure Detekt
 detekt {
-    toolVersion = "1.23.8"
-    config = files("config/detekt/detekt.yml")
+    config = files("$projectDir/config/detekt/detekt.yml")
     buildUponDefaultConfig = true
     allRules = false
     autoCorrect = true
-    baseline = file("config/detekt/baseline.xml")
+    baseline = file("$projectDir/config/detekt/baseline.xml")
 }
 
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
@@ -130,5 +132,5 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
 
 tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
     jvmTarget = "21"
-    baseline.set(file("config/detekt/baseline.xml"))
+    baseline.set(file("$projectDir/config/detekt/baseline.xml"))
 }
