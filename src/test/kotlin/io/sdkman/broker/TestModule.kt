@@ -1,4 +1,4 @@
-package io.sdkman.broker.test
+package io.sdkman.broker
 
 import io.ktor.server.application.Application
 import io.sdkman.broker.interfaces.api.HealthHandler

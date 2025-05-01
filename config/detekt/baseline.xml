@@ -2,7 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
-    <ID>InvalidPackageDeclaration:TestModule.kt$package io.sdkman.broker.test</ID>
     <ID>MagicNumber:Application.kt$8080</ID>
     <ID>TooGenericExceptionCaught:Application.kt$e: Exception</ID>
   </CurrentIssues>
