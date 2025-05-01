@@ -1,5 +1,5 @@
 ---
-description: 
+description: Language-agnostic Domain-Driven Design principles for modeling complex systems with explicit boundaries
 globs: 
 alwaysApply: false
 ---

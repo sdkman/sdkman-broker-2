@@ -1,7 +1,7 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+description: Kotlin testing conventions with Kotest, Testcontainers, and Wiremock for structured test layers
+globs: ["**/src/test/**/*Spec.kt"]
+alwaysApply: true
 ---
 # Kotlin Testing Rules
 

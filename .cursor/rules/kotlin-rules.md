@@ -1,7 +1,7 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+description: Functional Kotlin guidelines with Arrow for AI-generated code
+globs: ["**/*.kt"]
+alwaysApply: true
 ---
  # Kotlin Functional Programming Style Guide
 

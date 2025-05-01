@@ -1,5 +1,5 @@
 ---
-description: 
+description: Guidelines for implementing Hexagonal (Ports and Adapters) Architecture to isolate domain logic from external concerns
 globs: 
 alwaysApply: false
 ---
