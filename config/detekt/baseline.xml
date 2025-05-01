@@ -1,8 +1,6 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
-    <ID>MagicNumber:Application.kt$8080</ID>
-    <ID>TooGenericExceptionCaught:Application.kt$e: Exception</ID>
   </CurrentIssues>
 </SmellBaseline>

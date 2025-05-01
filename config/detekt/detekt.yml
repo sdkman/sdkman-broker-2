@@ -620,23 +620,7 @@ style:
     active: true
     maxJumpCount: 1
   MagicNumber:
-    active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts']
-    ignoreNumbers:
-      - '-1'
-      - '0'
-      - '1'
-      - '2'
-    ignoreHashCodeFunction: true
-    ignorePropertyDeclaration: false
-    ignoreLocalVariableDeclaration: false
-    ignoreConstantDeclaration: true
-    ignoreCompanionObjectPropertyDeclaration: true
-    ignoreAnnotation: false
-    ignoreNamedArgument: true
-    ignoreEnums: false
-    ignoreRanges: false
-    ignoreExtensionFunctions: true
+    active: false
   MandatoryBracesLoops:
     active: false
   MaxChainedCallsOnSameLine:
@@ -795,3 +779,23 @@ style:
     active: true
     excludeImports:
       - 'java.util.*'
+
+formatting:
+  active: true
+  autoCorrect: true
+  
+  AnnotationOnSeparateLine:
+    active: true
+    autoCorrect: true
+
+  Indentation:
+    active: true
+    autoCorrect: true
+    indentSize: 4
+
+  MaximumLineLength:
+    active: true
+    maxLineLength: 120
+    
+  Filename:
+    active: true
