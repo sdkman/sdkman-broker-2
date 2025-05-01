@@ -6,7 +6,8 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.right
 import io.kotest.core.spec.style.ShouldSpec
-import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import io.sdkman.broker.application.service.HealthCheckError
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.HealthStatus
@@ -28,7 +29,8 @@ class HealthServiceSpec : ShouldSpec({
     
     should("return UP status when application record exists and is valid") {
         // given
-        val mockRepo = MockApplicationRepository(Some(applicationOK).right())
+        val mockRepo = mockk<ApplicationRepository>()
+        every { mockRepo.findApplication() } returns Some(applicationOK).right()
         val service = HealthServiceImpl(mockRepo)
         
         // when
@@ -40,7 +42,8 @@ class HealthServiceSpec : ShouldSpec({
     
     should("return ApplicationNotFound error when application record doesn't exist") {
         // given
-        val mockRepo = MockApplicationRepository(None.right())
+        val mockRepo = mockk<ApplicationRepository>()
+        every { mockRepo.findApplication() } returns None.right()
         val service = HealthServiceImpl(mockRepo)
         
         // when
@@ -53,7 +56,8 @@ class HealthServiceSpec : ShouldSpec({
     should("return DatabaseError when repository encounters a database error") {
         // given
         val dbError = RepositoryError.DatabaseError(RuntimeException("DB error"))
-        val mockRepo = MockApplicationRepository(Either.Left(dbError))
+        val mockRepo = mockk<ApplicationRepository>()
+        every { mockRepo.findApplication() } returns Either.Left(dbError)
         val service = HealthServiceImpl(mockRepo)
         
         // when
@@ -62,14 +66,4 @@ class HealthServiceSpec : ShouldSpec({
         // then
         result shouldBeLeftAnd { it is HealthCheckError.DatabaseError }
     }
-})
-
-/**
- * Mock implementation of ApplicationRepository for testing.
- */
-//TODO: Use Mockk instead
-class MockApplicationRepository(
-    private val returnValue: Either<RepositoryError, Option<Application>>
-) : ApplicationRepository {
-    override fun findApplication(): Either<RepositoryError, Option<Application>> = returnValue
-} 
+}) 
