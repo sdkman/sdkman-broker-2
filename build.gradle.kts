@@ -44,11 +44,8 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-
-    // MongoDB
-    //TODO: Add MongoDB driver for MongoDB 3.2!!!
-    
-    // Logging
+    implementation("org.mongodb:mongo-java-driver:3.12.14")
+    implementation("com.typesafe:config:1.4.3")
     implementation("ch.qos.logback:logback-classic:1.4.14")
 
     // Testing
@@ -57,6 +54,8 @@ dependencies {
     testImplementation("io.arrow-kt:arrow-core:$arrowVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.testcontainers:mongodb:1.19.3")
+    testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")
+    testImplementation("io.mockk:mockk:1.13.9")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
