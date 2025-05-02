@@ -6,4 +6,4 @@ import io.sdkman.broker.configureApp
 
 fun Application.configureAppForTesting(healthService: HealthService) {
     configureApp(healthService)
-} 
+}

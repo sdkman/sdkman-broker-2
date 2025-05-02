@@ -91,8 +91,8 @@ jib {
         environment =
             mapOf(
                 "MONGODB_URI" to "mongodb://localhost:27017",
-                "MONGODB_DATABASE" to "sdkman",
-        )
+                "MONGODB_DATABASE" to "sdkman"
+            )
         // A sensible default for production containers
         user = "1000"
     }
@@ -113,7 +113,7 @@ ktlint {
 
 // Configure Detekt
 detekt {
-    config = files("$projectDir/config/detekt/detekt.yml")
+    config.setFrom(files("$projectDir/config/detekt/detekt.yml"))
     buildUponDefaultConfig = true
     allRules = false
     autoCorrect = true

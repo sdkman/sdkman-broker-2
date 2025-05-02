@@ -12,20 +12,20 @@ object TestDependencyInjection {
     private val mongoClient by lazy {
         MongoClient(MongoClientURI(System.getProperty("mongodb.uri", config.mongodbUri)))
     }
-    
+
     private val database by lazy {
         mongoClient.getDatabase(config.mongodbDatabase)
     }
-    
+
     private val applicationRepository by lazy {
         MongoApplicationRepository(database)
     }
-    
+
     val healthService: HealthService by lazy {
         HealthServiceImpl(applicationRepository)
     }
-    
+
     fun close() {
         mongoClient.close()
     }
-} 
+}

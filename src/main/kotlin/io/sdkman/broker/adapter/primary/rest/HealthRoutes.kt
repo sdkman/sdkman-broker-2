@@ -32,22 +32,23 @@ private suspend fun ApplicationCall.handleHealthStatus(status: HealthStatus) {
 }
 
 private suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
-    val response = when (error) {
-        is HealthCheckError.DatabaseUnavailable -> {
-            HealthResponse("DOWN", "Database unavailable: ${error.cause.message}")
+    val response =
+        when (error) {
+            is HealthCheckError.DatabaseUnavailable -> {
+                HealthResponse("DOWN", "Database unavailable: ${error.cause.message}")
+            }
+            is HealthCheckError.DatabaseError -> {
+                HealthResponse("DOWN", "Database error: ${error.cause.message}")
+            }
+            is HealthCheckError.ApplicationNotFound -> {
+                HealthResponse("DOWN", "Application record not found")
+            }
+            is HealthCheckError.InvalidApplicationState -> {
+                HealthResponse("DOWN", "Application in invalid state")
+            }
         }
-        is HealthCheckError.DatabaseError -> {
-            HealthResponse("DOWN", "Database error: ${error.cause.message}")
-        }
-        is HealthCheckError.ApplicationNotFound -> {
-            HealthResponse("DOWN", "Application record not found")
-        }
-        is HealthCheckError.InvalidApplicationState -> {
-            HealthResponse("DOWN", "Application in invalid state")
-        }
-    }
     respond(HttpStatusCode.ServiceUnavailable, response)
-} 
+}
 
 @Serializable
-data class HealthResponse(val status: String, val reason: String? = null) 
+data class HealthResponse(val status: String, val reason: String? = null)

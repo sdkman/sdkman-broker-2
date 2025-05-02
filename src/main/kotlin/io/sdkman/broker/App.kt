@@ -17,17 +17,17 @@ import kotlinx.serialization.json.Json
 
 fun main() {
     val config = AppConfig()
-    
+
     // Create MongoDB client
     val mongoClient = MongoClient(MongoClientURI(config.mongodbUri))
     val database = mongoClient.getDatabase(config.mongodbDatabase)
-    
+
     // Initialize repositories
     val applicationRepository = MongoApplicationRepository(database)
-    
+
     // Initialize services
     val healthService = HealthServiceImpl(applicationRepository)
-    
+
     // Start Ktor server
     embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
         configureApp(healthService)
@@ -37,14 +37,16 @@ fun main() {
 fun Application.configureApp(healthService: HealthService) {
     // Install plugins
     install(ContentNegotiation) {
-        json(Json {
-            prettyPrint = true
-            isLenient = true
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-        })
+        json(
+            Json {
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true
+                encodeDefaults = true
+            }
+        )
     }
-    
+
     // Configure routes
     healthRoutes(healthService)
-} 
+}

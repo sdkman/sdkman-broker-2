@@ -14,7 +14,6 @@ import io.sdkman.broker.domain.repository.RepositoryError
 import org.bson.Document
 
 class MongoApplicationRepository(private val database: MongoDatabase) : ApplicationRepository {
-
     companion object {
         private const val COLLECTION_NAME = "application"
         private const val ALIVE_FIELD = "alive"
@@ -28,7 +27,7 @@ class MongoApplicationRepository(private val database: MongoDatabase) : Applicat
                     { doc -> processDocument(doc) }
                 )
             }
-    
+
     private fun findDocument(): Either<RepositoryError, Option<Document>> =
         Either.catch {
             Option.fromNullable(
@@ -46,14 +45,13 @@ class MongoApplicationRepository(private val database: MongoDatabase) : Applicat
     private fun processDocument(document: Document): Either<RepositoryError, Option<Application>> =
         Either.catch { document.getString(ALIVE_FIELD) }
             .mapLeft { error -> RepositoryError.DatabaseError(error) }
-            .flatMap { aliveStatus -> 
+            .flatMap { aliveStatus ->
                 Application.of(aliveStatus)
-                    .mapLeft { error -> 
+                    .mapLeft { error ->
                         val errorMsg = "Invalid application record: $error"
-                        RepositoryError.DatabaseError(
-                            IllegalStateException(errorMsg)
-                        ) 
+                        val exception = IllegalStateException(errorMsg)
+                        RepositoryError.DatabaseError(exception)
                     }
                     .map { app -> Some(app) }
             }
-} 
+}
