@@ -12,9 +12,6 @@ import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthStatus
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class HealthResponse(val status: String, val reason: String? = null)
-
 fun Application.healthRoutes(healthService: HealthService) {
     routing {
         get("/health/alive") {
@@ -51,3 +48,6 @@ private suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
     }
     respond(HttpStatusCode.ServiceUnavailable, response)
 } 
+
+@Serializable
+data class HealthResponse(val status: String, val reason: String? = null) 
