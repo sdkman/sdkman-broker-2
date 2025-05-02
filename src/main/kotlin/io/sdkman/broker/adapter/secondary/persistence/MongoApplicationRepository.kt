@@ -48,7 +48,12 @@ class MongoApplicationRepository(private val database: MongoDatabase) : Applicat
             .mapLeft { error -> RepositoryError.DatabaseError(error) }
             .flatMap { aliveStatus -> 
                 Application.of(aliveStatus)
-                    .mapLeft { error -> RepositoryError.DatabaseError(IllegalStateException("Invalid application record: $error")) }
+                    .mapLeft { error -> 
+                        val errorMsg = "Invalid application record: $error"
+                        RepositoryError.DatabaseError(
+                            IllegalStateException(errorMsg)
+                        ) 
+                    }
                     .map { app -> Some(app) }
             }
 } 
