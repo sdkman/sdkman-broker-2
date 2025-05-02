@@ -44,11 +44,11 @@ console-reports:
 output-reports:
   active: true
   exclude:
+  - 'XmlOutputReport'
+  - 'SarifOutputReport'
   # - 'TxtOutputReport'
-  # - 'XmlOutputReport'
   # - 'HtmlOutputReport'
   # - 'MdOutputReport'
-  # - 'SarifOutputReport'
 
 comments:
   active: true
@@ -81,7 +81,6 @@ comments:
     searchInInnerObject: true
     searchInInnerInterface: true
     searchInProtectedClass: false
-    ignoreDefaultCompanionObject: false
   UndocumentedPublicFunction:
     active: false
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
@@ -176,7 +175,6 @@ complexity:
     ignoreDeprecated: false
     ignorePrivate: false
     ignoreOverridden: false
-    ignoreAnnotatedFunctions: []
 
 coroutines:
   active: true
@@ -349,17 +347,6 @@ naming:
   MatchingDeclarationName:
     active: true
     mustBeFirst: true
-    multiplatformTargets:
-      - 'ios'
-      - 'android'
-      - 'js'
-      - 'jvm'
-      - 'native'
-      - 'iosArm64'
-      - 'iosX64'
-      - 'macosX64'
-      - 'mingwX64'
-      - 'linuxX64'
   MemberNameEqualsClassName:
     active: true
     ignoreOverridden: true
@@ -780,22 +767,4 @@ style:
     excludeImports:
       - 'java.util.*'
 
-formatting:
-  active: true
-  autoCorrect: true
-  
-  AnnotationOnSeparateLine:
-    active: true
-    autoCorrect: true
 
-  Indentation:
-    active: true
-    autoCorrect: true
-    indentSize: 4
-
-  MaximumLineLength:
-    active: true
-    maxLineLength: 120
-    
-  Filename:
-    active: true
