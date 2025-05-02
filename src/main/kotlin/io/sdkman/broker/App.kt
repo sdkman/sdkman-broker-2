@@ -15,23 +15,26 @@ import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.config.AppConfig
 import kotlinx.serialization.json.Json
 
-fun main() {
-    val config = AppConfig()
+object App {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val config = AppConfig()
 
-    // Create MongoDB client
-    val mongoClient = MongoClient(MongoClientURI(config.mongodbUri))
-    val database = mongoClient.getDatabase(config.mongodbDatabase)
+        // Create MongoDB client
+        val mongoClient = MongoClient(MongoClientURI(config.mongodbUri))
+        val database = mongoClient.getDatabase(config.mongodbDatabase)
 
-    // Initialize repositories
-    val applicationRepository = MongoApplicationRepository(database)
+        // Initialize repositories
+        val applicationRepository = MongoApplicationRepository(database)
 
-    // Initialize services
-    val healthService = HealthServiceImpl(applicationRepository)
+        // Initialize services
+        val healthService = HealthServiceImpl(applicationRepository)
 
-    // Start Ktor server
-    embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
-        configureApp(healthService)
-    }.start(wait = true)
+        // Start Ktor server
+        embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
+            configureApp(healthService)
+        }.start(wait = true)
+    }
 }
 
 fun Application.configureApp(healthService: HealthService) {
