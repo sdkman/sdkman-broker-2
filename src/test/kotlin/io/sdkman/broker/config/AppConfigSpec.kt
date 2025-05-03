@@ -47,4 +47,4 @@ class AppConfigSpec : ShouldSpec({
         config.serverPort shouldBe 8080
         config.serverHost shouldBe "0.0.0.0"
     }
-}) 
+})

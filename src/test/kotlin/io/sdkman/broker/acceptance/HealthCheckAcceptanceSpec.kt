@@ -14,10 +14,6 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
         listeners(MongoTestListener)
     }
 
-    override suspend fun afterSpec(spec: io.kotest.core.spec.Spec) {
-        TestDependencyInjection.close()
-    }
-
     init {
         should("return 200 OK when database is healthy") {
             // given: an initialised database

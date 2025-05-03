@@ -20,7 +20,4 @@ object TestDependencyInjection {
     val healthService by lazy {
         HealthServiceImpl(applicationRepository)
     }
-
-    // No need to close resources - MongoTestListener handles cleanup
-    fun close() {}
 }

@@ -38,4 +38,4 @@ fun Config.getOptionString(path: String): Option<String> =
         } else {
             Option.fromNullable(getString(path))
         }
-    }.getOrElse { none() } 
+    }.getOrElse { none() }

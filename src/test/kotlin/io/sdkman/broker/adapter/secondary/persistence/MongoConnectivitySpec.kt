@@ -86,4 +86,4 @@ class MongoConnectivitySpec : ShouldSpec({
         // then
         connectionString shouldBe "mongodb://broker:password123@mongo.sdkman.io:16434/sdkman?authMechanism=SCRAM-SHA-1"
     }
-}) 
+})

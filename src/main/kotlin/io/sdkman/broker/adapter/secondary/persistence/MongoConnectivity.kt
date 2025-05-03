@@ -1,7 +1,6 @@
 package io.sdkman.broker.adapter.secondary.persistence
 
 import arrow.core.Either
-import arrow.core.Option
 import arrow.core.flatMap
 import arrow.core.getOrElse
 import com.mongodb.MongoClient
@@ -47,10 +46,5 @@ class MongoConnectivity(private val config: AppConfig) {
         }
     }
 
-    // TODO: no CI variable, infer the environment from the host
-    fun isProductionEnvironment(host: String): Boolean {
-        val ciEnv = Option.fromNullable(System.getenv("CI"))
-
-        return host != "localhost" && ciEnv.isNone()
-    }
-} 
+    fun isProductionEnvironment(host: String): Boolean = host != "localhost" && host != "127.0.0.1"
+}
