@@ -10,8 +10,8 @@ import io.kotest.matchers.shouldNot
 // Provides expressive, readable assertions for functional tests
 
 // Matcher for Option.isSome() with optional value validation
-fun <T> beSome(expectedValue: T? = null) =
-    object : Matcher<Option<T>> {
+fun <T> beSome(expectedValue: T? = null): Matcher<Option<T>> {
+    return object : Matcher<Option<T>> {
         override fun test(value: Option<T>): MatcherResult {
             val isSome = value.isSome()
             val valueMatches = expectedValue?.let { value.getOrNull() == it } ?: true
@@ -23,10 +23,11 @@ fun <T> beSome(expectedValue: T? = null) =
             )
         }
     }
+}
 
 // Matcher for Option.isNone()
-fun <T> beNone() =
-    object : Matcher<Option<T>> {
+fun <T> beNone(): Matcher<Option<T>> {
+    return object : Matcher<Option<T>> {
         override fun test(value: Option<T>): MatcherResult {
             return MatcherResult(
                 value.isNone(),
@@ -35,6 +36,7 @@ fun <T> beNone() =
             )
         }
     }
+}
 
 // Extension functions for more readable syntax
 infix fun <T> Option<T>.shouldBeSome(expected: T) = this should beSome(expected)
