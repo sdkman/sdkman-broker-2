@@ -16,5 +16,5 @@ class AppConfig {
 
     // Server settings
     val serverPort: Int = config.getIntOrDefault("server.port", 8080)
-    val serverHost: String = config.getStringOrDefault("server.host", "0.0.0.0")
+    val serverHost: String = config.getStringOrDefault("server.host", "localhost")
 }
