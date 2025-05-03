@@ -30,7 +30,8 @@ class MongoConnectivity(private val config: AppConfig) {
         )
     }
 
-    private fun buildConnectionString(): String {
+
+    fun buildConnectionString(): String {
         val host = config.mongodbHost
         val port = config.mongodbPort
         
@@ -47,9 +48,9 @@ class MongoConnectivity(private val config: AppConfig) {
     }
 
     //TODO: no CI variable, infer the environment from the host
-    private fun isProductionEnvironment(host: String): Boolean {
+    fun isProductionEnvironment(host: String): Boolean {
         val ciEnv = Option.fromNullable(System.getenv("CI"))
         
-        return host != "localhost" && ciEnv.isEmpty()
+        return host != "localhost" && ciEnv.isNone()
     }
 } 
