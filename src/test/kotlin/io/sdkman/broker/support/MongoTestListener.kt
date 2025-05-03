@@ -33,7 +33,14 @@ object MongoTestListener : TestListener {
 
     override suspend fun beforeTest(testCase: TestCase) {
         resetDatabase()
-        System.setProperty("mongodb.uri", "mongodb://$host:$port")
-        System.setProperty("mongodb.database", "sdkman")
+        
+        // Set environment variables for MongoDB configuration
+        System.setProperty("MONGODB_HOST", host)
+        System.setProperty("MONGODB_PORT", port.toString())
+        System.setProperty("MONGODB_DATABASE", "sdkman")
+        
+        // Set CI environment variable to prevent auth mechanism from being added
+        //TODO: Do not use this variable, infer the environment from the host
+        System.setProperty("CI", "true")
     }
 }

@@ -1,7 +1,5 @@
 package io.sdkman.broker
 
-import com.mongodb.MongoClient
-import com.mongodb.MongoClientURI
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -10,6 +8,7 @@ import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.sdkman.broker.adapter.primary.rest.healthRoutes
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
+import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.config.AppConfig
@@ -20,9 +19,9 @@ object App {
     fun main(args: Array<String>) {
         val config = AppConfig()
 
-        // Create MongoDB client
-        val mongoClient = MongoClient(MongoClientURI(config.mongodbUri))
-        val database = mongoClient.getDatabase(config.mongodbDatabase)
+        // Create MongoDB connection
+        val mongoConnectivity = MongoConnectivity(config)
+        val database = mongoConnectivity.database()
 
         // Initialize repositories
         val applicationRepository = MongoApplicationRepository(database)
