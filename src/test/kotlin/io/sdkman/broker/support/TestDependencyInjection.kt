@@ -1,8 +1,6 @@
 package io.sdkman.broker.support
 
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
-import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
-import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.config.AppConfig
 
@@ -11,10 +9,10 @@ import io.sdkman.broker.config.AppConfig
 object TestDependencyInjection {
     // Use the shared container from MongoTestListener
     val config by lazy { AppConfig() }
-    
+
     // Use the database from MongoTestListener directly
     val database by lazy { MongoTestListener.database }
-    
+
     val applicationRepository by lazy {
         MongoApplicationRepository(database)
     }

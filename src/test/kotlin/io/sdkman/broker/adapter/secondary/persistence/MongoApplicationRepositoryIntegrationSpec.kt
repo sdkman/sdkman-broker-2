@@ -6,7 +6,6 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.sdkman.broker.domain.model.Application
 import io.sdkman.broker.domain.repository.RepositoryError
 import io.sdkman.broker.support.MongoTestListener
-import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRight
 

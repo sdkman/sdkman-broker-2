@@ -25,10 +25,10 @@ object MongoTestListener : TestListener {
     override suspend fun beforeSpec(spec: Spec) {
         // Ensure container is started
         mongoContainer
-        
+
         // Set up environment for tests
         setSystemProperties()
-        
+
         // Reset database to clean state
         resetDatabase()
     }
@@ -36,7 +36,7 @@ object MongoTestListener : TestListener {
     override suspend fun beforeTest(testCase: TestCase) {
         resetDatabase()
     }
-    
+
     // Sets system properties for tests
     private fun setSystemProperties() {
         System.setProperty("MONGODB_HOST", host)
