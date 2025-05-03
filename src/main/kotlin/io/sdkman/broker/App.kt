@@ -12,6 +12,7 @@ import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.config.AppConfig
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
 object App {
@@ -36,6 +37,7 @@ object App {
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 fun Application.configureApp(healthService: HealthService) {
     // Install plugins
     install(ContentNegotiation) {
@@ -45,6 +47,7 @@ fun Application.configureApp(healthService: HealthService) {
                 isLenient = true
                 ignoreUnknownKeys = true
                 encodeDefaults = true
+                explicitNulls = false
             }
         )
     }
