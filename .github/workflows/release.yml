@@ -28,7 +28,7 @@ jobs:
         run: chmod +x gradlew
           
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build --scan
           
       - name: Create version tag
         id: tag_version
