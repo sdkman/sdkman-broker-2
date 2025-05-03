@@ -31,8 +31,8 @@ class MongoConnectivity(private val config: AppConfig) {
     }
 
     private fun buildConnectionString(): String {
-        val host = config.mongodbHost.getOrElse { "localhost" }
-        val port = config.mongodbPort.getOrElse { "27017" }
+        val host = config.mongodbHost
+        val port = config.mongodbPort
         
         val credentials = config.mongodbUsername.flatMap { username ->
             config.mongodbPassword.map { password ->
