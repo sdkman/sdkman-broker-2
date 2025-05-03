@@ -1,35 +1,28 @@
 package io.sdkman.broker.support
 
-import com.mongodb.MongoClient
-import com.mongodb.MongoClientURI
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.config.AppConfig
 
+// Dependency injection for tests
+// Uses the shared MongoTestListener to provide consistent MongoDB access across all tests
 object TestDependencyInjection {
-    private val config = AppConfig()
-    private val mongoConnectivity = MongoConnectivity(config)
+    // Use the shared container from MongoTestListener
+    val config by lazy { AppConfig() }
     
-    private val mongoClient by lazy {
-        val connectionString = mongoConnectivity.buildConnectionString()
-        MongoClient(MongoClientURI(connectionString))
-    }
-
-    private val database by lazy {
-        mongoClient.getDatabase(config.mongodbDatabase)
-    }
-
-    private val applicationRepository by lazy {
+    // Use the database from MongoTestListener directly
+    val database by lazy { MongoTestListener.database }
+    
+    val applicationRepository by lazy {
         MongoApplicationRepository(database)
     }
 
-    val healthService: HealthService by lazy {
+    val healthService by lazy {
         HealthServiceImpl(applicationRepository)
     }
 
-    fun close() {
-        mongoClient.close()
-    }
+    // No need to close resources - MongoTestListener handles cleanup
+    fun close() {}
 }
