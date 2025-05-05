@@ -26,5 +26,5 @@ class DefaultAppConfig : AppConfig {
 
     // Server settings
     override val serverPort: Int = config.getIntOrDefault("server.port", 8080)
-    override val serverHost: String = config.getStringOrDefault("server.host", "127.0.0.1")
+    override val serverHost: String = config.getStringOrDefault("server.host", "0.0.0.0")
 }
