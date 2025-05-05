@@ -26,8 +26,8 @@ jobs:
       run: chmod +x gradlew
     
     - name: Build with Gradle
-      run: ./gradlew build --scan
-    
+      run: ./gradlew build --scan --info
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
