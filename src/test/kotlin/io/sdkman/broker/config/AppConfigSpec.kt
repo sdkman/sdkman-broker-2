@@ -19,7 +19,7 @@ class AppConfigSpec : ShouldSpec({
         val config = AppConfig()
 
         // when/then
-        config.mongodbHost shouldBe "localhost"
+        config.mongodbHost shouldBe "127.0.0.1"
     }
 
     should("read MongoDB port from configuration") {
