@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo:3.2
+    container_name: mongo
+    restart: always
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+      - ./mongo-config:/etc/mongo
+    command: mongod --bind_ip 0.0.0.0
+
+volumes:
+  mongo_data:
+  mongo_config:
