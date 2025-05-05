@@ -38,7 +38,7 @@ object MongoTestListener : TestListener {
     }
 
     // Sets system properties for tests using TypeSafe Config format
-    private fun setSystemProperties() {        
+    private fun setSystemProperties() {
         // Lower case with dots (format used by AppConfig)
         System.setProperty("mongodb.host", host)
         System.setProperty("mongodb.port", port.toString())
