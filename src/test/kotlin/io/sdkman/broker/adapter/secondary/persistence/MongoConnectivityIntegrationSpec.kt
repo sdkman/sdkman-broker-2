@@ -1,5 +1,6 @@
 package io.sdkman.broker.adapter.secondary.persistence
 
+import arrow.core.None
 import arrow.core.Option
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
@@ -14,7 +15,16 @@ class MongoConnectivityIntegrationSpec : ShouldSpec({
 
     should("successfully connect to MongoDB and get a database instance") {
         // given
-        val config = AppConfig()
+        val config =
+            object : AppConfig {
+                override val mongodbHost: String = MongoTestListener.host
+                override val mongodbPort: String = MongoTestListener.port.toString()
+                override val mongodbDatabase: String = "sdkman"
+                override val mongodbUsername: Option<String> = None
+                override val mongodbPassword: Option<String> = None
+                override val serverPort: Int = 8080
+                override val serverHost: String = "127.0.0.1"
+            }
         val connectivity = MongoConnectivity(config)
 
         // when

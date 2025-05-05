@@ -8,7 +8,7 @@ class AppConfigSpec : ShouldSpec({
 
     should("read database name from configuration") {
         // given
-        val config = AppConfig()
+        val config = DefaultAppConfig()
 
         // when/then
         config.mongodbDatabase shouldBe "sdkman"
@@ -16,7 +16,7 @@ class AppConfigSpec : ShouldSpec({
 
     should("read MongoDB host from configuration") {
         // given
-        val config = AppConfig()
+        val config = DefaultAppConfig()
 
         // when/then
         config.mongodbHost shouldBe "127.0.0.1"
@@ -24,7 +24,7 @@ class AppConfigSpec : ShouldSpec({
 
     should("read MongoDB port from configuration") {
         // given
-        val config = AppConfig()
+        val config = DefaultAppConfig()
 
         // when/then
         config.mongodbPort shouldBe "27017"
@@ -32,7 +32,7 @@ class AppConfigSpec : ShouldSpec({
 
     should("handle null values for credentials") {
         // given
-        val config = AppConfig()
+        val config = DefaultAppConfig()
 
         // when/then
         config.mongodbUsername shouldBe Option.fromNullable(null)
@@ -41,7 +41,7 @@ class AppConfigSpec : ShouldSpec({
 
     should("read server settings from configuration") {
         // given
-        val config = AppConfig()
+        val config = DefaultAppConfig()
 
         // when/then
         config.serverPort shouldBe 8080

@@ -11,14 +11,14 @@ import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
-import io.sdkman.broker.config.AppConfig
+import io.sdkman.broker.config.DefaultAppConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
 object App {
     @JvmStatic
     fun main(args: Array<String>) {
-        val config = AppConfig()
+        val config = DefaultAppConfig()
 
         // Create MongoDB connection
         val mongoConnectivity = MongoConnectivity(config)
