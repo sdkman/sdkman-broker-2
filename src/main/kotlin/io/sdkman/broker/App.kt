@@ -7,10 +7,13 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.sdkman.broker.adapter.primary.rest.healthRoutes
+import io.sdkman.broker.adapter.primary.rest.versionRoutes
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
+import io.sdkman.broker.application.service.VersionService
+import io.sdkman.broker.application.service.VersionServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -29,16 +32,17 @@ object App {
 
         // Initialize services
         val healthService = HealthServiceImpl(applicationRepository)
+        val versionService = VersionServiceImpl()
 
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
-            configureApp(healthService)
+            configureApp(healthService, versionService)
         }.start(wait = true)
     }
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-fun Application.configureApp(healthService: HealthService) {
+fun Application.configureApp(healthService: HealthService, versionService: VersionService) {
     // Install plugins
     install(ContentNegotiation) {
         json(
@@ -54,4 +58,5 @@ fun Application.configureApp(healthService: HealthService) {
 
     // Configure routes
     healthRoutes(healthService)
+    versionRoutes(versionService)
 }

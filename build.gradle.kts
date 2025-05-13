@@ -26,6 +26,27 @@ scmVersion {
     }
 }
 
+// Add task to generate version.properties file
+tasks.register("generateVersionProperties") {
+    description = "Generates version.properties file with the current project version"
+    group = "build"
+
+    inputs.property("version", version)
+    //TODO: Use a better way to get the resources directory
+    val resourcesDir = "$buildDir/resources/main"
+    outputs.file("$resourcesDir/version.properties")
+
+    doLast {
+        mkdir(resourcesDir)
+        file("$resourcesDir/version.properties").writeText("version=${project.version}")
+    }
+}
+
+// Make processResources depend on generateVersionProperties
+tasks.processResources {
+    dependsOn("generateVersionProperties")
+}
+
 repositories {
     mavenCentral()
 }
