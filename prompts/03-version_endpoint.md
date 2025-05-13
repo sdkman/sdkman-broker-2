@@ -36,6 +36,8 @@ The only difference is in the response body, which is now a JSON response.
 * The version for the test should be injected into the application using a test versions.properties file.
 * The test version.properties file should be located in the `src/test/resources` directory.
 * The test version.properties should override the default version.properties file.
+* Do not implement a Repository, but read the version.properties directly in the Service layer.
+* The version file should be generated and added to the classpath by the Axion plugin.
 
 ## Specification by Example
 
