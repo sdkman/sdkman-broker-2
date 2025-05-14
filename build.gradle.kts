@@ -32,13 +32,12 @@ tasks.register("generateVersionProperties") {
     group = "build"
 
     inputs.property("version", version)
-    //TODO: Use a better way to get the resources directory
-    val resourcesDir = "$buildDir/resources/main"
-    outputs.file("$resourcesDir/version.properties")
+    val resourcesDir = tasks.processResources.get().destinationDir
+    outputs.file(File(resourcesDir, "version.properties"))
 
     doLast {
-        mkdir(resourcesDir)
-        file("$resourcesDir/version.properties").writeText("version=${project.version}")
+        resourcesDir.mkdirs()
+        File(resourcesDir, "version.properties").writeText("version=${project.version}")
     }
 }
 
