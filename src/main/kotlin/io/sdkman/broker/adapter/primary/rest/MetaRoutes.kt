@@ -10,15 +10,35 @@ import io.ktor.server.routing.routing
 import io.sdkman.broker.application.service.HealthCheckError
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthStatus
+import io.sdkman.broker.application.service.ReleaseError
+import io.sdkman.broker.application.service.ReleaseService
 import kotlinx.serialization.Serializable
 
-fun Application.healthRoutes(healthService: HealthService) {
+fun Application.metaRoutes(
+    healthService: HealthService,
+    releaseService: ReleaseService
+) {
     routing {
-        get("/health/alive") {
+        get("/meta/alive") {
             healthService.checkHealth()
                 .fold(
                     { error -> call.handleHealthError(error) },
                     { status -> call.handleHealthStatus(status) }
+                )
+        }
+
+        get("/meta/release") {
+            releaseService.getRelease()
+                .fold(
+                    { error ->
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            ReleaseErrorResponse("Error retrieving release: ${error.cause.message}")
+                        )
+                    },
+                    { release ->
+                        call.respond(HttpStatusCode.OK, ReleaseResponse(release))
+                    }
                 )
         }
     }
@@ -52,3 +72,15 @@ private suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
 
 @Serializable
 data class HealthResponse(val status: String, val reason: String? = null)
+
+@Serializable
+data class ReleaseResponse(val release: String)
+
+@Serializable
+data class ReleaseErrorResponse(val error: String)
+
+private val ReleaseError.cause: Throwable
+    get() =
+        when (this) {
+            is ReleaseError.ReleaseFileError -> cause
+        }

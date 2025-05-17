@@ -26,6 +26,26 @@ scmVersion {
     }
 }
 
+// Add task to generate release.properties file
+tasks.register("generateReleaseProperties") {
+    description = "Generates release.properties file with the current project version"
+    group = "build"
+
+    inputs.property("version", version)
+    val resourcesDir = tasks.processResources.get().destinationDir
+    outputs.file(File(resourcesDir, "release.properties"))
+
+    doLast {
+        resourcesDir.mkdirs()
+        File(resourcesDir, "release.properties").writeText("release=${project.version}")
+    }
+}
+
+// Make processResources depend on generateReleaseProperties
+tasks.processResources {
+    dependsOn("generateReleaseProperties")
+}
+
 repositories {
     mavenCentral()
 }
