@@ -26,24 +26,24 @@ scmVersion {
     }
 }
 
-// Add task to generate version.properties file
-tasks.register("generateVersionProperties") {
-    description = "Generates version.properties file with the current project version"
+// Add task to generate release.properties file
+tasks.register("generateReleaseProperties") {
+    description = "Generates release.properties file with the current project version"
     group = "build"
 
     inputs.property("version", version)
     val resourcesDir = tasks.processResources.get().destinationDir
-    outputs.file(File(resourcesDir, "version.properties"))
+    outputs.file(File(resourcesDir, "release.properties"))
 
     doLast {
         resourcesDir.mkdirs()
-        File(resourcesDir, "version.properties").writeText("version=${project.version}")
+        File(resourcesDir, "release.properties").writeText("release=${project.version}")
     }
 }
 
-// Make processResources depend on generateVersionProperties
+// Make processResources depend on generateReleaseProperties
 tasks.processResources {
-    dependsOn("generateVersionProperties")
+    dependsOn("generateReleaseProperties")
 }
 
 repositories {

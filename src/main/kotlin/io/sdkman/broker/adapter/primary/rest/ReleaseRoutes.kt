@@ -6,23 +6,23 @@ import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import io.sdkman.broker.application.service.VersionError
-import io.sdkman.broker.application.service.VersionService
+import io.sdkman.broker.application.service.ReleaseError
+import io.sdkman.broker.application.service.ReleaseService
 import kotlinx.serialization.Serializable
 
-fun Application.versionRoutes(versionService: VersionService) {
+fun Application.releaseRoutes(releaseService: ReleaseService) {
     routing {
-        get("/version") {
-            versionService.getVersion()
+        get("/release") {
+            releaseService.getRelease()
                 .fold(
                     { error ->
                         call.respond(
                             HttpStatusCode.InternalServerError,
-                            VersionErrorResponse("Error retrieving version: ${error.cause.message}")
+                            ReleaseErrorResponse("Error retrieving release: ${error.cause.message}")
                         )
                     },
-                    { version ->
-                        call.respond(HttpStatusCode.OK, VersionResponse(version))
+                    { release ->
+                        call.respond(HttpStatusCode.OK, ReleaseResponse(release))
                     }
                 )
         }
@@ -30,13 +30,13 @@ fun Application.versionRoutes(versionService: VersionService) {
 }
 
 @Serializable
-data class VersionResponse(val version: String)
+data class ReleaseResponse(val release: String)
 
 @Serializable
-data class VersionErrorResponse(val error: String)
+data class ReleaseErrorResponse(val error: String)
 
-private val VersionError.cause: Throwable
+private val ReleaseError.cause: Throwable
     get() =
         when (this) {
-            is VersionError.VersionFileError -> cause
+            is ReleaseError.ReleaseFileError -> cause
         }

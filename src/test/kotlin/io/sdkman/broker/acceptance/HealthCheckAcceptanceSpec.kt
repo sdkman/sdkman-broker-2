@@ -24,7 +24,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                 application {
                     configureAppForTesting(
                         TestDependencyInjection.healthService,
-                        TestDependencyInjection.versionService
+                        TestDependencyInjection.releaseService
                     )
                 }
                 val response = client.get("/health/alive")
@@ -42,7 +42,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                 application {
                     configureAppForTesting(
                         TestDependencyInjection.healthService,
-                        TestDependencyInjection.versionService
+                        TestDependencyInjection.releaseService
                     )
                 }
                 val response = client.get("/health/alive")
@@ -61,7 +61,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                 application {
                     configureAppForTesting(
                         TestDependencyInjection.healthService,
-                        TestDependencyInjection.versionService
+                        TestDependencyInjection.releaseService
                     )
                 }
                 val response = client.get("/health/alive")
@@ -80,7 +80,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                 application {
                     configureAppForTesting(
                         TestDependencyInjection.healthService,
-                        TestDependencyInjection.versionService
+                        TestDependencyInjection.releaseService
                     )
                 }
                 val response = client.get("/health/alive")
