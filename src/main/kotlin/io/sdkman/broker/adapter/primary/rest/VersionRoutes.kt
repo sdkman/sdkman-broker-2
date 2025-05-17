@@ -2,7 +2,6 @@ package io.sdkman.broker.adapter.primary.rest
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
@@ -16,24 +15,18 @@ fun Application.versionRoutes(versionService: VersionService) {
         get("/version") {
             versionService.getVersion()
                 .fold(
-                    { error -> call.handleVersionError(error) },
-                    { version -> call.handleVersionSuccess(version) }
+                    { error ->
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            VersionErrorResponse("Error retrieving version: ${error.cause.message}")
+                        )
+                    },
+                    { version ->
+                        call.respond(HttpStatusCode.OK, VersionResponse(version))
+                    }
                 )
         }
     }
-}
-
-// TODO: Inline this function
-private suspend fun ApplicationCall.handleVersionSuccess(version: String) {
-    respond(HttpStatusCode.OK, VersionResponse(version))
-}
-
-// TODO: Inline this function
-private suspend fun ApplicationCall.handleVersionError(error: VersionError) {
-    respond(
-        HttpStatusCode.InternalServerError,
-        VersionErrorResponse("Error retrieving version: ${error.cause.message}")
-    )
 }
 
 @Serializable
