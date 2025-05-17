@@ -1,3 +1,4 @@
+---
 name: Release
 
 on:
@@ -13,57 +14,42 @@ jobs:
     name: "Release"
     runs-on: ubuntu-latest
     steps:
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_TOKEN }}
+
+      - name: Log in to DigitalOcean Docker Registry
+        run: |
+          doctl registry login
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: gradle
-          
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-          
-      - name: Build with Gradle
-        run: ./gradlew build --scan
-          
-      - name: Create version tag
+
+      - name: Gradle check
+        run: ./gradlew clean check
+
+      - name: Gradle release
+        run: ./gradlew clean release
+
+      - name: Propagate current release version
         id: tag_version
         run: |
-          # Get the current version from Axion
-          current_version=$(./gradlew currentVersion -q | grep "Project version" | awk '{print $3}' | sed 's/-SNAPSHOT//')
-          
-          # Create tag if it doesn't exist
-          if ! git rev-parse "v$current_version" >/dev/null 2>&1; then
-            echo "Creating new tag v$current_version"
-            git config user.name "GitHub Actions"
-            git config user.email "actions@github.com"
-            git tag -a "v$current_version" -m "Release version $current_version"
-            git push origin "v$current_version"
-            echo "version=$current_version" >> $GITHUB_OUTPUT
-          else
-            echo "Tag v$current_version already exists, using commit hash for Docker tag"
-            version=$(git rev-parse --short=8 HEAD)
-            echo "version=$version" >> $GITHUB_OUTPUT
-          fi
-          
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_TOKEN }}
-          
-      - name: Log in to DigitalOcean Docker Registry
-        run: |
-          doctl registry login
-          
+          current_version=$(./gradlew currentVersion -q | grep "Project version" | awk '{print $3}')
+          echo "Version set to: $current_version"
+          echo "version=$current_version" >> $GITHUB_OUTPUT
+
       - name: Build and publish Docker image
         run: |
           version="${{ steps.tag_version.outputs.version }}"
           commit_hash=$(git rev-parse --short=8 HEAD)
-          
-          # Always tag with commit hash and latest
-          # If we created a version tag, also tag with that version
-          ./gradlew jib -Djib.to.tags=$commit_hash,$version,latest 
+          ./gradlew build
+          ./gradlew jib -Djib.to.tags=$commit_hash,$version,latest
