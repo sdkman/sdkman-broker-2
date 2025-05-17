@@ -1,8 +1,6 @@
 package io.sdkman.broker.application.service
 
 import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import java.util.Properties
 
 interface VersionService {
@@ -18,7 +16,7 @@ class VersionServiceImpl : VersionService {
     override fun getVersion(): Either<VersionError, String> =
         Either.catch {
             val properties = Properties()
-            //TODO: Use an Option instead of nullables!!!
+            // TODO: Use an Option instead of nullables!!!
             javaClass.classLoader.getResourceAsStream(VERSION_PROPERTIES)?.use { stream ->
                 properties.load(stream)
                 val version = properties.getProperty(VERSION_KEY)

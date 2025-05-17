@@ -21,7 +21,7 @@ object TestDependencyInjection {
     val healthService by lazy {
         HealthServiceImpl(applicationRepository)
     }
-    
+
     val versionService by lazy {
         VersionServiceImpl()
     }

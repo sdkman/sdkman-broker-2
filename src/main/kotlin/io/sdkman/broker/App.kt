@@ -42,7 +42,10 @@ object App {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-fun Application.configureApp(healthService: HealthService, versionService: VersionService) {
+fun Application.configureApp(
+    healthService: HealthService,
+    versionService: VersionService
+) {
     // Install plugins
     install(ContentNegotiation) {
         json(

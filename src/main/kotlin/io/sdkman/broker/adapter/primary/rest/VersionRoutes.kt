@@ -23,14 +23,17 @@ fun Application.versionRoutes(versionService: VersionService) {
     }
 }
 
-//TODO: Inline this function
+// TODO: Inline this function
 private suspend fun ApplicationCall.handleVersionSuccess(version: String) {
     respond(HttpStatusCode.OK, VersionResponse(version))
 }
 
-//TODO: Inline this function
+// TODO: Inline this function
 private suspend fun ApplicationCall.handleVersionError(error: VersionError) {
-    respond(HttpStatusCode.InternalServerError, VersionErrorResponse("Error retrieving version: ${error.cause.message}"))
+    respond(
+        HttpStatusCode.InternalServerError,
+        VersionErrorResponse("Error retrieving version: ${error.cause.message}")
+    )
 }
 
 @Serializable
@@ -40,6 +43,7 @@ data class VersionResponse(val version: String)
 data class VersionErrorResponse(val error: String)
 
 private val VersionError.cause: Throwable
-    get() = when (this) {
-        is VersionError.VersionFileError -> cause
-    }
+    get() =
+        when (this) {
+            is VersionError.VersionFileError -> cause
+        }

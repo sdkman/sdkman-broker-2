@@ -21,7 +21,12 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
 
             // when: a GET request is made for "/health/alive"
             testApplication {
-                application { configureAppForTesting(TestDependencyInjection.healthService) }
+                application {
+                    configureAppForTesting(
+                        TestDependencyInjection.healthService,
+                        TestDependencyInjection.versionService
+                    )
+                }
                 val response = client.get("/health/alive")
 
                 // then: the service response status is 200
@@ -34,7 +39,12 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
 
             // when: a GET request is made for "/health/alive"
             testApplication {
-                application { configureAppForTesting(TestDependencyInjection.healthService) }
+                application {
+                    configureAppForTesting(
+                        TestDependencyInjection.healthService,
+                        TestDependencyInjection.versionService
+                    )
+                }
                 val response = client.get("/health/alive")
 
                 // then: the service response status is 503
@@ -48,7 +58,12 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
 
             // when: a GET request is made for "/health/alive"
             testApplication {
-                application { configureAppForTesting(TestDependencyInjection.healthService) }
+                application {
+                    configureAppForTesting(
+                        TestDependencyInjection.healthService,
+                        TestDependencyInjection.versionService
+                    )
+                }
                 val response = client.get("/health/alive")
 
                 // then: the service response status is 503
@@ -62,7 +77,12 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
 
             // when: a GET request is made for "/health/alive"
             testApplication {
-                application { configureAppForTesting(TestDependencyInjection.healthService) }
+                application {
+                    configureAppForTesting(
+                        TestDependencyInjection.healthService,
+                        TestDependencyInjection.versionService
+                    )
+                }
                 val response = client.get("/health/alive")
 
                 // then: the service response status is 503

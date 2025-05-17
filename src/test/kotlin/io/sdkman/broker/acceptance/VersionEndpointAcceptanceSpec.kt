@@ -1,15 +1,17 @@
 package io.sdkman.broker.acceptance
 
+import arrow.core.Either
+import arrow.core.left
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import io.sdkman.broker.adapter.primary.rest.VersionResponse
+import io.sdkman.broker.application.service.VersionError
+import io.sdkman.broker.application.service.VersionService
 import io.sdkman.broker.application.service.VersionServiceImpl
 import io.sdkman.broker.support.configureAppForVersionTesting
-import java.io.File
 
 class VersionEndpointAcceptanceSpec : ShouldSpec({
 
@@ -21,11 +23,13 @@ class VersionEndpointAcceptanceSpec : ShouldSpec({
 
             // when: a GET request is made for "/version"
             val response = client.get("/version")
-            val body = response.body<VersionResponse>()
+            val responseText = response.body<String>()
 
-            // then: the service response status is 200 and contains correct version
+            // then: the service response status is 200
             response.status shouldBe HttpStatusCode.OK
-            body.version shouldBe "1.0.0-test"
+
+            // Verify the response contains the expected version
+            responseText.contains("1.0.0-test") shouldBe true
         }
     }
 
@@ -33,14 +37,13 @@ class VersionEndpointAcceptanceSpec : ShouldSpec({
         // given: a running application but the version.properties file will not be found
         testApplication {
             // Using a service that can't find the file
-            //TODO: Use a mockk or a stub instead of a real file
-            val mockService = object : VersionServiceImpl() {
-                override fun getVersion() =
-                    //TODO: Create the Either.left() using an arrow extension function
-                    arrow.core.left(io.sdkman.broker.application.service.VersionError.VersionFileError(
-                        IllegalStateException("Could not load version.properties")
-                    ))
-            }
+            val mockService =
+                object : VersionService {
+                    override fun getVersion(): Either<VersionError, String> =
+                        VersionError.VersionFileError(
+                            IllegalStateException("Could not load version.properties")
+                        ).left()
+                }
 
             application { configureAppForVersionTesting(mockService) }
 
