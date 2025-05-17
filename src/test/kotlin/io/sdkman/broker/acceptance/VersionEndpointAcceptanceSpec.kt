@@ -52,6 +52,9 @@ class VersionEndpointAcceptanceSpec : ShouldSpec({
 
             // then: the service response status is 500
             response.status shouldBe HttpStatusCode.InternalServerError
+
+            // Verify the response contains the expected error message
+            response.body<String>().contains("Could not load version.properties") shouldBe true
         }
     }
 })
