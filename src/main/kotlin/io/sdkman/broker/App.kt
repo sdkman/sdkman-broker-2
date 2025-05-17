@@ -6,8 +6,7 @@ import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.sdkman.broker.adapter.primary.rest.healthRoutes
-import io.sdkman.broker.adapter.primary.rest.releaseRoutes
+import io.sdkman.broker.adapter.primary.rest.metaRoutes
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
 import io.sdkman.broker.application.service.HealthService
@@ -60,6 +59,5 @@ fun Application.configureApp(
     }
 
     // Configure routes
-    healthRoutes(healthService)
-    releaseRoutes(releaseService)
+    metaRoutes(healthService, releaseService)
 }

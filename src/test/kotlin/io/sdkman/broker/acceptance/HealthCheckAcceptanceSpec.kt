@@ -19,7 +19,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
             // given: an initialised database
             MongoTestListener.setupValidAppRecord()
 
-            // when: a GET request is made for "/health/alive"
+            // when: a GET request is made for "/meta/alive"
             testApplication {
                 application {
                     configureAppForTesting(
@@ -27,7 +27,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                         TestDependencyInjection.releaseService
                     )
                 }
-                val response = client.get("/health/alive")
+                val response = client.get("/meta/alive")
 
                 // then: the service response status is 200
                 response.status shouldBe HttpStatusCode.OK
@@ -37,7 +37,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
         should("return 503 Service Unavailable when database is empty") {
             // given: an uninitialised database with NO application record
 
-            // when: a GET request is made for "/health/alive"
+            // when: a GET request is made for "/meta/alive"
             testApplication {
                 application {
                     configureAppForTesting(
@@ -45,7 +45,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                         TestDependencyInjection.releaseService
                     )
                 }
-                val response = client.get("/health/alive")
+                val response = client.get("/meta/alive")
 
                 // then: the service response status is 503
                 response.status shouldBe HttpStatusCode.ServiceUnavailable
@@ -56,7 +56,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
             // given: an uninitialised database with an invalid application record
             MongoTestListener.setupInvalidAppRecord()
 
-            // when: a GET request is made for "/health/alive"
+            // when: a GET request is made for "/meta/alive"
             testApplication {
                 application {
                     configureAppForTesting(
@@ -64,7 +64,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                         TestDependencyInjection.releaseService
                     )
                 }
-                val response = client.get("/health/alive")
+                val response = client.get("/meta/alive")
 
                 // then: the service response status is 503
                 response.status shouldBe HttpStatusCode.ServiceUnavailable
@@ -75,7 +75,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
             // given: an inaccessible database due to connectivity issues
             System.setProperty("mongodb.uri", "mongodb://nonexistent-host:27017")
 
-            // when: a GET request is made for "/health/alive"
+            // when: a GET request is made for "/meta/alive"
             testApplication {
                 application {
                     configureAppForTesting(
@@ -83,7 +83,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                         TestDependencyInjection.releaseService
                     )
                 }
-                val response = client.get("/health/alive")
+                val response = client.get("/meta/alive")
 
                 // then: the service response status is 503
                 response.status shouldBe HttpStatusCode.ServiceUnavailable

@@ -11,7 +11,8 @@ import io.ktor.server.testing.testApplication
 import io.sdkman.broker.application.service.ReleaseError
 import io.sdkman.broker.application.service.ReleaseService
 import io.sdkman.broker.application.service.ReleaseServiceImpl
-import io.sdkman.broker.support.configureAppForReleaseTesting
+import io.sdkman.broker.support.TestDependencyInjection
+import io.sdkman.broker.support.configureAppForTesting
 
 class ReleaseEndpointAcceptanceSpec : ShouldSpec({
 
@@ -19,10 +20,15 @@ class ReleaseEndpointAcceptanceSpec : ShouldSpec({
         // given: a running application and the release.properties file is present
         testApplication {
             // Using the test properties file in src/test/resources
-            application { configureAppForReleaseTesting(ReleaseServiceImpl()) }
+            application {
+                configureAppForTesting(
+                    TestDependencyInjection.healthService,
+                    ReleaseServiceImpl()
+                )
+            }
 
-            // when: a GET request is made for "/release"
-            val response = client.get("/release")
+            // when: a GET request is made for "/meta/release"
+            val response = client.get("/meta/release")
             val responseText = response.body<String>()
 
             // then: the service response status is 200
@@ -45,10 +51,15 @@ class ReleaseEndpointAcceptanceSpec : ShouldSpec({
                         ).left()
                 }
 
-            application { configureAppForReleaseTesting(mockService) }
+            application {
+                configureAppForTesting(
+                    TestDependencyInjection.healthService,
+                    mockService
+                )
+            }
 
-            // when: a GET request is made for "/release"
-            val response = client.get("/release")
+            // when: a GET request is made for "/meta/release"
+            val response = client.get("/meta/release")
 
             // then: the service response status is 500
             response.status shouldBe HttpStatusCode.InternalServerError
