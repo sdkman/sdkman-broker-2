@@ -29,7 +29,7 @@ class VersionServiceImpl(
             classLoader.getResourceAsStream(VERSION_PROPERTIES).toOption()
                 .fold(
                     { throw IllegalStateException("Could not load $VERSION_PROPERTIES") },
-                    { stream -> 
+                    { stream ->
                         stream.use { properties.load(it) }
                         properties
                     }
@@ -40,7 +40,11 @@ class VersionServiceImpl(
         properties.getProperty(VERSION_KEY).toOption()
             .filter { it.isNotBlank() }
             .fold(
-                { VersionError.VersionFileError(IllegalStateException("Version property not found in $VERSION_PROPERTIES")).left() },
+                {
+                    VersionError.VersionFileError(
+                        IllegalStateException("Version property not found in $VERSION_PROPERTIES")
+                    ).left()
+                },
                 { it.right() }
             )
 }
