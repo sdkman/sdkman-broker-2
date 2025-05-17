@@ -38,7 +38,7 @@ jobs:
         run: ./gradlew clean check
 
       - name: Gradle release
-        run: ./gradlew clean release
+        run: ./gradlew release
 
       - name: Propagate current release version
         id: tag_version
@@ -51,5 +51,4 @@ jobs:
         run: |
           version="${{ steps.tag_version.outputs.version }}"
           commit_hash=$(git rev-parse --short=8 HEAD)
-          ./gradlew build
-          ./gradlew jib -Djib.to.tags=$commit_hash,$version,latest
+          ./gradlew build jib -Djib.to.tags=$commit_hash,$version,latest
