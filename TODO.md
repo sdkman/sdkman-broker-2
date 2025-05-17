@@ -10,7 +10,7 @@
 
 ## Functional Programming Improvements
 
-- [ ] **Implement Arrow's Option Type for Nullable Handling**
+- [x] **Implement Arrow's Option Type for Nullable Handling**
   - Replace nullable handling with Arrow's Option type in VersionService
   - Refactor the version properties loading to use functional constructs
   - Ensure proper error handling with Either and Option types
@@ -32,7 +32,7 @@
 ## Testing Improvements
 
 - [ ] **Improve Test Mocking Strategy**
-  - Replace the anonymous object-based mock with a proper mockk implementation
+  - Replace the anonymous object-based mock with a proper mockk implementation where possible
   - Create a clean stub for the VersionService in tests
   - Ensure tests remain clear and focused on their intent
   - Related to: `//TODO: Use a mockk or a stub instead of a real file` in VersionEndpointAcceptanceSpec.kt
