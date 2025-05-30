@@ -24,7 +24,8 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                 application {
                     configureAppForTesting(
                         TestDependencyInjection.healthService,
-                        TestDependencyInjection.releaseService
+                        TestDependencyInjection.releaseService,
+                        TestDependencyInjection.downloadService
                     )
                 }
                 val response = client.get("/meta/alive")
@@ -42,7 +43,8 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                 application {
                     configureAppForTesting(
                         TestDependencyInjection.healthService,
-                        TestDependencyInjection.releaseService
+                        TestDependencyInjection.releaseService,
+                        TestDependencyInjection.downloadService
                     )
                 }
                 val response = client.get("/meta/alive")
@@ -61,7 +63,8 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                 application {
                     configureAppForTesting(
                         TestDependencyInjection.healthService,
-                        TestDependencyInjection.releaseService
+                        TestDependencyInjection.releaseService,
+                        TestDependencyInjection.downloadService
                     )
                 }
                 val response = client.get("/meta/alive")
@@ -80,7 +83,8 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                 application {
                     configureAppForTesting(
                         TestDependencyInjection.healthService,
-                        TestDependencyInjection.releaseService
+                        TestDependencyInjection.releaseService,
+                        TestDependencyInjection.downloadService
                     )
                 }
                 val response = client.get("/meta/alive")

@@ -6,9 +6,14 @@ import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.routing.routing
+import io.sdkman.broker.adapter.primary.rest.downloadRoutes
 import io.sdkman.broker.adapter.primary.rest.metaRoutes
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
+import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
+import io.sdkman.broker.application.service.DownloadService
+import io.sdkman.broker.application.service.DownloadServiceImpl
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.ReleaseService
@@ -28,14 +33,16 @@ object App {
 
         // Initialize repositories
         val applicationRepository = MongoApplicationRepository(database)
+        val versionRepository = MongoVersionRepository(database)
 
         // Initialize services
         val healthService = HealthServiceImpl(applicationRepository)
         val releaseService = ReleaseServiceImpl()
+        val downloadService = DownloadServiceImpl(versionRepository)
 
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
-            configureApp(healthService, releaseService)
+            configureApp(healthService, releaseService, downloadService)
         }.start(wait = true)
     }
 }
@@ -43,7 +50,8 @@ object App {
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.configureApp(
     healthService: HealthService,
-    releaseService: ReleaseService
+    releaseService: ReleaseService,
+    downloadService: DownloadService
 ) {
     // Install plugins
     install(ContentNegotiation) {
@@ -60,4 +68,7 @@ fun Application.configureApp(
 
     // Configure routes
     metaRoutes(healthService, releaseService)
+    routing {
+        downloadRoutes(downloadService)
+    }
 }
