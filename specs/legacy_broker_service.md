@@ -161,7 +161,9 @@ For the native CLI, these platform codes are mapped to Rust platform triples:
 
 ## Handlers
 
-### GET `/health`
+### Health Check
+
+**Endpoint:** `GET /health`
 
 Returns the broker's health status.
 
@@ -178,7 +180,9 @@ Returns the broker's health status.
 }
 ```
 
-### GET `/version`
+### Service Version
+
+**Endpoint:** `GET /version`
 
 Returns the broker service version.
 
@@ -191,7 +195,9 @@ Returns the broker service version.
 - **Response Body**:
   Plain text banner with version information
 
-### GET `/download/{candidate}/{version}/{platform}`
+### Candidate Version Download
+
+**Endpoint:** `GET /download/{candidate}/{version}/{platform}`
 
 Main endpoint for all candidate downloads including third-party SDKs.
 
@@ -223,7 +229,9 @@ Main endpoint for all candidate downloads including third-party SDKs.
   8. Issues a 302 redirect to the binary URL
   9. Records an audit entry
 
-### GET `/download/sdkman/{command}/{version}/{platform}`
+### SDKMAN Bash CLI Download
+
+**Endpoint:** `GET /download/sdkman/{command}/{version}/{platform}`
 
 Downloads the SDKMAN Bash CLI binary.
 
@@ -251,7 +259,9 @@ Downloads the SDKMAN Bash CLI binary.
   5. Issues a 302 redirect to the constructed URL
   6. Records an audit entry
 
-### GET `/download/native/{command}/{version}/{platform}`
+### SDKMAN Native CLI Download
+
+**Endpoint:** `GET /download/native/{command}/{version}/{platform}`
 
 Downloads the SDKMAN Native CLI binary.
 
@@ -279,7 +289,9 @@ Downloads the SDKMAN Native CLI binary.
   4. Issues a 302 redirect to the constructed URL
   5. Records an audit entry
 
-### GET `/download/sdkman/version/{channel}`
+### Legacy CLI Version Retrieval
+
+**Endpoint:** `GET /download/sdkman/version/{channel}`
 
 Legacy endpoint to get the current SDKMAN Bash CLI version.
 
@@ -302,7 +314,9 @@ Legacy endpoint to get the current SDKMAN Bash CLI version.
      - For "stable": `stableCliVersion`
      - For "beta": `betaCliVersion`
 
-### GET `/version/sdkman/{type}/{channel}`
+### CLI Version Information
+
+**Endpoint:** `GET /version/sdkman/{type}/{channel}`
 
 Gets the current CLI version information.
 
@@ -582,4 +596,4 @@ Each domain entity has a corresponding repository:
 ### Asynchronous Access
 
 - Non-blocking operations are used where possible to maximize throughput
-- Audit logging is fully asynchronous to avoid impacting download performance 
+- Audit logging is fully asynchronous to avoid impacting download performance
