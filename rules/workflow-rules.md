@@ -3,7 +3,6 @@ description: Guidelines for interaction workflow between user and AI
 globs: 
 alwaysApply: true
 ---
-
 # AI Assistant Workflow Guidelines
 
 *Cursor rules file – workflow guidelines for interaction between user and AI assistant.*
@@ -57,6 +56,17 @@ alwaysApply: true
 - For larger changes, propose intermediate commits at logical points
 - Remind about uncommitted changes when appropriate
 
+## 7. Verification
+
+Use this checklist to verify that the workflow has been followed correctly:
+
+Final Outcome Verification:
+- [ ] All planned objectives were achieved
+- [ ] Code builds and tests pass successfully
+- [ ] No unintended side effects were introduced
+- [ ] Code was formatted
+- [ ] Code was committed to version control
+
 ---
 
 ### TL;DR
@@ -66,4 +76,5 @@ alwaysApply: true
 3. **Step-by-Step Approach**: Present one change at a time, waiting for confirmation
 4. **Context Awareness**: Follow existing project patterns and conventions
 5. **Targeted Solutions**: Propose specific changes rather than broad refactoring
-6. **Version Control**: Suggest commits after each logical unit of work 
+6. **Version Control**: Suggest commits after each logical unit of work
+7. **Verification**: Verify that all tasks were executed correctly

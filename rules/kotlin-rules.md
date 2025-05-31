@@ -3,7 +3,7 @@ description: Functional Kotlin guidelines with Arrow for AI-generated code
 globs: ["**/*.kt"]
 alwaysApply: true
 ---
- # Kotlin Functional Programming Style Guide
+# Kotlin Functional Programming Style Guide
 
 *Cursor rules file – functional Kotlin guidelines with Arrow for AI-generated code.*
 

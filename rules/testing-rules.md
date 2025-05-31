@@ -1,19 +1,19 @@
 ---
 description: Kotlin testing conventions with Kotest, Testcontainers, and Wiremock for structured test layers
-globs: 
+globs:
 alwaysApply: false
 ---
 # Kotlin Testing Rules
 
 *Cursor rules file – testing conventions for **sdkman‑broker** and future Kotlin services.*
 
-> **Intent**  
-> Provide a repeatable recipe for writing **clear, reliable tests** that align with the functional Kotlin style guide.  
+> **Intent**
+> Provide a repeatable recipe for writing **clear, reliable tests** that align with the functional Kotlin style guide.
 > The rules emphasize meaningful assertions, readable structure, and just‑enough coverage across **acceptance, integration, unit, and property** test layers.
 
 ---
 
-## 1 Test Layers & Purpose
+## 1 Test Layers & Purpose
 
 | Layer | Scope | Tooling |
 |-------|-------|---------|
@@ -24,13 +24,13 @@ alwaysApply: false
 
 ---
 
-## 2 Framework & Dependencies
+## 2 Framework & Dependencies
 
-* **Kotest 5.x** — the single test framework (`ShouldSpec` style everywhere).  
-* **Wiremock 3** for stubbing outbound HTTP calls.  
+* **Kotest 5.x** — the single test framework (`ShouldSpec` style everywhere).
+* **Wiremock 3** for stubbing outbound HTTP calls.
 * **Testcontainers** for MongoDB and (future) auxiliary services.
 
-Gradle (Kotlin DSL) snippet:
+Gradle (Kotlin DSL) snippet:
 
 ```kotlin
 dependencies {
@@ -45,7 +45,7 @@ dependencies {
 
 ---
 
-## 3 Naming & Organisation
+## 3 Naming & Organisation
 
 | Convention | Rule |
 |------------|------|
@@ -57,7 +57,7 @@ dependencies {
 
 ---
 
-## 4 ShouldSpec Guidelines
+## 4 ShouldSpec Guidelines
 
 Keep tests **flat** with top‑level `should` blocks. Delineate phases with comments:
 
@@ -83,9 +83,9 @@ class DownloadRouteAcceptanceSpec : ShouldSpec({
 
 ---
 
-## 5 Assertions & Clues
+## 5 Assertions & Clues
 
-* Use Kotest matchers (`shouldBe`, `shouldContain`, etc.).  
+* Use Kotest matchers (`shouldBe`, `shouldContain`, etc.).
 * Provide **clues** for fast triage:
 
 ```kotlin
@@ -96,10 +96,10 @@ call.status shouldBe HttpStatusCode.Found withClue {
 
 ---
 
-## 6 Testcontainers & Datastore Rules
+## 6 Testcontainers & Datastore Rules
 
-* **Singleton** containers via Kotest `Listener` objects (`withReuse(true)` where CI allows).  
-* Acceptance tests spin up **entire app** wired to the container URI.  
+* **Singleton** containers via Kotest `Listener` objects (`withReuse(true)` where CI allows).
+* Acceptance tests spin up **entire app** wired to the container URI.
 * Integration tests talk directly to repositories.
 
 ```kotlin
@@ -108,7 +108,7 @@ object MongoContainerListener : KMongoContainer("mongo:6").withReuse(true), Test
 
 ---
 
-## 7 Wiremock for Outbound Stubs
+## 7 Wiremock for Outbound Stubs
 
 * Declare a **WireMockExtension** as Kotest listener:
 
@@ -143,15 +143,15 @@ class PaymentClientIntegrationSpec : ShouldSpec({
 
 ---
 
-## 8 Property‑Based Testing
+## 8 Property‑Based Testing
 
-* Use sparingly—only when boundary conditions warrant.  
-* Default iterations: 100; adjust as needed.  
+* Use sparingly—only when boundary conditions warrant.
+* Default iterations: 100; adjust as needed.
 * Generators live in `Generators.kt`; reuse across specs.
 
 ---
 
-## 9 Gradle Tasks
+## 9 Gradle Tasks
 
 | Task | Layers |
 |------|--------|
@@ -163,21 +163,21 @@ CI pipeline order: `test` → `integrationTest` → `acceptanceTest`.
 
 ---
 
-## 10 Linting & Quality
+## 10 Linting & Quality
 
 * Detekt/kotlinter rules forbid:
   * `shouldBe true/false`
   * Empty `should` blocks
-  * Non‑descriptive test names  
+  * Non‑descriptive test names
 * Every `@Ignore` requires a **reason**.
 
 ---
 
 ### TL;DR
 
-1. **ShouldSpec** everywhere—flat, readable.  
-2. **Acceptance / Integration / Unit / PBT** layers each serve a distinct purpose.  
-3. **Wiremock + Testcontainers** simulate external boundaries.  
+1. **ShouldSpec** everywhere—flat, readable.
+2. **Acceptance / Integration / Unit / PBT** layers each serve a distinct purpose.
+3. **Wiremock + Testcontainers** simulate external boundaries.
 4. **Descriptive assertions with clues** make failures self‑explanatory.
 
 Place this file with your other Cursor rules to steer AI‑generated tests.

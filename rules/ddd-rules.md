@@ -3,7 +3,7 @@ description: Language-agnostic Domain-Driven Design principles for modeling comp
 globs: 
 alwaysApply: false
 ---
- # Domain Driven Design Principles
+# Domain Driven Design Principles
 
 *Cursor rules file – language-agnostic DDD guidelines for complex software systems.*
 

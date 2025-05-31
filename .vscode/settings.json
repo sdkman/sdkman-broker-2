@@ -1,0 +1,65 @@
+{
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable",
+    "java.configuration.updateBuildConfiguration": "automatic",
+
+    // GitHub Copilot Configuration
+    "github.copilot.enable": {
+        "*": true,
+        "yaml": true,
+        "plaintext": false,
+        "markdown": true,
+        "kotlin": true
+    },
+
+    // Include rules files in workspace context
+    "files.associations": {
+        "**/rules/*.md": "markdown"
+    },
+
+    // Exclude build artifacts from Copilot context but include rules
+    "github.copilot.advanced": {
+        "inlineSuggestCount": 3
+    },
+
+    // Workspace context for better Copilot suggestions
+    "files.exclude": {
+        "**/build/**": false,
+        "**/gradle/wrapper/**": true,
+        "**/.gradle/**": true
+    },
+
+    // Include relevant project files in search/context
+    "search.exclude": {
+        "**/build/classes/**": true,
+        "**/build/intermediates/**": true,
+        "**/build/tmp/**": true,
+        "**/build/kotlin/**": true,
+        "**/build/reports/**": true,
+        "**/build/test-results/**": true,
+        "**/build/snapshot/**": true,
+        "rules/**": false,
+        "prompts/**": false,
+        "specs/**": false
+    },
+
+    // Kotlin specific settings that align with your rules
+    "kotlin.suggest.addUnambiguousImports": true,
+
+    // Editor settings to match your coding standards
+    "editor.rulers": [120],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.trimAutoWhitespace": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+
+    // Markdown settings for rules files
+    "markdown.preview.breaks": true,
+    "markdown.preview.linkify": true,
+
+    // File watcher to help Copilot stay aware of changes
+    "files.watcherExclude": {
+        "**/build/**": true,
+        "**/.gradle/**": true
+    }
+}
