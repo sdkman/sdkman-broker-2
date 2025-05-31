@@ -1,4 +1,4 @@
-# Download Candidate Version by Platform Feature
+# Download Candidate Version Feature
 
 Generate the main download endpoint that implements the **core functionality** of the SDKMAN Broker service. This endpoint handles resolving and redirecting download requests for SDK binaries via HTTP 302 redirects.
 
@@ -7,13 +7,15 @@ The feature should implement:
 * An acceptance test that calls the download endpoint with various scenarios
 * An HTTP handler that accepts download requests at `/download/{candidate}/{version}/{platform}`
 * Delegates to the `VersionRepo` to fetch version records from the `versions` collection
+* An integration test that tests the `VersionRepo` against a database test container
 * Implements platform resolution strategy with UNIVERSAL fallback
 * Issues HTTP 302 redirects with appropriate headers
 * Handles all error cases with proper HTTP status codes
+* Be implemented in the simplest possible way, following the existing codebase patterns
 
 ## Requirements
 
-The endpoint must implement exactly what is described in the @legacy_broker_service.md file under the `/download/{candidate}/{version}/{platform}` section, including:
+The endpoint must implement exactly what is described in `specs/legacy_broker_service.md` under the `### Candidate Version Download` section, including:
 
 * **Platform validation**: Validate platform parameter against supported identifiers
 * **Version lookup**: Find exact candidate/version/platform match in database
@@ -29,12 +31,12 @@ Implement the `Version` domain entity as specified:
 ```kotlin
 data class Version(
     val candidate: String,
-    val version: String, 
+    val version: String,
     val platform: String,
     val url: String,
-    val vendor: String? = null,
-    val visible: Boolean? = true,
-    val checksums: Map<String, String>? = null
+    val vendor: Option<String> = None,
+    val visible: Boolean = true,
+    val checksums: Map<String, String> = emptyMap<String, String>()
 )
 ```
 
@@ -52,20 +54,22 @@ Implement the exact platform identifier mapping as specified:
 | `windowsx64`  | `WindowsX64`         | 64-bit Windows |
 | `exotic`      | `Exotic`             | Fallback for unsupported platforms |
 
-## Carefully observe all the following Cursor rules:
+## Carefully observe all the following rules:
 
-* follow the Kotlin style guide rules @kotlin-rules.md
-* follow the Kotlin Testing rules @testing-rules.md
-* follow the DDD guideline rules @ddd-rules.md
-* follow the Hexagonal Architecture rules @hexagonal-architecture-rules.md
+All rules can be found in the `rules` directory:
+
+* follow the Kotlin style guide rules `kotlin-rules.md`
+* follow the Kotlin Testing rules `testing-rules.md`
+* follow the DDD guideline rules `ddd-rules.md`
+* follow the Hexagonal Architecture rules `hexagonal-architecture-rules.md`
 
 ## Extra considerations
 
 * Use the existing MongoDB test container setup
 * Implement `VersionRepo` following the SPI pattern used for `ApplicationRepo`
-* Create archive type detection utility for determining file types from URLs
-* Implement checksum header generation with algorithm priority (SHA-256 highest)
-* Use test data that matches the examples in @legacy_broker_service.md
+* Create archive type detection functionality for determining file types from URLs
+* Implement checksum header generation with algorithm support (SHA-256 and MD5 most common)
+* Use test data that matches the examples in the `legacy_broker_service.md`
 
 ## Test Data Setup
 
@@ -75,21 +79,21 @@ Use the following test data in your acceptance tests:
 // Java version with platform-specific binary
 Version(
     candidate = "java",
-    version = "17.0.2-tem", 
+    version = "17.0.2-tem",
     platform = "MAC_ARM64",
     url = "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.2%2B8/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.2_8.tar.gz",
     vendor = "tem",
     visible = true,
-    checksums = mapOf("sha256" to "abc123def456")
+    checksums = mapOf("SHA-256" to "abc123def456")
 )
 
 // Groovy version with UNIVERSAL binary
 Version(
     candidate = "groovy",
     version = "4.0.0",
-    platform = "UNIVERSAL", 
+    platform = "UNIVERSAL",
     url = "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-4.0.0.zip",
-    checksums = mapOf("sha256" to "def456ghi789", "sha1" to "ghi789jkl012")
+    checksums = mapOf("SHA-256" to "def456ghi789", "MD5" to "ghi789jkl012")
 )
 ```
 
@@ -153,16 +157,19 @@ Feature: Download Candidate Version by Platform
 ## Implementation Notes
 
 * **Platform Resolution Strategy**: Always try exact platform match first, then UNIVERSAL fallback
-* **Checksum Priority**: SHA-256 > SHA-512 > SHA-384 > SHA-224 > SHA-1 > MD5
+* **Checksum Priority**: SHA-256 > SHA-512 > MD5
 * **Archive Type Detection**: Parse URL extension to determine archive type
 * **Error Responses**: Return only HTTP status codes, no response body for errors
 * **Header Formatting**: Use exact header names as specified (e.g., `X-Sdkman-Checksum-SHA-256`)
 
-## Acceptance Criteria
+## Validation Checklist
 
-* All tests must pass when running `./gradlew check`
-* All code is formatted properly with `./gradlew ktlintFormat`
-* The endpoint handles all specified scenarios correctly
-* Platform validation and mapping work as specified
-* Checksum and archive type headers are generated correctly
-* UNIVERSAL fallback strategy is implemented properly
+**Always use the Gradle MCP plugin to run Gradle tasks.**
+
+[ ] All tests pass when running `gradlew test`
+[ ] All code is formatted properly with `gradlew ktlintFormat`
+[ ] The endpoint responds correctly when tested manually using `curl`
+[ ] The endpoint handles all specified scenarios correctly
+[ ] Checksum headers are generated correctly
+[ ] Archive type header is set based on URL extension
+[ ] UNIVERSAL fallback strategy is implemented properly
