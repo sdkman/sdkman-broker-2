@@ -70,6 +70,10 @@ All rules can be found in the `rules` directory:
 * Create archive type detection functionality for determining file types from URLs
 * Implement checksum header generation with algorithm support (SHA-256 and MD5 most common)
 * Use test data that matches the examples in the `legacy_broker_service.md`
+* Introduce a `MongoSupport` class or object for all MongoDB-related boilerplate code
+* No direct database access in the tests; use the `MongoSupport` for all interactions
+* No **nullables, `let` and elvis operators** in the code; instead use `Option` and `map` for safe handling of optional values
+* Interactions with the mongo driver should immediately be converted to `Option` instead of using `null` checks
 
 ## Test Data Setup
 
@@ -141,9 +145,10 @@ Feature: Download Candidate Version by Platform
 	Scenario: Multiple checksum algorithms
 		Given a version record with multiple checksums (SHA-256, SHA-1, MD5)
 		When a successful download request is made
-		Then all checksum headers are present in priority order
-		And SHA-256 appears before SHA-1
-		And SHA-1 appears before MD5
+		Then X-Sdkman-Checksum-SHA-256 header is present
+		And X-Sdkman-Checksum-SHA-1 header is present
+		And X-Sdkman-Checksum-MD5 header is present
+		And the checksums match the version record
 
 	Scenario: Archive type detection
 		Given version records with different URL extensions (.zip, .tar.gz, .tgz)
@@ -157,7 +162,7 @@ Feature: Download Candidate Version by Platform
 ## Implementation Notes
 
 * **Platform Resolution Strategy**: Always try exact platform match first, then UNIVERSAL fallback
-* **Checksum Priority**: SHA-256 > SHA-512 > MD5
+* **Checksums**: Propagate any checksums as headers availabe in the database - SHA-256, SHA-512, MD5, etc.
 * **Archive Type Detection**: Parse URL extension to determine archive type
 * **Error Responses**: Return only HTTP status codes, no response body for errors
 * **Header Formatting**: Use exact header names as specified (e.g., `X-Sdkman-Checksum-SHA-256`)
@@ -166,10 +171,12 @@ Feature: Download Candidate Version by Platform
 
 **Always use the Gradle MCP plugin to run Gradle tasks.**
 
-[ ] All tests pass when running `gradlew test`
-[ ] All code is formatted properly with `gradlew ktlintFormat`
-[ ] The endpoint responds correctly when tested manually using `curl`
-[ ] The endpoint handles all specified scenarios correctly
-[ ] Checksum headers are generated correctly
-[ ] Archive type header is set based on URL extension
-[ ] UNIVERSAL fallback strategy is implemented properly
+[ ] All tests pass with `gradlew test`
+[ ] All code formatted with `gradlew ktlintFormat`
+[ ] The endpoint responds correctly for all scenarios using `curl`
+[ ] The acceptance test covers all specified scenarios
+[ ] The `VersionRepo` integration test passes against the MongoDB test container
+[ ] The platform resolution logic is implemented correctly
+[ ] All error cases return appropriate HTTP status codes
+[ ] Checksum headers are generated and included in responses
+[ ] Archive type detection works as expected based on URL analysis
