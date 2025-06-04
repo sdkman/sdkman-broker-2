@@ -162,7 +162,7 @@ Feature: Download Candidate Version by Platform
 ## Implementation Notes
 
 * **Platform Resolution Strategy**: Always try exact platform match first, then UNIVERSAL fallback
-* **Checksums**: Propagate any checksums as headers availabe in the database - SHA-256, SHA-512, MD5, etc.
+* **Checksums**: Propagate any checksums as headers available in the database - SHA-256, SHA-512, MD5, etc.
 * **Archive Type Detection**: Parse URL extension to determine archive type
 * **Error Responses**: Return only HTTP status codes, no response body for errors
 * **Header Formatting**: Use exact header names as specified (e.g., `X-Sdkman-Checksum-SHA-256`)
@@ -172,11 +172,7 @@ Feature: Download Candidate Version by Platform
 **Always use the Gradle MCP plugin to run Gradle tasks.**
 
 [ ] All tests pass with `gradlew test`
-[ ] All code formatted with `gradlew ktlintFormat`
-[ ] The endpoint responds correctly for all scenarios using `curl`
+[ ] All code is formatted with `gradlew ktlintFormat`
+[ ] The endpoint responds correctly with a 302 using `curl`
 [ ] The acceptance test covers all specified scenarios
 [ ] The `VersionRepo` integration test passes against the MongoDB test container
-[ ] The platform resolution logic is implemented correctly
-[ ] All error cases return appropriate HTTP status codes
-[ ] Checksum headers are generated and included in responses
-[ ] Archive type detection works as expected based on URL analysis
