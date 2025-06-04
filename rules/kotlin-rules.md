@@ -5,113 +5,52 @@ alwaysApply: true
 ---
 # Kotlin Functional Programming Style Guide
 
-*Cursor rules file – functional Kotlin guidelines with Arrow for AI-generated code.*
+*Functional Kotlin guidelines with Arrow for AI-generated code.*
 
-> **Intent**  
-> Provide a blueprint for writing **clean, functional Kotlin code** that prioritizes immutability, type safety, and explicit error handling.  
-> Embrace functional programming principles while maintaining readability and practicality.  
-> Leverage Arrow for robust functional abstractions instead of imperative patterns.
+## 1. Core Principles
 
----
+- **Immutability First**: Default to `val` and immutable collections
+- **Expression Over Statement**: Favor expressions that return values over statements with side effects
+- **Type Safety**: Make impossible states unrepresentable
+- **Pure Functions**: Functions with no side effects, same output for same input
+- **Explicit Error Handling**: Use Arrow's `Either`, `Option`, `Validated` instead of nullables and exceptions
+- **Composition**: Build complex logic by composing smaller, focused functions
+- **No Exception Throwing**: Use Arrow's `Either.catch {}` for exception handling
 
-## 1 Core Principles
+**FAVOR SIMPLE SOLUTIONS OVER COMPLEX ONES!**
 
-| Principle | Description |
-|-----------|-------------|
-| **Immutability First** | Default to immutable data structures (`val`, immutable collections) |
-| **Expression Over Statement** | Favor expressions that return values over statements with side effects |
-| **Type Safety** | Use the type system to prevent errors; make impossible states unrepresentable |
-| **Pure Functions** | Functions with no side effects that return the same output for the same input |
-| **Explicit Error Handling** | Use Arrow's `Either`, `Option`, `Validated` instead of nulls or exceptions |
-| **Composition** | Build complex logic by composing smaller, focused functions |
-| **No Exception Throwing** | Never use try/catch blocks; always use Arrow's `Either.catch {}` for exception handling |
+## 2. Project & Code Organization
 
+### File Structure
 
-**Favour SIMPLE solutions of COMPLEX ones!!!**
+One file can contain multiple related classes/functions (cohesive unit)
 
----
+### Naming Conventions
+- **Packages**: lowercase (`io.sdkman.state.version`)
+- **Classes/Interfaces**: PascalCase (`VersionRepository`)
+- **Functions**: camelCase (`findById()`)
+- **Properties**: camelCase (`username`)
+- **Constants**: UPPER_SNAKE_CASE (`MAX_RETRY_ATTEMPTS`)
 
-## 2 Project Structure
+## 3. Type System & Error Handling
 
-### 2.1 Package Organization
-
-Organize packages by feature or domain concept, not by technical layer:
-
-```
-io.sdkman.state
-├── version/           # Version-related functionality
-│   ├── model/         # Domain models for versions
-│   ├── service/       # Services for version operations
-│   └── routes/        # HTTP routes for version endpoints
-├── repos/             # Repository interfaces and implementations
-├── config/            # Application configuration
-└── util/              # Cross-cutting utilities
-```
-
-### 2.2 File Structure
-
-* One file can contain multiple related classes/functions (cohesive unit)
-* Group by feature rather than technical concerns
-* Acceptable pairings in a single file:
-  * Data class + its Repository interface
-  * Domain model + its associated services
-  * Related pure functions that operate on the same data structure
-
----
-
-## 3 Naming Conventions
-
-| Element | Convention | Example |
-|---------|------------|---------|
-| **Packages** | All lowercase, no underscores | `io.sdkman.state.version` |
-| **Classes/Interfaces** | PascalCase, descriptive nouns | `VersionRepository`, `StateService` |
-| **Functions** | camelCase, verb phrases | `findById()`, `transformVersion()` |
-| **Properties** | camelCase, nouns | `username`, `creationDate` |
-| **Constants** | UPPER_SNAKE_CASE | `MAX_RETRY_ATTEMPTS`, `DEFAULT_TIMEOUT` |
-| **Type Parameters** | Single uppercase letter or descriptive name | `T`, `E`, `RequestType` |
-
----
-
-## 4 Type System
-
-### 4.1 Algebraic Data Types
-
-Use sealed classes/interfaces to represent finite sets of possibilities:
-
+### Algebraic Data Types
 ```kotlin
 sealed class Result<out A> {
     data class Success<A>(val value: A) : Result<A>()
     data class Failure(val error: DomainError) : Result<Nothing>()
 }
-
-sealed class DomainError {
-    data class NotFound(val id: String) : DomainError()
-    data class ValidationFailed(val reason: String) : DomainError()
-    data class SystemError(val cause: Throwable) : DomainError()
-}
 ```
 
-### 4.2 Avoiding Nulls
-
-* Never use nullable types (`String?`, `Int?`, etc.) in your domain model
-* Represent optional values with Arrow's `Option<A>`:
-
+### Avoiding Nulls(**IMPORTANT**)
+Use Arrow's `Option<A>` instead of nullable types:
 ```kotlin
-// Instead of:
-fun findUser(id: String): User? 
-
-// Prefer:
+// Instead of: fun findUser(id: String): User?
 fun findUser(id: String): Option<User>
 ```
 
-### 4.3 Error Handling
-
-* Use `Either<E, A>` for operations that can fail with typed errors
-* Use `Validated<E, A>` when accumulating multiple errors
-* Always use `Either.catch` for exception handling; never use try/catch blocks
-* All exceptions must be captured and converted to domain errors
-* Avoid throwing exceptions; make failures explicit in the return type:
-
+### Error Handling
+Use `Either<E, A>` for operations that can fail:
 ```kotlin
 // NEVER do this:
 try {
@@ -121,89 +60,36 @@ try {
 }
 
 // ALWAYS do this:
-Either.catch { 
-    parseData(input) 
-}.mapLeft { e -> 
-    DomainError.ParseError(e) 
-}
-
-// Or with a helper function:
-fun validateAndParse(input: String): Either<ValidationError, ParsedData> =
-    if (!isValid(input)) {
-        ValidationError(input).left()
-    } else {
-        Either.catch { 
-            parse(input) 
-        }.mapLeft { e -> 
-            ValidationError("Parse error: ${e.message}") 
-        }
-    }
+Either.catch {
+    parseData(input)
+}.mapLeft { e -> DomainError.ParseError(e) }
 ```
 
-### 4.4 Smart Constructors
-
-Use factory functions to ensure invariants for domain objects:
-
+### Smart Constructors
 ```kotlin
 data class Email private constructor(val value: String) {
     companion object {
         fun of(value: String): Either<ValidationError, Email> =
-            if (value.matches(EMAIL_REGEX)) {
-                Email(value).right()
-            } else {
-                ValidationError("Invalid email format").left()
-            }
+            if (value.matches(EMAIL_REGEX)) Email(value).right()
+            else ValidationError("Invalid email format").left()
     }
 }
 ```
 
----
+## 4. Functions and Collections
 
-## 5 Functions and Lambdas
-
-### 5.1 Function Design
-
-* Keep functions small and focused on a single responsibility
-* Prefer pure functions that don't cause side effects
-* Use default parameters instead of function overloading
-* Always specify explicit return types for public functions and methods
-* Prefer expression bodies over block bodies for simple functions:
-
+### Function Design
+- Keep functions small and focused
+- Prefer pure functions without side effects
+- Specify explicit return types for public functions
+- Prefer expression bodies for simple functions:
 ```kotlin
-// Prefer:
 fun transform(input: String): Int = input.length
-
-// Instead of:
-fun transform(input: String): Int {
-    return input.length
-}
 ```
 
-### 5.2 Higher-Order Functions
-
-* Use higher-order functions from the standard library (`map`, `filter`, `fold`)
-* Extract complex lambdas to named functions for readability
-
-### 5.3 Function Composition
-
-* Compose functions using extensions or operators
-* Use Arrow's function composition utilities for complex chains
-
-```kotlin
-val validateAndProcess: (RawData) -> Either<AppError, ProcessedData> = 
-    ::validate andThen ::process
-```
-
----
-
-## 6 Collections
-
-### 6.1 Immutable Collections
-
-* Always use immutable collection interfaces (`List`, `Set`, `Map`)
-* Avoid mutable collection operations (`.add()`, `.remove()`, etc.)
-* Create new collections instead of modifying existing ones:
-
+### Immutable Collections
+- Use immutable collection interfaces (`List`, `Set`, `Map`)
+- Create new collections instead of modifying existing ones:
 ```kotlin
 // Instead of:
 val items = mutableListOf<Item>()
@@ -213,10 +99,7 @@ items.add(newItem)
 val updatedItems = items + newItem
 ```
 
-### 6.2 Collection Operations
-
-* Prefer functional operations over imperative loops:
-
+### Collection Operations
 ```kotlin
 // Instead of:
 val result = mutableListOf<String>()
@@ -232,314 +115,82 @@ val result = items
     .map { it.name.uppercase() }
 ```
 
-* Chain operations for complex transformations
-* Extract complex lambdas to named functions
+## 5. Arrow for Functional Programming
 
----
-
-## 7 Error Handling with Arrow
-
-### 7.1 Option
-
-Use `Option<A>` for values that might be absent:
-
+### Option
 ```kotlin
 fun findConfig(key: String): Option<Config> =
     configs[key].toOption()
-
-val result = findConfig("api.url")
-    .map { it.value }
-    .getOrElse { DEFAULT_URL }
 ```
 
-### 7.2 Either
-
-Use `Either<E, A>` for operations that might fail with a specific error:
-
+### Either
 ```kotlin
 fun validateInput(input: String): Either<ValidationError, Input> =
     when {
         input.isEmpty() -> ValidationError("Input cannot be empty").left()
-        input.length < 3 -> ValidationError("Input too short").left()
         else -> Input(input).right()
     }
 ```
 
-### 7.3 Validated
-
-Use `Validated<E, A>` to accumulate multiple errors:
-
+### Validated
+For accumulating multiple errors:
 ```kotlin
-fun validateForm(name: String, email: String, age: Int): ValidatedNel<ValidationError, Form> =
+fun validateForm(name: String, email: String): ValidatedNel<ValidationError, Form> =
     ValidatedNel.applicative(Nel.semigroup<ValidationError>()).map(
         validateName(name).toValidatedNel(),
-        validateEmail(email).toValidatedNel(),
-        validateAge(age).toValidatedNel()
-    ) { (validName, validEmail, validAge) ->
-        Form(validName, validEmail, validAge)
+        validateEmail(email).toValidatedNel()
+    ) { (validName, validEmail) ->
+        Form(validName, validEmail)
     }.fix()
 ```
 
-### 7.4 IO
+## 6. Domain Modeling
 
-Use `IO<E, A>` for effectful operations (database access, HTTP calls, etc.):
-
+### Data Classes
 ```kotlin
-fun fetchUser(id: String): IO<ApiError, User> =
-    IO.effect {
-        api.getUser(id) // This may throw exceptions
-    }.mapError { e ->
-        when (e) {
-            is HttpException -> ApiError.HttpError(e.code)
-            else -> ApiError.UnknownError(e)
-        }
-    }
-```
-
----
-
-## 8 Domain Modeling
-
-### 8.1 Data Classes
-
-* Use data classes for immutable value objects:
-
-```kotlin
-data class Version(
-    val candidate: String,
-    val version: String,
-    val url: String,
-    val platform: Platform,
-    val vendor: String? = null
+data class MyDomain(
+    val a: String,
+    val b: String,
 )
 ```
 
-### 8.2 Sealed Classes
-
-* Use sealed classes for sum types (entities with different variants):
-
+### Sealed Classes
 ```kotlin
-sealed class Platform {
+sealed class MyPlatform {
     object Universal : Platform()
-    data class MacOS(val arch: Architecture) : Platform()
     data class Linux(val arch: Architecture) : Platform()
-    data class Windows(val arch: Architecture) : Platform()
-}
-
-sealed class Architecture {
-    object X64 : Architecture()
-    object Arm64 : Architecture()
 }
 ```
 
-### 8.3 Value Types
-
-* Create dedicated types for primitive values to improve type safety:
-
+### Value Types
 ```kotlin
 @JvmInline
-value class CandidateId(val value: String)
-
-@JvmInline
-value class VersionString(val value: String)
+value class EntityId(val value: String)
 ```
 
----
-
-## 9 Persistence and Effects
-
-### 9.1 Repository Pattern
-
-* Define repository interfaces in the domain layer:
+## 7. Repository Pattern & Effect Management
 
 ```kotlin
 interface VersionRepository {
-    fun findById(id: VersionId): IO<RepositoryError, Option<Version>>
-    fun findByCandidate(candidate: String): IO<RepositoryError, List<Version>>
-    fun save(version: Version): IO<RepositoryError, Version>
+    fun findById(id: VersionId): Either<RepositoryError, Option<Version>>
+    fun save(version: Version): Either<RepositoryError, Version>
 }
-```
 
-### 9.2 Effect Management
-
-* Use Arrow's `IO` for managing side effects:
-
-```kotlin
 class MongoVersionRepository(private val db: MongoDatabase) : VersionRepository {
-    override fun findById(id: VersionId): IO<RepositoryError, Option<Version>> =
-        IO.effect {
+    override fun findById(id: VersionId): Either<RepositoryError, Option<Version>> =
+        Either.catch {
             db.collection("versions")
                 .find(Filters.eq("_id", id.value))
                 .firstOrNull()
-                ?.toVersion()
-        }.map { it.toOption() }
-         .mapError { RepositoryError.DatabaseError(it) }
+                .toOption()
+                .map{ it.toVersion() }
+        }.mapLeft { RepositoryError.DatabaseError(it) }
 }
 ```
 
-### 9.3 Transaction Handling
+## 8. Self-Documenting Code
 
-* Keep transactions explicit and at the service layer:
-
-```kotlin
-fun processOrder(order: Order): IO<OrderError, Receipt> =
-    IO.fx {
-        val validatedOrder = !validateOrder(order)
-                              .mapLeft { OrderError.ValidationFailed(it) }
-        val savedOrder = !orderRepository.save(validatedOrder)
-                         .mapLeft { OrderError.PersistenceError(it) }
-        val payment = !paymentService.processPayment(savedOrder)
-                      .mapLeft { OrderError.PaymentFailed(it) }
-        
-        Receipt(savedOrder.id, payment.id, savedOrder.total)
-    }
-```
-
----
-
-## 10 API Design
-
-### 10.1 Function Signatures
-
-* Make failures explicit in function signatures:
-
-```kotlin
-// Instead of:
-@Throws(NotFoundException::class)
-fun getUser(id: String): User
-
-// Prefer:
-fun getUser(id: String): Either<GetUserError, User>
-```
-
-### 10.2 Consistent Return Types
-
-* Maintain consistent return types across similar operations:
-
-```kotlin
-interface CandidateService {
-    fun findById(id: String): IO<ServiceError, Option<Candidate>>
-    fun findAll(): IO<ServiceError, List<Candidate>>
-    fun save(candidate: Candidate): IO<ServiceError, Candidate>
-    fun delete(id: String): IO<ServiceError, Unit>
-}
-```
-
-### 10.3 Parameterization Over Generics
-
-* Parameterize interfaces to support different result types:
-
-```kotlin
-interface CrudRepository<ID, E, F> {
-    fun findById(id: ID): IO<F, Option<E>>
-    fun findAll(): IO<F, List<E>>
-    fun save(entity: E): IO<F, E>
-    fun delete(id: ID): IO<F, Unit>
-}
-```
-
----
-
-## 11 Code Formatting and Style
-
-### 11.1 Line Length and Wrapping
-
-* Maximum line length: 120 characters
-* Wrap long parameter lists, chained function calls
-
-### 11.2 Indentation and Spacing
-
-* Use 4 spaces for indentation (no tabs)
-* Put spaces around operators
-* No trailing whitespace
-
-### 11.3 File Organization
-
-* Order of declarations in files:
-  1. Package statement
-  2. Imports (alphabetical, no wildcards)
-  3. Top-level declarations (classes, functions, properties)
-
-### 11.4 EditorConfig Settings
-
-```
-root = true
-
-[*]
-charset = utf-8
-end_of_line = lf
-indent_size = 4
-indent_style = space
-insert_final_newline = true
-max_line_length = 120
-tab_width = 4
-trim_trailing_whitespace = true
-
-[*.{yml,yaml}]
-indent_size = 2
-```
-
----
-
-## 11 Kotlin-Specific Hexagonal Architecture
-
-### 11.1 Functional Error Handling
-
-* Use `Either<E, A>` for expressing operations that can fail
-* Define explicit error hierarchies for each layer
-* Map errors at adapter boundaries
-
-```kotlin
-interface UserRepository {
-    fun findById(id: String): Either<RepositoryError, User>
-}
-
-class UserService(private val repo: UserRepository) {
-    fun getUser(id: String): Either<DomainError, UserDto> =
-        repo.findById(id)
-            .mapLeft { it.toDomainError() }
-            .map { it.toDto() }
-}
-```
-
-### 11.2 Interface Default Methods
-
-* Use interface default methods for simple adapter logic
-* Keep complex logic in separate implementation classes
-
-```kotlin
-interface AuditLog {
-    fun log(event: AuditEvent): IO<LogError, Unit>
-    
-    // Default method for common case
-    fun logUserAction(user: String, action: String) = 
-        log(AuditEvent(user, action, Instant.now()))
-}
-```
-
-### 11.3 Sealed Classes for Ports
-
-* Use sealed classes/interfaces for modeling port behaviors
-* Leverage the compiler to ensure all cases are handled
-
-```kotlin
-sealed interface StorageResult<out T> {
-    data class Success<T>(val value: T) : StorageResult<T>
-    data class NotFound(val id: String) : StorageResult<Nothing>
-    data class Error(val exception: Throwable) : StorageResult<Nothing>
-}
-```
-
----
-
-## 12 Self-Documenting Code
-
-### 12.1 Clear Naming Over Comments
-
-* Code should be self-explanatory through thoughtful naming
-* Method, class, and variable names should clearly express their purpose and intent
-* **No JavaDoc-style comments** (`/** ... */`) are allowed in the codebase
-
+### Clear Naming Over Comments
 ```kotlin
 // AVOID this:
 /**
@@ -553,95 +204,31 @@ fun process(orderId: String): Boolean
 fun validateAndProcessCustomerOrder(orderId: String): Either<OrderProcessingError, ProcessedOrder>
 ```
 
-### 12.2 Naming Guidelines
+### Naming Guidelines
+- **Classes**: Nouns describing the entity
+- **Methods**: Verb phrases describing the action
+- **Variables**: Descriptive nouns indicating purpose
+- **Boolean variables/functions**: Use prefixes like `is`, `has`, or `should`
 
-* **Classes**: Use nouns that clearly describe the entity
-* **Methods**: Use verb phrases that describe the action
-* **Variables**: Use descriptive nouns that indicate purpose, not implementation
-* **Boolean variables/functions**: Use prefixes like `is`, `has`, or `should`
-
-```kotlin
-// AVOID:
-val s = "John Doe"
-fun proc(): Boolean
-
-// PREFER:
-val customerFullName = "John Doe"
-fun isEligibleForDiscount(): Boolean
-```
-
-### 12.3 Acceptable Comments
-
-* Use single-line comments (`//`) sparingly and only when:
-  * Explaining "why" rather than "what" or "how"
-  * Documenting non-obvious edge cases or constraints
-  * Marking TODOs for future improvements (with clear action items)
-
-```kotlin
-// REASONABLE comments:
-// Using 15 minutes (900 seconds) as timeout to comply with API rate limits
-val requestTimeout = 900
-
-// Force refresh token if less than 10 minutes remaining before expiry
-if (tokenExpiryTime - currentTime < 600) {
-    refreshAuthToken()
-}
-```
-
-### 12.4 Code Organization for Readability
-
-* Break complex methods into smaller, well-named helper methods
-* Group related functionality together
-* Place the most important code first in files and methods
-* Use meaningful parameter naming rather than comments:
-
-```kotlin
-// AVOID:
-fun sendEmail(recipient: String, subject: String, body: String, isHtml: Boolean)
-
-// PREFER:
-data class EmailContent(
-    val subject: String,
-    val body: String,
-    val isHtmlFormat: Boolean = false
-)
-fun sendEmailTo(recipient: String, content: EmailContent)
-```
-
-### 12.5 Functions as Documentation
-
-* Extract complex logic into well-named functions that serve as their own documentation
-* Function names should describe their full purpose and side effects
-* Single-responsibility functions reduce the need for comments
-
+### Functions as Documentation
 ```kotlin
 // AVOID:
 // Check if user is active and has admin privileges
-if (user.status == "ACTIVE" && user.role == "ADMIN") {
-    // ... logic here
-}
+if (user.status == "ACTIVE" && user.role == "ADMIN") { /* ... */ }
 
 // PREFER:
 fun isActiveAdministrator(user: User): Boolean =
     user.status == "ACTIVE" && user.role == "ADMIN"
 
-if (isActiveAdministrator(user)) {
-    // ... logic here
-}
+if (isActiveAdministrator(user)) { /* ... */ }
 ```
 
----
+## TL;DR
 
-### TL;DR
-
-1. **Immutability**: Use `val`, immutable collections, and data classes.
-2. **Type Safety**: Make illegal states unrepresentable with sealed classes and custom types.
-3. **Functional Style**: Use expressions over statements, pure functions, and function composition.
-4. **Error Handling**: Represent errors with Arrow's `Either`, `Option`, `Validated`, and `IO`.
-5. **Null Avoidance**: Never use nullable types; use `Option<A>` instead.
-6. **Collection Operations**: Use functional operators (`map`, `filter`, `fold`) instead of loops.
-7. **Domain Modeling**: Use data classes, sealed classes, and value types for rich domain models.
-8. **Side Effects**: Isolate and manage side effects with Arrow's `IO`.
-9. **Self-Documenting Code**: Use clear naming conventions instead of comments; no JavaDoc-style comments allowed.
-
-Place this file with your other Cursor rules to guide AI-generated Kotlin code toward functional best practices.
+1. **Immutability**: Use `val`, immutable collections, and data classes
+2. **Type Safety**: Use sealed classes and custom types to prevent invalid states
+3. **Functional Style**: Expressions over statements, pure functions, function composition
+4. **Error Handling**: Use Arrow's `Either`, `Option`, `Validated`
+5. **Null Avoidance**: Use `Option<A>` instead of nullable types
+6. **Collections**: Use functional operators (`map`, `filter`, `fold`) instead of loops
+7. **Self-Documenting Code**: Clear naming over comments; no JavaDoc
