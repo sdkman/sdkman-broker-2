@@ -118,6 +118,9 @@ val result = items
 ## 5. Arrow for Functional Programming
 
 ### Option
+
+Convert nullable types to `Option` **as soon as possible** to avoid null checks throughout the codebase:
+
 ```kotlin
 fun findConfig(key: String): Option<Config> =
     configs[key].toOption()
@@ -157,7 +160,7 @@ data class MyDomain(
 ### Sealed Classes
 ```kotlin
 sealed class MyPlatform {
-    object Universal : Platform()
+    data object Universal : Platform()
     data class Linux(val arch: Architecture) : Platform()
 }
 ```
@@ -229,6 +232,6 @@ if (isActiveAdministrator(user)) { /* ... */ }
 2. **Type Safety**: Use sealed classes and custom types to prevent invalid states
 3. **Functional Style**: Expressions over statements, pure functions, function composition
 4. **Error Handling**: Use Arrow's `Either`, `Option`, `Validated`
-5. **Null Avoidance**: Use `Option<A>` instead of nullable types
+5. **Null Avoidance**: Convert nullable types to `Option<A>` as soon as possible
 6. **Collections**: Use functional operators (`map`, `filter`, `fold`) instead of loops
 7. **Self-Documenting Code**: Clear naming over comments; no JavaDoc
