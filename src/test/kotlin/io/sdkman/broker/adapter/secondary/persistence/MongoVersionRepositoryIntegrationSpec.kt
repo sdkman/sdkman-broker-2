@@ -15,7 +15,6 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
 
     val repository = MongoVersionRepository(MongoTestListener.database)
 
-
     should("find version by exact candidate, version, and platform match") {
         // given: version record in database
         setupVersion(
@@ -186,11 +185,12 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
                 platform = "UNIVERSAL",
                 url = "https://example.com/maven-3.8.1.tar.gz",
                 vendor = None,
-                checksums = mapOf(
-                    "SHA-256" to "sha256value",
-                    "SHA-1" to "sha1value",
-                    "MD5" to "md5value"
-                )
+                checksums =
+                    mapOf(
+                        "SHA-256" to "sha256value",
+                        "SHA-1" to "sha1value",
+                        "MD5" to "md5value"
+                    )
             )
         )
 

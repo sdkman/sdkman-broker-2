@@ -1,6 +1,10 @@
 package io.sdkman.broker.adapter.secondary.persistence
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Option
+import arrow.core.firstOrNone
+import arrow.core.getOrElse
+import arrow.core.toOption
 import com.mongodb.MongoException
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
@@ -50,7 +54,6 @@ class MongoVersionRepository(private val database: MongoDatabase) : VersionRepos
                 else -> VersionError.DatabaseError(error)
             }
         }
-
 }
 
 private fun Document.toVersion(): Version {
