@@ -8,10 +8,10 @@ import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.sdkman.broker.domain.model.Version
+import io.sdkman.broker.support.MongoSupport.setupVersion
 import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
-import org.bson.Document
 
 class VersionDownloadAcceptanceSpec : ShouldSpec({
     listener(MongoTestListener)
@@ -282,20 +282,3 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
     }
 })
 
-// TODO: move this fixture helper into a `MongoSupport` helper object under the test `support` package
-private fun setupVersion(version: Version) {
-    val versionsCollection = MongoTestListener.database.getCollection("versions")
-    versionsCollection.insertOne(
-        Document().apply {
-            put("candidate", version.candidate)
-            put("version", version.version)
-            put("platform", version.platform)
-            put("url", version.url)
-            version.vendor.map { put("vendor", it) }
-            put("visible", version.visible)
-            if (version.checksums.isNotEmpty()) {
-                put("checksums", Document(version.checksums))
-            }
-        }
-    )
-}
