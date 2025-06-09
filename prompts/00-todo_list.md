@@ -10,7 +10,9 @@ Then I want you to generate a new document called `TODO.md` in the root director
 * The headline of the task
 * A description of what the task entails
 
-**IMPORTANT**: Each entry should be structured like a small prompt that we can use to generate the code for that task. The prompt must have all the relevant detail and context for an AI agent to complete the entire task in one shot.
-**IMPORTANT**: Each prompt should reference the files that are affected.
-**IMPORTANT**: Each task should be scoped correctly to be completed in one shot.
-**IMPORTANT**: Do not make up your own TODOs! Only use the ones that I have provided in the source code.
+## IMPORTANT!
+
+* Each entry in `TODO.md` should be structured as a prompt that we can use to generate the code to complete that task. The prompt must have all the relevant detail and context for an AI agent to complete the entire task in one shot.
+* Each prompt should be followed by the list of files that are affected.
+* Each task should be scoped correctly so it will be completed in a single shot.
+* Do not make up your own TODOs! Only use the ones provided in the source code!
