@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import io.sdkman.broker.support.MongoSupport
 import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
@@ -17,7 +18,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
     init {
         should("return 200 OK when database is healthy") {
             // given: an initialised database
-            MongoTestListener.setupValidAppRecord()
+            MongoSupport.setupValidAppRecord()
 
             // when: a GET request is made for "/meta/alive"
             testApplication {
@@ -56,7 +57,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
 
         should("return 503 Service Unavailable when database has invalid application record") {
             // given: an uninitialised database with an invalid application record
-            MongoTestListener.setupInvalidAppRecord()
+            MongoSupport.setupInvalidAppRecord()
 
             // when: a GET request is made for "/meta/alive"
             testApplication {
