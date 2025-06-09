@@ -37,7 +37,7 @@ Keep only the core assertions that validate the main acceptance criteria (HTTP s
 
 ## Task 3: Replace Null Checks with Option and For Comprehension
 
-- [ ] **Use Option instead of null checks and implement for comprehension for parameter handling**
+- [x] **Use Option instead of null checks and implement for comprehension for parameter handling**
 
 **Description:** The download routes currently use null checks for extracting path parameters. This should be replaced with Arrow's Option type and for comprehension to handle the parameters in a more functional way, following the project's functional programming patterns.
 

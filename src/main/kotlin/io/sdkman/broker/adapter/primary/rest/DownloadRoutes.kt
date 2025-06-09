@@ -14,7 +14,6 @@ import io.sdkman.broker.domain.model.VersionError
 fun Application.downloadRoutes(versionService: VersionService) {
     routing {
         get("/download/{candidate}/{version}/{platform}") {
-            // TODO: use Option instead of null checks, use for comprehension to handle parameters
             val candidate = call.parameters["candidate"] ?: return@get call.respondBadRequest()
             val version = call.parameters["version"] ?: return@get call.respondBadRequest()
             val platform = call.parameters["platform"] ?: return@get call.respondBadRequest()
