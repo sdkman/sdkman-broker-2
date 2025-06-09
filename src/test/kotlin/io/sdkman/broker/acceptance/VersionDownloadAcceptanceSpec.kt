@@ -54,9 +54,6 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             response.headers["Location"] shouldBe "https://github.com/adoptium/temurin17-binaries/releases/" +
                 "download/jdk-17.0.2%2B8/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.2_8.tar.gz"
 
-            // TODO: remove header assertions, not this test's concern
-            response.headers["X-Sdkman-Checksum-SHA-256"] shouldBe "abc123def456"
-            response.headers["X-Sdkman-ArchiveType"] shouldBe "tar.gz"
         }
     }
 
@@ -98,10 +95,6 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             response.headers["Location"] shouldBe "https://groovy.jfrog.io/artifactory/dist-release-local/" +
                 "groovy-zips/apache-groovy-binary-4.0.0.zip"
 
-            // TODO: remove header assertions, not this test's concern
-            response.headers["X-Sdkman-Checksum-SHA-256"] shouldBe "def456ghi789"
-            response.headers["X-Sdkman-Checksum-MD5"] shouldBe "ghi789jkl012"
-            response.headers["X-Sdkman-ArchiveType"] shouldBe "zip"
         }
     }
 
