@@ -10,7 +10,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.sdkman.broker.application.service.ReleaseError
 import io.sdkman.broker.application.service.ReleaseService
-import io.sdkman.broker.application.service.ReleaseServiceImpl
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
 

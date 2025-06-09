@@ -42,7 +42,7 @@ class MongoVersionRepository(private val database: MongoDatabase) : VersionRepos
                 .first()
                 .toOption()
                 .map { doc ->
-                    //TODO: Call an extension method on Document
+                    // TODO: Call an extension method on Document
                     documentToVersion(doc)
                 }
         }.mapLeft { error ->
@@ -52,7 +52,7 @@ class MongoVersionRepository(private val database: MongoDatabase) : VersionRepos
             }
         }
 
-    //TODO: Turn this into an extension method on Document
+    // TODO: Turn this into an extension method on Document
     private fun documentToVersion(document: Document): Version {
         val checksums =
             document.get(CHECKSUMS_FIELD, Document::class.java)
