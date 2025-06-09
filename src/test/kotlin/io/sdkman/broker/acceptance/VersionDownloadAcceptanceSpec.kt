@@ -2,7 +2,6 @@ package io.sdkman.broker.acceptance
 
 import arrow.core.None
 import arrow.core.Some
-import io.kotest.assertions.fail
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
