@@ -19,7 +19,7 @@ Keep only the core assertions that validate the main acceptance criteria (HTTP s
 
 ## Task 2: Extract Document to Version Conversion Logic
 
-- [ ] **Convert document-to-version mapping into extension methods**
+- [x] **Convert document-to-version mapping into extension methods**
 
 **Description:** The MongoVersionRepository contains inline document-to-version conversion logic that should be extracted into extension methods for better code organization and reusability. This will make the repository code cleaner and the conversion logic more testable.
 
