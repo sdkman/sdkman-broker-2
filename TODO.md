@@ -2,7 +2,7 @@
 
 ## Task 1: Remove Header Assertions from Acceptance Tests
 
-- [ ] **Remove header assertions that are not the acceptance test's primary concern**
+- [x] **Remove header assertions that are not the acceptance test's primary concern**
 
 **Description:** The acceptance tests for version download functionality currently include assertions for HTTP headers like checksums and archive types. These header assertions are not the primary concern of these acceptance tests, which should focus on the main behavior (redirects, status codes). The header assertions should be moved to more focused unit or integration tests.
 
