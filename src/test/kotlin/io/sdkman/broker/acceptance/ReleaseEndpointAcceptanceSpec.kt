@@ -23,7 +23,8 @@ class ReleaseEndpointAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    ReleaseServiceImpl()
+                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.versionService
                 )
             }
 
@@ -54,7 +55,8 @@ class ReleaseEndpointAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    mockService
+                    mockService,
+                    TestDependencyInjection.versionService
                 )
             }
 
