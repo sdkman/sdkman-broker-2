@@ -4,7 +4,6 @@ import com.mongodb.MongoClient
 import io.kotest.core.listeners.TestListener
 import io.kotest.core.spec.Spec
 import io.kotest.core.test.TestCase
-import org.bson.Document
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.utility.DockerImageName
 
@@ -47,20 +46,8 @@ object MongoTestListener : TestListener {
     }
 
     // Resets the database to a clean state
-    fun resetDatabase() {
+    private fun resetDatabase() {
         applicationCollection.drop()
         versionsCollection.drop()
-    }
-
-    // Sets up a valid application record
-    fun setupValidAppRecord() {
-        resetDatabase()
-        applicationCollection.insertOne(Document("alive", "OK"))
-    }
-
-    // Sets up an invalid application record
-    fun setupInvalidAppRecord() {
-        resetDatabase()
-        applicationCollection.insertOne(Document("alive", "NOT_OK"))
     }
 }

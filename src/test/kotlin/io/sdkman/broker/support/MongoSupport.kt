@@ -5,7 +5,7 @@ import org.bson.Document
 
 object MongoSupport {
     fun setupVersion(version: Version) {
-        val versionsCollection = MongoTestListener.database.getCollection("versions")
+        val versionsCollection = MongoTestListener.versionsCollection
         versionsCollection.insertOne(
             Document().apply {
                 put("candidate", version.candidate)
@@ -19,5 +19,17 @@ object MongoSupport {
                 }
             }
         )
+    }
+
+    // Sets up a valid application record
+    fun setupValidAppRecord() {
+        val applicationCollection = MongoTestListener.applicationCollection
+        applicationCollection.insertOne(Document("alive", "OK"))
+    }
+
+    // Sets up an invalid application record
+    fun setupInvalidAppRecord() {
+        val applicationCollection = MongoTestListener.applicationCollection
+        applicationCollection.insertOne(Document("alive", "NOT_OK"))
     }
 }

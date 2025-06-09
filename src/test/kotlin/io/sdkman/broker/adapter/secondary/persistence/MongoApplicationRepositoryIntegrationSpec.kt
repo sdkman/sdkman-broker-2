@@ -5,6 +5,7 @@ import arrow.core.Some
 import io.kotest.core.spec.style.ShouldSpec
 import io.sdkman.broker.domain.model.Application
 import io.sdkman.broker.domain.repository.RepositoryError
+import io.sdkman.broker.support.MongoSupport
 import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRight
@@ -16,7 +17,7 @@ class MongoApplicationRepositoryIntegrationSpec : ShouldSpec({
 
     should("return application when record exists with valid alive status") {
         // given
-        MongoTestListener.setupValidAppRecord()
+        MongoSupport.setupValidAppRecord()
 
         // when
         val result = repository.findApplication()
@@ -40,7 +41,7 @@ class MongoApplicationRepositoryIntegrationSpec : ShouldSpec({
 
     should("return an error when application record has invalid alive status") {
         // given
-        MongoTestListener.setupInvalidAppRecord()
+        MongoSupport.setupInvalidAppRecord()
 
         // when
         val result = repository.findApplication()
