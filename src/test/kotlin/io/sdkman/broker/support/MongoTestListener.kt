@@ -21,6 +21,7 @@ object MongoTestListener : TestListener {
     val mongoClient: MongoClient by lazy { MongoClient(host, port) }
     val database by lazy { mongoClient.getDatabase("sdkman") }
     val applicationCollection by lazy { database.getCollection("application") }
+    val versionsCollection by lazy { database.getCollection("versions") }
 
     override suspend fun beforeSpec(spec: Spec) {
         // Ensure container is started
@@ -48,6 +49,7 @@ object MongoTestListener : TestListener {
     // Resets the database to a clean state
     fun resetDatabase() {
         applicationCollection.drop()
+        versionsCollection.drop()
     }
 
     // Sets up a valid application record

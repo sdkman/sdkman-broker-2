@@ -73,6 +73,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation("io.arrow-kt:arrow-core:$arrowVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
+    testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     testImplementation("org.testcontainers:mongodb:1.19.3")
     testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")
     testImplementation("io.mockk:mockk:1.13.9")
@@ -88,6 +89,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
     maxHeapSize = "512m"
+    maxParallelForks = 1
 }
 
 application {
