@@ -14,4 +14,3 @@ sealed class ArchiveType(val value: String) {
             }
     }
 }
-

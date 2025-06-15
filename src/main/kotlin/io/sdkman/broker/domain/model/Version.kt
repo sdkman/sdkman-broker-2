@@ -12,4 +12,3 @@ data class Version(
     val visible: Boolean = true,
     val checksums: Map<String, String> = emptyMap()
 )
-

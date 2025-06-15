@@ -35,4 +35,3 @@ sealed class Platform(val code: String, val normalizedId: String) {
         fun fromCode(code: String): Option<Platform> = Option.fromNullable(platformMap[code.lowercase()])
     }
 }
-
