@@ -9,7 +9,7 @@ sealed class Platform(val code: String, val persistentId: String) {
 
     data object LinuxX32 : Platform("linuxx32", "LINUX_32")
 
-    data object DarwinX64 : Platform("darwinx64", "MAC_64")
+    data object DarwinX64 : Platform("darwinx64", "MAC_OSX")
 
     data object DarwinARM64 : Platform("darwinarm64", "MAC_ARM64")
 
