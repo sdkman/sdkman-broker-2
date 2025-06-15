@@ -21,7 +21,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
             Version(
                 candidate = "java",
                 version = "17.0.2-tem",
-                platform = "DarwinARM64",
+                platform = "MAC_ARM64",
                 url = "https://example.com/java-17.0.2-arm64.tar.gz",
                 vendor = Some("tem"),
                 visible = true,
@@ -30,7 +30,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
         )
 
         // when: searching for exact match
-        val result = repository.findByQuery("java", "17.0.2-tem", "DarwinARM64")
+        val result = repository.findByQuery("java", "17.0.2-tem", "MAC_ARM64")
 
         // then: version is found
         result shouldBeRightAnd { versionOption ->
@@ -39,7 +39,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
                     Version(
                         candidate = "java",
                         version = "17.0.2-tem",
-                        platform = "DarwinARM64",
+                        platform = "MAC_ARM64",
                         url = "https://example.com/java-17.0.2-arm64.tar.gz",
                         vendor = Some("tem"),
                         visible = true,
@@ -53,7 +53,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
         // given: empty database
 
         // when: searching for non-existent version
-        val result = repository.findByQuery("nonexistent", "1.0.0", "LinuxX64")
+        val result = repository.findByQuery("nonexistent", "1.0.0", "LINUX_64")
 
         // then: None is returned
         result shouldBeRightAnd { versionOption ->
@@ -67,14 +67,14 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
             Version(
                 candidate = "java",
                 version = "11.0.2-tem",
-                platform = "LinuxX64",
+                platform = "LINUX_64",
                 url = "https://example.com/java-11.0.2.tar.gz",
                 vendor = None
             )
         )
 
         // when: searching for different version
-        val result = repository.findByQuery("java", "17.0.2-tem", "LinuxX64")
+        val result = repository.findByQuery("java", "17.0.2-tem", "LINUX_64")
 
         // then: None is returned
         result shouldBeRightAnd { versionOption ->
@@ -88,14 +88,14 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
             Version(
                 candidate = "java",
                 version = "17.0.2-tem",
-                platform = "WindowsX64",
+                platform = "WINDOWS_64",
                 url = "https://example.com/java-17.0.2-windows.zip",
                 vendor = None
             )
         )
 
         // when: searching for different platform
-        val result = repository.findByQuery("java", "17.0.2-tem", "LinuxX64")
+        val result = repository.findByQuery("java", "17.0.2-tem", "LINUX_64")
 
         // then: None is returned
         result shouldBeRightAnd { versionOption ->

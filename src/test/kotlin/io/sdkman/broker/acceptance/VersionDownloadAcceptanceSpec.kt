@@ -22,7 +22,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             Version(
                 candidate = "java",
                 version = "17.0.2-tem",
-                platform = "DarwinARM64",
+                platform = "MAC_ARM64",
                 url =
                     "https://github.com/adoptium/temurin17-binaries/releases/" +
                         "download/jdk-17.0.2%2B8/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.2_8.tar.gz",
@@ -138,7 +138,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             Version(
                 candidate = "java",
                 version = "17.0.2-tem",
-                platform = "DarwinARM64",
+                platform = "MAC_ARM64",
                 url = "https://example.com/java-17.0.2.tar.gz",
                 vendor = Some("tem")
             )
@@ -167,7 +167,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             Version(
                 candidate = "java",
                 version = "17.0.2-tem",
-                platform = "DarwinARM64",
+                platform = "MAC_ARM64",
                 url = "https://example.com/java-arm64.tar.gz",
                 vendor = Some("tem")
             )

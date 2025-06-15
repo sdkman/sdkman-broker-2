@@ -20,7 +20,7 @@ interface VersionService {
     fun downloadVersion(
         candidate: String,
         version: String,
-        platform: String
+        platformCode: String
     ): Either<VersionError, DownloadResponse>
 }
 
@@ -30,12 +30,12 @@ class VersionServiceImpl(
     override fun downloadVersion(
         candidate: String,
         version: String,
-        platform: String
+        platformCode: String
     ): Either<VersionError, DownloadResponse> =
-        Platform.fromCode(platform)
-            .toEither { VersionError.InvalidPlatform(platform) }
-            .flatMap { platformObj ->
-                findVersionWithFallback(candidate, version, platformObj.normalizedId)
+        Platform.fromCode(platformCode)
+            .toEither { VersionError.InvalidPlatform(platformCode) }
+            .flatMap { platform ->
+                findVersionWithFallback(candidate, version, platform.persistentId)
                     .map { versionEntity ->
                         val checksumHeaders =
                             versionEntity.checksums.mapKeys { (algorithm, _) ->
@@ -60,7 +60,7 @@ class VersionServiceImpl(
             .flatMap { versionOption ->
                 versionOption.fold(
                     { // Try UNIVERSAL fallback
-                        versionRepository.findByQuery(candidate, version, Platform.Universal.normalizedId)
+                        versionRepository.findByQuery(candidate, version, Platform.Universal.persistentId)
                             .flatMap { universalOption ->
                                 universalOption.fold(
                                     { VersionError.VersionNotFound(candidate, version, platformId).left() },

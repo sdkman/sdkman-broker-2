@@ -23,12 +23,12 @@ class VersionServiceSpec : ShouldSpec({
             Version(
                 candidate = "java",
                 version = "17.0.2-tem",
-                platform = "DarwinARM64",
+                platform = "MAC_ARM64",
                 url = "https://example.com/java-17.0.2-arm64.tar.gz",
                 vendor = Some("tem"),
                 checksums = mapOf("SHA-256" to "abc123")
             )
-        every { mockRepository.findByQuery("java", "17.0.2-tem", "DarwinARM64") } returns Some(version).right()
+        every { mockRepository.findByQuery("java", "17.0.2-tem", "MAC_ARM64") } returns Some(version).right()
 
         // when: downloading version
         val result = service.downloadVersion("java", "17.0.2-tem", "darwinarm64")
@@ -51,7 +51,7 @@ class VersionServiceSpec : ShouldSpec({
                 url = "https://example.com/groovy-4.0.0.zip",
                 checksums = mapOf("SHA-256" to "def456", "MD5" to "ghi789")
             )
-        every { mockRepository.findByQuery("groovy", "4.0.0", "LinuxX64") } returns None.right()
+        every { mockRepository.findByQuery("groovy", "4.0.0", "LINUX_64") } returns None.right()
         every {
             mockRepository.findByQuery("groovy", "4.0.0", "UNIVERSAL")
         } returns Some(universalVersion).right()
@@ -81,33 +81,33 @@ class VersionServiceSpec : ShouldSpec({
 
     should("return VersionNotFound error when no version exists") {
         // given: no version found for exact or UNIVERSAL
-        every { mockRepository.findByQuery("nonexistent", "1.0.0", "LinuxX64") } returns None.right()
+        every { mockRepository.findByQuery("nonexistent", "1.0.0", "LINUX_64") } returns None.right()
         every { mockRepository.findByQuery("nonexistent", "1.0.0", "UNIVERSAL") } returns None.right()
 
         // when: downloading non-existent version
         val result = service.downloadVersion("nonexistent", "1.0.0", "linuxx64")
 
         // then: VersionNotFound error
-        result shouldBeLeft VersionError.VersionNotFound("nonexistent", "1.0.0", "LinuxX64")
+        result shouldBeLeft VersionError.VersionNotFound("nonexistent", "1.0.0", "LINUX_64")
     }
 
     should("return VersionNotFound error when platform not found and no UNIVERSAL fallback") {
         // given: no exact match and no UNIVERSAL fallback
-        every { mockRepository.findByQuery("java", "17.0.2-tem", "LinuxX64") } returns None.right()
+        every { mockRepository.findByQuery("java", "17.0.2-tem", "LINUX_64") } returns None.right()
         every { mockRepository.findByQuery("java", "17.0.2-tem", "UNIVERSAL") } returns None.right()
 
         // when: downloading version for unsupported platform
         val result = service.downloadVersion("java", "17.0.2-tem", "linuxx64")
 
         // then: VersionNotFound error
-        result shouldBeLeft VersionError.VersionNotFound("java", "17.0.2-tem", "LinuxX64")
+        result shouldBeLeft VersionError.VersionNotFound("java", "17.0.2-tem", "LINUX_64")
     }
 
     should("return DatabaseError when repository fails") {
         // given: repository error
         val dbError = RuntimeException("Database connection failed")
         every {
-            mockRepository.findByQuery("java", "17.0.2-tem", "DarwinARM64")
+            mockRepository.findByQuery("java", "17.0.2-tem", "MAC_ARM64")
         } returns VersionError.DatabaseError(dbError).left()
 
         // when: downloading version

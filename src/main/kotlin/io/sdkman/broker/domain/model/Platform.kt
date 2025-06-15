@@ -2,18 +2,18 @@ package io.sdkman.broker.domain.model
 
 import arrow.core.Option
 
-sealed class Platform(val code: String, val normalizedId: String) {
-    data object LinuxX64 : Platform("linuxx64", "LinuxX64")
+sealed class Platform(val code: String, val persistentId: String) {
+    data object LinuxX64 : Platform("linuxx64", "LINUX_64")
 
-    data object LinuxARM64 : Platform("linuxarm64", "LinuxARM64")
+    data object LinuxARM64 : Platform("linuxarm64", "LINUX_ARM64")
 
-    data object LinuxX32 : Platform("linuxx32", "LinuxX32")
+    data object LinuxX32 : Platform("linuxx32", "LINUX_32")
 
-    data object DarwinX64 : Platform("darwinx64", "DarwinX64")
+    data object DarwinX64 : Platform("darwinx64", "MAC_64")
 
-    data object DarwinARM64 : Platform("darwinarm64", "DarwinARM64")
+    data object DarwinARM64 : Platform("darwinarm64", "MAC_ARM64")
 
-    data object WindowsX64 : Platform("windowsx64", "WindowsX64")
+    data object WindowsX64 : Platform("windowsx64", "WINDOWS_64")
 
     data object Exotic : Platform("exotic", "Exotic")
 
