@@ -1,7 +1,14 @@
 package io.sdkman.broker.application.service
 
 import arrow.core.Either
+import arrow.core.flatMap
+import arrow.core.left
+import arrow.core.right
+import io.sdkman.broker.domain.model.ArchiveType
+import io.sdkman.broker.domain.model.Platform
+import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.domain.model.VersionError
+import io.sdkman.broker.domain.repository.VersionRepository
 
 data class DownloadResponse(
     val redirectUrl: String,
