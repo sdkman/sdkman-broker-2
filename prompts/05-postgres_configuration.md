@@ -27,7 +27,12 @@ Implement flexible PostgreSQL configuration that follows the same patterns as th
 * the `PostgresConnectivity` should be instantiated in the `App` main method with the `AppConfig` parameter
 * The `PostgresConnectivity` class should be located in the same package as `MongoConnectivity`
 * The `PostgresConnectivity` class should provide an already-configured database connection pool instance that may be injected into repository classes
+* Generate an integration spec for `PostgresConnectivity` to test Postgres connectivity
 * Follow the same error handling patterns as `MongoConnectivity`
+* Use HikariCP for connection pooling
+* Use fluid syntax for building `HikariConfig` using Kotlin DSL `with(HikariConfig()) { ... }`
+* Run a correctly configured Postgres container as part of the docker-compose setup
+* Ensure that the README is updated with postgres details to match the MongoDB setup
 
 ## Specification by Example
 
