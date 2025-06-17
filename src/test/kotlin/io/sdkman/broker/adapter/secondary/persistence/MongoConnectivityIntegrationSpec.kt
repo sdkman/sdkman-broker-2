@@ -22,6 +22,11 @@ class MongoConnectivityIntegrationSpec : ShouldSpec({
                 override val mongodbDatabase: String = "sdkman"
                 override val mongodbUsername: Option<String> = None
                 override val mongodbPassword: Option<String> = None
+                override val postgresHost: String = "localhost"
+                override val postgresPort: String = "5432"
+                override val postgresDatabase: String = "sdkman"
+                override val postgresUsername: Option<String> = None
+                override val postgresPassword: Option<String> = None
                 override val serverPort: Int = 8080
                 override val serverHost: String = "127.0.0.1"
             }

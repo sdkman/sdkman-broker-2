@@ -1,6 +1,7 @@
 package io.sdkman.broker.adapter.secondary.persistence
 
 import arrow.core.Either
+import arrow.core.Option
 import arrow.core.getOrElse
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -15,6 +16,7 @@ class PostgresConnectivity(private val config: AppConfig) {
         val result =
             Either.catch {
                 val connectionString = buildConnectionString()
+                logger.info("Building postgres connection string: $connectionString")
                 createDataSource(connectionString)
             }
 
@@ -31,18 +33,20 @@ class PostgresConnectivity(private val config: AppConfig) {
         val host = config.postgresHost
         val port = config.postgresPort
         val database = config.postgresDatabase
+        val simpleConnectionString = "jdbc:postgresql://$host:$port/$database"
 
-        val credentials =
+        if (!isProductionEnvironment(host)) {
+            return simpleConnectionString
+        }
+
+        val credentialConnectionString: Option<String> =
             config.postgresUsername.flatMap { username ->
                 config.postgresPassword.map { password ->
-                    val sslMode = if (isProductionEnvironment(host)) "?sslmode=require" else ""
-                    "jdbc:postgresql://$username:$password@$host:$port/$database$sslMode"
+                    "jdbc:postgresql://$username:$password@$host:$port/$database?sslmode=require"
                 }
             }
 
-        return credentials.getOrElse {
-            "jdbc:postgresql://$host:$port/$database"
-        }
+        return credentialConnectionString.getOrElse { simpleConnectionString }
     }
 
     private fun createDataSource(connectionString: String): DataSource =
