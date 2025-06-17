@@ -6,6 +6,7 @@ A service for brokering SDKMAN CLI downloads and SDK binaries.
 
 This application implements a health check endpoint that performs a deep health check:
 - Connects to MongoDB to verify database availability
+- Connects to Postgres for modern data persistence
 - Checks for the presence of application record
 - Verifies that the application is in a healthy state
 
@@ -15,6 +16,7 @@ This application implements a health check endpoint that performs a deep health 
 
 - JDK 21 (Temurin recommended)
 - MongoDB (or use Docker)
+- Postgres (or use Docker)
 - Gradle
 
 ### SDKMAN Setup
@@ -41,10 +43,24 @@ Run tests:
 
 ### Running Locally
 
-Start MongoDB:
+Start MongoDB and Postgres using Docker Compose:
 
 ```
+docker-compose up -d
+```
+
+Or start them individually:
+
+```
+# MongoDB
 docker run -d -p 27017:27017 --name mongo mongo:5.0
+
+# PostgreSQL
+docker run -d -p 5432:5432 --name postgres \
+  -e POSTGRES_DB=sdkman \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  postgres:15-alpine
 ```
 
 Initialize test data:
@@ -81,7 +97,7 @@ This project uses GitHub Actions for CI/CD:
   - Builds a Docker image and pushes it to Digital Ocean Container Registry
   - The image is tagged with the version number, commit hash, and "latest"
 
-The version is managed by the Axion Release Plugin based on Git tags. 
+The version is managed by the Axion Release Plugin based on Git tags.
 
 ### Checking the Current Version
 
@@ -91,4 +107,4 @@ To check the current version of the application, run:
 ./gradlew currentVersion
 ```
 
-This will display the current version as determined by the Axion Release Plugin. 
+This will display the current version as determined by the Axion Release Plugin.

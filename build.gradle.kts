@@ -65,6 +65,8 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("org.mongodb:mongo-java-driver:3.12.14")
+    implementation("org.postgresql:postgresql:42.7.7")
+    implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("com.typesafe:config:1.4.3")
     implementation("ch.qos.logback:logback-classic:1.4.14")
 
@@ -75,6 +77,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     testImplementation("org.testcontainers:mongodb:1.19.3")
+    testImplementation("org.testcontainers:postgresql:1.19.3")
     testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")
     testImplementation("io.mockk:mockk:1.13.9")
 }

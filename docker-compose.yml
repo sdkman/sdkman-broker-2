@@ -13,7 +13,21 @@ services:
       - ./mongo-config:/etc/mongo
     command: mongod --bind_ip 0.0.0.0
 
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    restart: always
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_DB: sdkman
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
 volumes:
   mongo_data:
   mongo_config:
+  postgres_data:
 

@@ -30,6 +30,10 @@ object App {
         val mongoConnectivity = MongoConnectivity(config)
         val database = mongoConnectivity.database()
 
+        // Create Postgres connection
+        // val postgresConnectivity = PostgresConnectivity(config)
+        // postgresConnectivity.dataSource()
+
         // Initialize repositories
         val applicationRepository = MongoApplicationRepository(database)
         val versionRepository = MongoVersionRepository(database)
