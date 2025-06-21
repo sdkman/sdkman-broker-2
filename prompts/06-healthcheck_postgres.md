@@ -38,8 +38,9 @@ Rules files are under `rules/`
 
 ## Implementation Details
 
-* Create a `PostgresHealthRepository` interface and implementation in the `adapter.secondary.persistence` package
-* The repository should have a simple `checkConnectivity(): Either<Throwable, Unit>` method
+* Create a `HealthRepository` interface and implementation in the `adapter.secondary.persistence` package as `PostgresHealthRepository`
+* The repository should have a simple `checkConnectivity(): Validated<Throwable, Unit>` method
+* Use the Arrow `Validated` type to accumulate multiple database states
 * Use a simple query like `SELECT 1` to validate database connectivity
 * Modify the existing `HealthService` to check both MongoDB and PostgreSQL connectivity
 * Update the `HealthServiceImpl` to orchestrate both database health checks
@@ -47,6 +48,7 @@ Rules files are under `rules/`
 * If either database fails, return appropriate `HealthCheckError` with database-specific context
 * Enhance the health check response to include a JSON body with individual database statuses
 * The JSON response should include `mongodb` and `postgres` fields showing their individual health status
+* Use `UP` for healthy databases and `DOWN` for unhealthy ones
 * Update the REST endpoint to return the detailed health information in JSON format
 * Update the dependency injection in `App.kt` to wire the new PostgreSQL health repository
 
@@ -85,7 +87,8 @@ Scenario: Both databases are inaccessible
 ## Testing Requirements
 
 * Create unit tests for the new `PostgresHealthRepository`
-* Create integration tests using TestContainers for PostgreSQL connectivity
+* Create an integration test using TestContainers for PostgreSQL connectivity
+* The integration test should only cover a single scenario of checking PostgreSQL connectivity (like its counterpart for MongoDB)
 * Update existing `HealthService` tests to cover the new dual-database scenarios
 * Update acceptance tests to validate the new health check behavior
 * Ensure all tests pass when running `./gradlew check`
@@ -98,6 +101,6 @@ Scenario: Both databases are inaccessible
 * Service returns 503 if either database is unhealthy
 * All existing tests continue to pass
 * New tests cover the PostgreSQL health check functionality
-* Integration tests use TestContainers for PostgreSQL
+* Integration test uses TestContainers for PostgreSQL
 * Code follows existing patterns and architectural guidelines
 * All code is properly formatted with `./gradlew ktlintFormat`
