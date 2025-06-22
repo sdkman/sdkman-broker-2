@@ -35,7 +35,6 @@ Rules files are under `rules/`
 ## Implementation Details
 
 * Create a `HealthRepository` interface with implementation as `PostgresHealthRepository`
-* Consider the Arrow `Validated` instead of `Either` type to accumulate multiple database states
 * The repository should have a simple `checkConnectivity()` method
 * Use a simple query like `SELECT 1` or `SELECT isValid()` to validate database connectivity
 * Modify the existing `HealthServiceImpl` to check both MongoDB and PostgreSQL connectivity
@@ -48,7 +47,6 @@ Rules files are under `rules/`
 * Do not modify the existing MongoDB health check logic
 * Use the existing `PostgresConnectivity` class to obtain the datasource
 * If either database fails, return appropriate `HealthCheckError` with database-specific context
-* If working with multiple UP/DOWN states proves difficult with `Either`, consider using Arrow's `Validated` instead!
 * Change the health check URL from `/meta/alive` to `/meta/health`
 
 ## Specification by Example
