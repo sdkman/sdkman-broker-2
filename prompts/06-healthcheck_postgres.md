@@ -18,40 +18,38 @@ MongoDB health check. Both databases must be healthy for the service to report a
 
 * Follow the same patterns as the existing MongoDB health check implementation
 * Create a lightweight PostgreSQL repository that performs a simple connectivity test
-* The PostgreSQL health check should integrate seamlessly with the existing `HealthService`
+* The PostgreSQL health check should be integrated into the existing `HealthService`
 * Both MongoDB and PostgreSQL must be healthy for the overall health check to pass
 * If either database is unavailable, the service should return HTTP 503
 * The health check endpoint should return a JSON response body with the status of both databases
-* The PostgreSQL repository should be located in the same package as other repository classes
-* Use the existing `PostgresConnectivity` class to obtain database connections
-* Follow the same error handling patterns as the MongoDB implementation
-* Implement appropriate unit and integration tests
-* Use the existing test patterns with TestContainers for PostgreSQL integration tests
+* Follow the same error handling pattern as the MongoDB implementation
 
 ## Carefully observe all the following rules:
 
 Rules files are under `rules/`
 * follow the Kotlin style guide rules `kotlin-rules.md`
-* follow the Kotlin Testing rules `testing-rules.md`
+* follow the Kotlin Testing rules `kotest-rules.md`
 * follow the DDD guideline rules `ddd-rules.md`
 * follow the Hexagonal Architecture rules `hexagonal-architecture-rules.md`
 
 ## Implementation Details
 
-* Create a `HealthRepository` interface and implementation in the `adapter.secondary.persistence` package as `PostgresHealthRepository`
+* Create a `HealthRepository` interface with implementation as `PostgresHealthRepository`
 * Consider the Arrow `Validated` instead of `Either` type to accumulate multiple database states
-* The repository should have a simple `checkConnectivity(): F<Throwable, Unit>` method, where `F` could be `Either` or `Validated` depending on your choice
+* The repository should have a simple `checkConnectivity()` method
 * Use a simple query like `SELECT 1` or `SELECT isValid()` to validate database connectivity
-* Modify the existing `HealthService` to check both MongoDB and PostgreSQL connectivity
-* Update the `HealthServiceImpl` to orchestrate both database health checks
+* Modify the existing `HealthServiceImpl` to check both MongoDB and PostgreSQL connectivity
 * Both databases must be healthy for the service to report `HealthStatus.UP`
-* If either database fails, return appropriate `HealthCheckError` with database-specific context
 * Enhance the health check response to include a JSON body with individual database statuses
 * The JSON response should include `mongodb` and `postgres` fields showing their individual health status
 * Use `UP` for healthy databases and `DOWN` for unhealthy ones
 * Update the REST endpoint to return the detailed health information in JSON format
 * Update the dependency injection in `App.kt` to wire the new PostgreSQL health repository
-* Do not modify the existing MongoDB health check logic, only extend it to include PostgreSQL
+* Do not modify the existing MongoDB health check logic
+* Use the existing `PostgresConnectivity` class to obtain the datasource
+* If either database fails, return appropriate `HealthCheckError` with database-specific context
+* If working with multiple UP/DOWN states proves difficult with `Either`, consider using Arrow's `Validated` instead!
+* Change the health check URL from `/meta/alive` to `/meta/health`
 
 ## Specification by Example
 
@@ -59,30 +57,30 @@ Rules files are under `rules/`
 Scenario: Both databases are healthy
     Given: MongoDB is accessible and contains valid application data
     And: PostgreSQL is accessible and responsive
-    When: a GET request is made for "/meta/alive"
+    When: a GET request is made for "/meta/health"
     Then: the service response status is 200
-    And: the response body contains JSON with mongodb: "UP" and postgres: "UP"
+    And: the response body contains JSON with "mongodb": "UP" and "postgres": "UP"
 
 Scenario: MongoDB is healthy but PostgreSQL is inaccessible
     Given: MongoDB is accessible and contains valid application data
     And: PostgreSQL is inaccessible due to connectivity issues
-    When: a GET request is made for "/meta/alive"
+    When: a GET request is made for "/meta/health"
     Then: the service response status is 503
-    And: the response body contains JSON with mongodb: "UP" and postgres: "DOWN"
+    And: the response body contains JSON with "mongodb": "UP" and "postgres": "DOWN"
 
 Scenario: PostgreSQL is healthy but MongoDB is inaccessible
     Given: PostgreSQL is accessible and responsive
     And: MongoDB is inaccessible due to connectivity issues
-    When: a GET request is made for "/meta/alive"
+    When: a GET request is made for "/meta/health"
     Then: the service response status is 503
-    And: the response body contains JSON with mongodb: "DOWN" and postgres: "UP"
+    And: the response body contains JSON with "mongodb": "DOWN" and "postgres": "UP"
 
 Scenario: Both databases are inaccessible
     Given: MongoDB is inaccessible due to connectivity issues
     And: PostgreSQL is inaccessible due to connectivity issues
-    When: a GET request is made for "/meta/alive"
+    When: a GET request is made for "/meta/health"
     Then: the service response status is 503
-    And: the response body contains JSON with mongodb: "DOWN" and postgres: "DOWN"
+    And: the response body contains JSON with "mongodb": "DOWN" and "postgres": "DOWN"
 ```
 
 ## Testing Requirements
@@ -91,18 +89,19 @@ Scenario: Both databases are inaccessible
 * Create an integration test using TestContainers for PostgreSQL connectivity
 * The integration test should cover a scenario for successful PostgreSQL connectivity
 * The integration test should cover a scenario where PostgreSQL is unavailable
-* Update existing `HealthService` tests to cover the new dual-database scenarios
-* Update acceptance tests to validate the new health check behavior
-* Ensure all tests pass when running `./gradlew test`
+* Update existing `HealthServiceImpl` tests to cover the new dual-database scenarios
+* Update acceptance tests to validate all health check permutations or behaviors
 * Follow the existing test patterns and structure
+* Use TestContainers for PostgreSQL integration tests
 
-## Acceptance Criteria
+## Validation
 
-* Health check validates both MongoDB and PostgreSQL connectivity
-* Service returns 200 only when both databases are healthy
-* Service returns 503 if either database is unhealthy
-* All existing tests continue to pass
-* New tests cover the PostgreSQL health check functionality
-* Integration test uses TestContainers for PostgreSQL
-* Code follows existing patterns and architectural guidelines
-* All code is properly formatted with `./gradlew ktlintFormat`
+- [ ] Health check validates both MongoDB and PostgreSQL connectivity
+- [ ] Service returns 200 only when both databases are healthy
+- [ ] Service returns 503 if either database is unhealthy
+- [ ] All existing tests continue to pass
+- [ ] New tests cover the PostgreSQL health check functionality
+- [ ] Integration test uses TestContainers for PostgreSQL
+- [ ] Code follows existing patterns and architectural guidelines
+- [ ] All tests pass when running `./gradlew test`
+- [ ] All code is properly formatted with `./gradlew ktlintFormat`
