@@ -11,6 +11,8 @@ import io.sdkman.broker.adapter.primary.rest.metaRoutes
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
+import io.sdkman.broker.adapter.secondary.persistence.PostgresConnectivity
+import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.ReleaseService
@@ -31,15 +33,16 @@ object App {
         val database = mongoConnectivity.database()
 
         // Create Postgres connection
-        // val postgresConnectivity = PostgresConnectivity(config)
-        // postgresConnectivity.dataSource()
+        val postgresConnectivity = PostgresConnectivity(config)
+        val postgresDataSource = postgresConnectivity.dataSource()
 
         // Initialize repositories
         val applicationRepository = MongoApplicationRepository(database)
         val versionRepository = MongoVersionRepository(database)
+        val postgresHealthRepository = PostgresHealthRepository(postgresDataSource)
 
         // Initialize services
-        val healthService = HealthServiceImpl(applicationRepository)
+        val healthService = HealthServiceImpl(applicationRepository, postgresHealthRepository)
         val releaseService = ReleaseServiceImpl()
         val versionService = VersionServiceImpl(versionRepository)
 

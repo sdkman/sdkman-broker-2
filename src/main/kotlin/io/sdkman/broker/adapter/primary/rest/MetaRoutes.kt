@@ -7,6 +7,7 @@ import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import io.sdkman.broker.application.service.DatabaseHealthStatus
 import io.sdkman.broker.application.service.HealthCheckError
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthStatus
@@ -19,11 +20,11 @@ fun Application.metaRoutes(
     releaseService: ReleaseService
 ) {
     routing {
-        get("/meta/alive") {
+        get("/meta/health") {
             healthService.checkHealth()
                 .fold(
                     { error -> call.handleHealthError(error) },
-                    { status -> call.handleHealthStatus(status) }
+                    { databaseStatus -> call.handleDatabaseHealthStatus(databaseStatus) }
                 )
         }
 
@@ -44,27 +45,51 @@ fun Application.metaRoutes(
     }
 }
 
-private suspend fun ApplicationCall.handleHealthStatus(status: HealthStatus) {
-    when (status) {
-        HealthStatus.UP -> respond(HttpStatusCode.OK, HealthResponse("UP"))
-        HealthStatus.DOWN -> respond(HttpStatusCode.ServiceUnavailable, HealthResponse("DOWN"))
-    }
+//TODO: Move this out of the MetaRoutes into a new file
+private suspend fun ApplicationCall.handleDatabaseHealthStatus(databaseStatus: DatabaseHealthStatus) {
+    val mongoDbStatus = databaseStatus.mongodb.name
+    val postgresStatus = databaseStatus.postgres.name
+
+    val overallHealthy = databaseStatus.mongodb == HealthStatus.UP && databaseStatus.postgres == HealthStatus.UP
+    val statusCode = if (overallHealthy) HttpStatusCode.OK else HttpStatusCode.ServiceUnavailable
+
+    respond(statusCode, DetailedHealthResponse(mongoDbStatus, postgresStatus))
 }
 
+//TODO: Move this out of the MetaRoutes into a new file
 private suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
     val response =
+        //TODO: This code relies and magic strings to represent database names and statuses. Use enums where possible
         when (error) {
             is HealthCheckError.DatabaseUnavailable -> {
-                HealthResponse("DOWN", "Database unavailable: ${error.cause.message}")
+                //TODO: Do not rely on `if` statement. Use a functional approach
+                val mongoStatus = if (error.database == "MongoDB") "DOWN" else "UP"
+                val postgresStatus = if (error.database == "PostgreSQL") "DOWN" else "UP"
+                DetailedHealthResponse(
+                    mongoStatus,
+                    postgresStatus,
+                    "${error.database} unavailable: ${error.cause.message}"
+                )
             }
             is HealthCheckError.DatabaseError -> {
-                HealthResponse("DOWN", "Database error: ${error.cause.message}")
+                val mongoStatus = if (error.database == "MongoDB") "DOWN" else "UP"
+                val postgresStatus = if (error.database == "PostgreSQL") "DOWN" else "UP"
+                DetailedHealthResponse(mongoStatus, postgresStatus, "${error.database} error: ${error.cause.message}")
             }
             is HealthCheckError.ApplicationNotFound -> {
-                HealthResponse("DOWN", "Application record not found")
+                DetailedHealthResponse("DOWN", "UP", "Application record not found")
             }
             is HealthCheckError.InvalidApplicationState -> {
-                HealthResponse("DOWN", "Application in invalid state")
+                DetailedHealthResponse("DOWN", "UP", "Application in invalid state")
+            }
+            is HealthCheckError.MongoDatabaseUnavailable -> {
+                DetailedHealthResponse("DOWN", "UP", "MongoDB unavailable")
+            }
+            is HealthCheckError.PostgresDatabaseUnavailable -> {
+                DetailedHealthResponse("UP", "DOWN", "PostgreSQL unavailable")
+            }
+            is HealthCheckError.BothDatabasesUnavailable -> {
+                DetailedHealthResponse("DOWN", "DOWN", "Both databases unavailable")
             }
         }
     respond(HttpStatusCode.ServiceUnavailable, response)
@@ -72,6 +97,9 @@ private suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
 
 @Serializable
 data class HealthResponse(val status: String, val reason: String? = null)
+
+@Serializable
+data class DetailedHealthResponse(val mongodb: String, val postgres: String, val reason: String? = null)
 
 @Serializable
 data class ReleaseResponse(val release: String)
