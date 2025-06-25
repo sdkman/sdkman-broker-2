@@ -8,6 +8,7 @@ import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.ReleaseServiceImpl
 import io.sdkman.broker.application.service.VersionServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
+import javax.sql.DataSource
 
 // Dependency injection for tests
 // Uses the shared MongoTestListener and PostgresTestListener to provide consistent database access across all tests
@@ -36,6 +37,23 @@ object TestDependencyInjection {
         }
     }
 
+    fun postgresDataSource(username: String, password: String): DataSource {
+        // Create a DataSource that uses the test container connection
+        val jdbcUrl = "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
+        //TODO: move this to PostgresTestListener, find a cleaner approach that aligns with current project patterns
+        return object : javax.sql.DataSource {
+            override fun getConnection() = java.sql.DriverManager.getConnection(jdbcUrl, username, password)
+            override fun getConnection(username: String?, password: String?) = java.sql.DriverManager.getConnection(jdbcUrl, username, password)
+            override fun getLogWriter() = null
+            override fun setLogWriter(out: java.io.PrintWriter?) {}
+            override fun getLoginTimeout() = 0
+            override fun setLoginTimeout(seconds: Int) {}
+            override fun getParentLogger() = java.util.logging.Logger.getLogger("")
+            override fun <T : Any?> unwrap(iface: Class<T>?) = throw UnsupportedOperationException()
+            override fun isWrapperFor(iface: Class<*>?) = false
+        }
+    }
+
     val applicationRepository by lazy {
         MongoApplicationRepository(database)
     }
@@ -48,8 +66,16 @@ object TestDependencyInjection {
         PostgresHealthRepository(postgresDataSource)
     }
 
+    val postgresHealthRepositoryInvalidCredentials by lazy {
+        PostgresHealthRepository(postgresDataSource("invalid",  "invalid"))
+    }
+
     val healthService by lazy {
         HealthServiceImpl(applicationRepository, postgresHealthRepository)
+    }
+
+    val healthServiceInvalidCredentials by lazy {
+        HealthServiceImpl(applicationRepository, postgresHealthRepositoryInvalidCredentials)
     }
 
     val releaseService by lazy {

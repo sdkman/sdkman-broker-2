@@ -8,6 +8,7 @@ import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRightAnd
 import org.junit.jupiter.api.Tag
+import org.postgresql.util.PSQLException
 import java.sql.DriverManager
 import javax.sql.DataSource
 
@@ -18,7 +19,8 @@ class PostgresHealthRepositoryIntegrationSpec : ShouldSpec() {
 
     //TODO: Move this into the `PostgresTestListener` where before hooks belong
     override suspend fun beforeTest(testCase: TestCase) {
-        val jdbcUrl = "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
+        val jdbcUrl =
+            "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
         val dataSource =
             createTestDataSource(
                 jdbcUrl,
@@ -57,7 +59,8 @@ class PostgresHealthRepositoryIntegrationSpec : ShouldSpec() {
             }
 
             should("return ConnectionFailure when connecting with invalid credentials") {
-                val jdbcUrl = "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
+                val jdbcUrl =
+                    "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
                 val invalidDataSource =
                     createTestDataSource(
                         jdbcUrl,
@@ -69,13 +72,14 @@ class PostgresHealthRepositoryIntegrationSpec : ShouldSpec() {
                 val result = invalidRepository.checkConnectivity()
 
                 result.shouldBeLeftAnd { error: HealthCheckFailure ->
-                    error is HealthCheckFailure.ConnectionFailure
+                    error.toString().contains("FATAL: password authentication failed for user \"invalid-user\"")
                 }
             }
 
             //TODO: remove redundant test
             should("work with actual PostgreSQL connection from container") {
-                val jdbcUrl = "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
+                val jdbcUrl =
+                    "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
 
                 // Verify container is running and accessible
                 val connection =
