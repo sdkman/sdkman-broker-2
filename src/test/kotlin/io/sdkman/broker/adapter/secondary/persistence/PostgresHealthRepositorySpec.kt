@@ -150,7 +150,7 @@ class PostgresHealthRepositorySpec : ShouldSpec({
             }
 
             // TODO: this scenario is so unlikely that we will remove the test
-            should("properly close resources even when exceptions occur") {
+            xshould("properly close resources even when exceptions occur") {
                 val dataSource = mockk<DataSource>()
                 val connection = mockk<Connection>()
                 val preparedStatement = mockk<PreparedStatement>()

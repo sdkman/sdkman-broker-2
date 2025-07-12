@@ -15,7 +15,7 @@ You need to refactor the HealthService class located in `src/main/kotlin/io/sdkm
 
 ## Task 2: Refactor PostgresHealthRepository Error Handling and Nullable Types
 
-- [ ] **Replace nullable types with Option and exceptions with Either**
+- [x] **Replace nullable types with Option and exceptions with Either**
 
 **Description:**
 Refactor the PostgresHealthRepository to eliminate nullable types and replace them with Arrow's `Option`. Replace exception-based error handling with `Either` types. Add well-named extension methods to ResultSet to hide low-level operations and improve code readability.

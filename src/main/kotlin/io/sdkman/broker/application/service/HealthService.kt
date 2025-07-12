@@ -2,7 +2,6 @@ package io.sdkman.broker.application.service
 
 import arrow.core.Either
 import arrow.core.Option
-import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.left
