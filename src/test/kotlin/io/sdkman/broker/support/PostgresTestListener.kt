@@ -39,4 +39,6 @@ object PostgresTestListener : TestListener {
         System.setProperty("postgres.username", username)
         System.setProperty("postgres.password", password)
     }
+
+    fun jdbcUrl(): String = "jdbc:postgresql://$host:$port/$databaseName"
 }

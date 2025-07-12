@@ -2,12 +2,14 @@ package io.sdkman.broker.support
 
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
-import io.sdkman.broker.adapter.secondary.persistence.PostgresConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.ReleaseServiceImpl
 import io.sdkman.broker.application.service.VersionServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
+import java.io.PrintWriter
+import java.sql.DriverManager
+import java.util.logging.Logger
 import javax.sql.DataSource
 
 // Dependency injection for tests
@@ -22,34 +24,60 @@ object TestDependencyInjection {
     // Use PostgreSQL from PostgresTestListener
     val postgresDataSource by lazy {
         // Create a DataSource that uses the test container connection
-        val jdbcUrl = "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
-        //TODO: move this to PostgresTestListener, find a cleaner approach that aligns with current project patterns
-        object : javax.sql.DataSource {
-            override fun getConnection() = java.sql.DriverManager.getConnection(jdbcUrl, PostgresTestListener.username, PostgresTestListener.password)
-            override fun getConnection(username: String?, password: String?) = java.sql.DriverManager.getConnection(jdbcUrl, username, password)
-            override fun getLogWriter() = null
-            override fun setLogWriter(out: java.io.PrintWriter?) {}
+        val jdbcUrl = PostgresTestListener.jdbcUrl()
+        // TODO: move this to PostgresTestListener, find a cleaner approach that aligns with current project patterns
+        object : DataSource {
+            override fun getConnection() =
+                DriverManager.getConnection(jdbcUrl, PostgresTestListener.username, PostgresTestListener.password)
+
+            override fun getConnection(
+                username: String?,
+                password: String?
+            ) = DriverManager.getConnection(jdbcUrl, username, password)
+
+            override fun getLogWriter() = throw UnsupportedOperationException("Can't get LogWriter")
+
+            override fun setLogWriter(out: PrintWriter?) = Unit
+
             override fun getLoginTimeout() = 0
-            override fun setLoginTimeout(seconds: Int) {}
-            override fun getParentLogger() = java.util.logging.Logger.getLogger("")
-            override fun <T : Any?> unwrap(iface: Class<T>?) = throw UnsupportedOperationException()
+
+            override fun setLoginTimeout(seconds: Int) = Unit
+
+            override fun getParentLogger() = Logger.getLogger("")
+
+            override fun <T : Any?> unwrap(iface: Class<T>?) = throw UnsupportedOperationException("Can't unwrap")
+
             override fun isWrapperFor(iface: Class<*>?) = false
         }
     }
 
-    fun postgresDataSource(username: String, password: String): DataSource {
+    fun postgresDataSource(
+        username: String,
+        password: String
+    ): DataSource {
         // Create a DataSource that uses the test container connection
-        val jdbcUrl = "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
-        //TODO: move this to PostgresTestListener, find a cleaner approach that aligns with current project patterns
-        return object : javax.sql.DataSource {
-            override fun getConnection() = java.sql.DriverManager.getConnection(jdbcUrl, username, password)
-            override fun getConnection(username: String?, password: String?) = java.sql.DriverManager.getConnection(jdbcUrl, username, password)
-            override fun getLogWriter() = null
-            override fun setLogWriter(out: java.io.PrintWriter?) {}
+        val jdbcUrl = PostgresTestListener.jdbcUrl()
+        // TODO: move this to PostgresTestListener, find a cleaner approach that aligns with current project patterns
+        return object : DataSource {
+            override fun getConnection() = DriverManager.getConnection(jdbcUrl, username, password)
+
+            override fun getConnection(
+                username: String?,
+                password: String?
+            ) = DriverManager.getConnection(jdbcUrl, username, password)
+
+            override fun getLogWriter() = throw UnsupportedOperationException("Can't get LogWriter")
+
+            override fun setLogWriter(out: PrintWriter?) = Unit
+
             override fun getLoginTimeout() = 0
-            override fun setLoginTimeout(seconds: Int) {}
-            override fun getParentLogger() = java.util.logging.Logger.getLogger("")
-            override fun <T : Any?> unwrap(iface: Class<T>?) = throw UnsupportedOperationException()
+
+            override fun setLoginTimeout(seconds: Int) = Unit
+
+            override fun getParentLogger() = Logger.getLogger("")
+
+            override fun <T : Any?> unwrap(iface: Class<T>?) = throw UnsupportedOperationException("Can't unwrap")
+
             override fun isWrapperFor(iface: Class<*>?) = false
         }
     }
@@ -67,7 +95,7 @@ object TestDependencyInjection {
     }
 
     val postgresHealthRepositoryInvalidCredentials by lazy {
-        PostgresHealthRepository(postgresDataSource("invalid",  "invalid"))
+        PostgresHealthRepository(postgresDataSource("invalid", "invalid"))
     }
 
     val healthService by lazy {

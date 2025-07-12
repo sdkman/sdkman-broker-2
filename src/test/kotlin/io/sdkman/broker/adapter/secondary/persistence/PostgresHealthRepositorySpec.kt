@@ -5,9 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.sdkman.broker.domain.repository.HealthCheckFailure
-import io.sdkman.broker.support.shouldBeLeft
 import io.sdkman.broker.support.shouldBeLeftAnd
-import io.sdkman.broker.support.shouldBeRight
 import io.sdkman.broker.support.shouldBeRightAnd
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -83,7 +81,7 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 }
             }
 
-            //TODO: this scenario is so unlikely that we will remove the test
+            // TODO: this scenario is so unlikely that we will remove the test
             should("return QueryFailure when SQL query fails") {
                 val dataSource = mockk<DataSource>()
                 val connection = mockk<Connection>()
@@ -104,7 +102,7 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 }
             }
 
-            //TODO: this scenario is so unlikely that we will remove the test
+            // TODO: this scenario is so unlikely that we will remove the test
             should("return QueryFailure when result set has no results") {
                 val dataSource = mockk<DataSource>()
                 val connection = mockk<Connection>()
@@ -127,7 +125,7 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 }
             }
 
-            //TODO: this scenario is so unlikely that we will remove the test
+            // TODO: this scenario is so unlikely that we will remove the test
             should("return QueryFailure when result set returns unexpected value") {
                 val dataSource = mockk<DataSource>()
                 val connection = mockk<Connection>()
@@ -151,8 +149,7 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 }
             }
 
-
-            //TODO: this scenario is so unlikely that we will remove the test
+            // TODO: this scenario is so unlikely that we will remove the test
             should("properly close resources even when exceptions occur") {
                 val dataSource = mockk<DataSource>()
                 val connection = mockk<Connection>()

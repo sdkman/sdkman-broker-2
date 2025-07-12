@@ -41,7 +41,6 @@ fun Application.metaRoutes(
     }
 }
 
-
 @Serializable
 data class HealthResponse(val status: String, val reason: String? = null)
 

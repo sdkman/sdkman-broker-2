@@ -120,7 +120,6 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                     responseBody shouldContain "\"mongodb\": \"DOWN\""
                     responseBody shouldContain "\"postgres\": \"DOWN\""
                 }
-
             }
         }
     }

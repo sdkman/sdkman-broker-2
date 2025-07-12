@@ -18,7 +18,6 @@ import io.sdkman.broker.domain.repository.HealthCheckFailure
 import io.sdkman.broker.domain.repository.HealthCheckSuccess
 import io.sdkman.broker.domain.repository.HealthRepository
 import io.sdkman.broker.domain.repository.RepositoryError
-import io.sdkman.broker.support.shouldBeLeft
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRight
 

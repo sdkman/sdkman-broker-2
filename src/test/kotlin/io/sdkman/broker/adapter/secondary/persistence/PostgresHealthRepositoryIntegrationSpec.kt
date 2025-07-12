@@ -8,19 +8,17 @@ import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRightAnd
 import org.junit.jupiter.api.Tag
-import org.postgresql.util.PSQLException
 import java.sql.DriverManager
 import javax.sql.DataSource
 
 @Tag("integration")
 class PostgresHealthRepositoryIntegrationSpec : ShouldSpec() {
-    //TODO: Instantiate the repository normally as a field inside `init`
+    // TODO: Instantiate the repository normally as a field inside `init`
     private lateinit var repository: PostgresHealthRepository
 
-    //TODO: Move this into the `PostgresTestListener` where before hooks belong
+    // TODO: Move this into the `PostgresTestListener` where before hooks belong
     override suspend fun beforeTest(testCase: TestCase) {
-        val jdbcUrl =
-            "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
+        val jdbcUrl = PostgresTestListener.jdbcUrl()
         val dataSource =
             createTestDataSource(
                 jdbcUrl,
@@ -30,7 +28,7 @@ class PostgresHealthRepositoryIntegrationSpec : ShouldSpec() {
         repository = PostgresHealthRepository(dataSource)
     }
 
-    //TODO: remove the init block when `beforeTest` and `repository` are refactored away
+    // TODO: remove the init block when `beforeTest` and `repository` are refactored away
     init {
         listeners(PostgresTestListener)
 
@@ -59,8 +57,7 @@ class PostgresHealthRepositoryIntegrationSpec : ShouldSpec() {
             }
 
             should("return ConnectionFailure when connecting with invalid credentials") {
-                val jdbcUrl =
-                    "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
+                val jdbcUrl = PostgresTestListener.jdbcUrl()
                 val invalidDataSource =
                     createTestDataSource(
                         jdbcUrl,
@@ -76,10 +73,9 @@ class PostgresHealthRepositoryIntegrationSpec : ShouldSpec() {
                 }
             }
 
-            //TODO: remove redundant test
+            // TODO: remove redundant test
             should("work with actual PostgreSQL connection from container") {
-                val jdbcUrl =
-                    "jdbc:postgresql://${PostgresTestListener.host}:${PostgresTestListener.port}/${PostgresTestListener.databaseName}"
+                val jdbcUrl = PostgresTestListener.jdbcUrl()
 
                 // Verify container is running and accessible
                 val connection =
@@ -106,7 +102,7 @@ class PostgresHealthRepositoryIntegrationSpec : ShouldSpec() {
         }
     }
 
-    //TODO: find a cleaner way of obtaining a datasource
+    // TODO: find a cleaner way of obtaining a datasource
     private fun createTestDataSource(
         jdbcUrl: String,
         username: String,
@@ -122,11 +118,11 @@ class PostgresHealthRepositoryIntegrationSpec : ShouldSpec() {
 
             override fun getLogWriter() = null
 
-            override fun setLogWriter(out: java.io.PrintWriter?) {}
+            override fun setLogWriter(out: java.io.PrintWriter?) = Unit
 
             override fun getLoginTimeout() = 0
 
-            override fun setLoginTimeout(seconds: Int) {}
+            override fun setLoginTimeout(seconds: Int) = Unit
 
             override fun getParentLogger() = java.util.logging.Logger.getLogger("")
 

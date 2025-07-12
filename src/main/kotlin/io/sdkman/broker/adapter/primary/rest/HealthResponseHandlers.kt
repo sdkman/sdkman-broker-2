@@ -18,15 +18,17 @@ enum class DatabaseStatus(val status: String) {
 }
 
 suspend fun ApplicationCall.handleDatabaseHealthStatus(databaseStatus: DatabaseHealthStatus) {
-    val mongoDbStatus = when (databaseStatus.mongodb) {
-        HealthStatus.UP -> DatabaseStatus.UP.status
-        HealthStatus.DOWN -> DatabaseStatus.DOWN.status
-    }
-    
-    val postgresStatus = when (databaseStatus.postgres) {
-        HealthStatus.UP -> DatabaseStatus.UP.status
-        HealthStatus.DOWN -> DatabaseStatus.DOWN.status
-    }
+    val mongoDbStatus =
+        when (databaseStatus.mongodb) {
+            HealthStatus.UP -> DatabaseStatus.UP.status
+            HealthStatus.DOWN -> DatabaseStatus.DOWN.status
+        }
+
+    val postgresStatus =
+        when (databaseStatus.postgres) {
+            HealthStatus.UP -> DatabaseStatus.UP.status
+            HealthStatus.DOWN -> DatabaseStatus.DOWN.status
+        }
 
     val overallHealthy = databaseStatus.mongodb == HealthStatus.UP && databaseStatus.postgres == HealthStatus.UP
     val statusCode = if (overallHealthy) HttpStatusCode.OK else HttpStatusCode.ServiceUnavailable
@@ -35,69 +37,76 @@ suspend fun ApplicationCall.handleDatabaseHealthStatus(databaseStatus: DatabaseH
 }
 
 suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
-    val response = when (error) {
-        is HealthCheckError.DatabaseUnavailable -> {
-            createDatabaseErrorResponse(error.database, error.cause.message)
+    val response =
+        when (error) {
+            is HealthCheckError.DatabaseUnavailable -> {
+                createDatabaseErrorResponse(error.database, error.cause.message)
+            }
+            is HealthCheckError.DatabaseError -> {
+                createDatabaseErrorResponse(error.database, error.cause.message)
+            }
+            is HealthCheckError.ApplicationNotFound -> {
+                DetailedHealthResponse(
+                    DatabaseStatus.DOWN.status,
+                    DatabaseStatus.UP.status,
+                    "Application record not found"
+                )
+            }
+            is HealthCheckError.InvalidApplicationState -> {
+                DetailedHealthResponse(
+                    DatabaseStatus.DOWN.status,
+                    DatabaseStatus.UP.status,
+                    "Application in invalid state"
+                )
+            }
+            is HealthCheckError.MongoDatabaseUnavailable -> {
+                DetailedHealthResponse(
+                    DatabaseStatus.DOWN.status,
+                    DatabaseStatus.UP.status,
+                    "MongoDB unavailable"
+                )
+            }
+            is HealthCheckError.PostgresDatabaseUnavailable -> {
+                DetailedHealthResponse(
+                    DatabaseStatus.UP.status,
+                    DatabaseStatus.DOWN.status,
+                    "PostgreSQL unavailable"
+                )
+            }
+            is HealthCheckError.BothDatabasesUnavailable -> {
+                DetailedHealthResponse(
+                    DatabaseStatus.DOWN.status,
+                    DatabaseStatus.DOWN.status,
+                    "Both databases unavailable"
+                )
+            }
         }
-        is HealthCheckError.DatabaseError -> {
-            createDatabaseErrorResponse(error.database, error.cause.message)
-        }
-        is HealthCheckError.ApplicationNotFound -> {
-            DetailedHealthResponse(
-                DatabaseStatus.DOWN.status,
-                DatabaseStatus.UP.status,
-                "Application record not found"
-            )
-        }
-        is HealthCheckError.InvalidApplicationState -> {
-            DetailedHealthResponse(
-                DatabaseStatus.DOWN.status,
-                DatabaseStatus.UP.status,
-                "Application in invalid state"
-            )
-        }
-        is HealthCheckError.MongoDatabaseUnavailable -> {
-            DetailedHealthResponse(
-                DatabaseStatus.DOWN.status,
-                DatabaseStatus.UP.status,
-                "MongoDB unavailable"
-            )
-        }
-        is HealthCheckError.PostgresDatabaseUnavailable -> {
-            DetailedHealthResponse(
-                DatabaseStatus.UP.status,
-                DatabaseStatus.DOWN.status,
-                "PostgreSQL unavailable"
-            )
-        }
-        is HealthCheckError.BothDatabasesUnavailable -> {
-            DetailedHealthResponse(
-                DatabaseStatus.DOWN.status,
-                DatabaseStatus.DOWN.status,
-                "Both databases unavailable"
-            )
-        }
-    }
     respond(HttpStatusCode.ServiceUnavailable, response)
 }
 
-private fun createDatabaseErrorResponse(database: String, message: String?): DetailedHealthResponse {
+private fun createDatabaseErrorResponse(
+    database: String,
+    message: String?
+): DetailedHealthResponse {
     val errorMessage = message ?: "Unknown error"
     return when (database) {
-        DatabaseName.MONGODB.displayName -> DetailedHealthResponse(
-            DatabaseStatus.DOWN.status,
-            DatabaseStatus.UP.status,
-            "${DatabaseName.MONGODB.displayName} error: $errorMessage"
-        )
-        DatabaseName.POSTGRESQL.displayName -> DetailedHealthResponse(
-            DatabaseStatus.UP.status,
-            DatabaseStatus.DOWN.status,
-            "${DatabaseName.POSTGRESQL.displayName} error: $errorMessage"
-        )
-        else -> DetailedHealthResponse(
-            DatabaseStatus.DOWN.status,
-            DatabaseStatus.DOWN.status,
-            "Database error: $errorMessage"
-        )
+        DatabaseName.MONGODB.displayName ->
+            DetailedHealthResponse(
+                DatabaseStatus.DOWN.status,
+                DatabaseStatus.UP.status,
+                "${DatabaseName.MONGODB.displayName} error: $errorMessage"
+            )
+        DatabaseName.POSTGRESQL.displayName ->
+            DetailedHealthResponse(
+                DatabaseStatus.UP.status,
+                DatabaseStatus.DOWN.status,
+                "${DatabaseName.POSTGRESQL.displayName} error: $errorMessage"
+            )
+        else ->
+            DetailedHealthResponse(
+                DatabaseStatus.DOWN.status,
+                DatabaseStatus.DOWN.status,
+                "Database error: $errorMessage"
+            )
     }
 }
