@@ -42,7 +42,7 @@ class PostgresConnectivity(private val config: AppConfig) {
         val credentialConnectionString: Option<String> =
             config.postgresUsername.flatMap { username ->
                 config.postgresPassword.map { password ->
-                    "jdbc:postgresql://$username:$password@$host:$port/$database?sslmode=require"
+                    "jdbc:postgresql://$host:$port/$database?user=$username&password=$password&sslmode=require"
                 }
             }
 

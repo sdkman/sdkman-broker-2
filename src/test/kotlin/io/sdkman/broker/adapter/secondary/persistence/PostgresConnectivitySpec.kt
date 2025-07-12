@@ -61,6 +61,7 @@ class PostgresConnectivitySpec : ShouldSpec({
         val result = connectivity.buildConnectionString()
 
         // then
-        result shouldBe "jdbc:postgresql://broker:password123@postgres.sdkman.io:5432/sdkman?sslmode=require"
+        result shouldBe
+            "jdbc:postgresql://postgres.sdkman.io:5432/sdkman?user=broker&password=password123&sslmode=require"
     }
 })
