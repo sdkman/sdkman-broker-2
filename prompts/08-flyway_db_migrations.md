@@ -25,6 +25,8 @@
 - Rollback strategy for failed migrations
 - Keep it simple! Try to do this in the fewest lines of code possible
 - No need for new components like services
+- The application should _always_ migrate on start
+- Do not make `migrate-on-start` configurable
 
 ## Implementation Notes
 
@@ -33,6 +35,7 @@
 - Place migration scripts in `src/main/resources/db/migration/` following Flyway conventions
 - Use standard versioning for migration scripts: `V1__Initial_schema.sql`
 - Use a standard generated UUID Primary Key for the `audit` table
+- No indexes on the `audit` table needed at this stage
 - Implement migration execution as part of application startup lifecycle
 - Use database-specific SQL for optimal performance
 - Configure Flyway in the simplest way possible
