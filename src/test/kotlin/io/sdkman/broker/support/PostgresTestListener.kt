@@ -3,6 +3,10 @@ package io.sdkman.broker.support
 import io.kotest.core.listeners.TestListener
 import io.kotest.core.spec.Spec
 import org.testcontainers.containers.PostgreSQLContainer
+import java.io.PrintWriter
+import java.sql.DriverManager
+import java.util.logging.Logger
+import javax.sql.DataSource
 
 object PostgresTestListener : TestListener {
     // Create a single static container for all tests
@@ -41,4 +45,51 @@ object PostgresTestListener : TestListener {
     }
 
     fun jdbcUrl(): String = "jdbc:postgresql://$host:$port/$databaseName"
+
+    /*
+     * Create DataSource with default test container credentials
+     */
+    val dataSource: DataSource by lazy {
+        createDataSource(username, password)
+    }
+
+    /*
+     * Create DataSource with custom credentials
+     */
+    fun createDataSource(
+        username: String,
+        password: String
+    ): DataSource = createDataSource(jdbcUrl(), username, password)
+
+    /*
+     * Create DataSource with custom URL and credentials
+     */
+    fun createDataSource(
+        jdbcUrl: String,
+        username: String,
+        password: String
+    ): DataSource {
+        return object : DataSource {
+            override fun getConnection() = DriverManager.getConnection(jdbcUrl, username, password)
+
+            override fun getConnection(
+                username: String?,
+                password: String?
+            ) = DriverManager.getConnection(jdbcUrl, username, password)
+
+            override fun getLogWriter() = throw UnsupportedOperationException("Can't get LogWriter")
+
+            override fun setLogWriter(out: PrintWriter?) = Unit
+
+            override fun getLoginTimeout() = 0
+
+            override fun setLoginTimeout(seconds: Int) = Unit
+
+            override fun getParentLogger() = Logger.getLogger("")
+
+            override fun <T : Any?> unwrap(iface: Class<T>?) = throw UnsupportedOperationException("Can't unwrap")
+
+            override fun isWrapperFor(iface: Class<*>?) = false
+        }
+    }
 }

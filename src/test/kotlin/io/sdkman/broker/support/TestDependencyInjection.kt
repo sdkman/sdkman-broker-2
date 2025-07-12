@@ -7,9 +7,6 @@ import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.ReleaseServiceImpl
 import io.sdkman.broker.application.service.VersionServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
-import java.io.PrintWriter
-import java.sql.DriverManager
-import java.util.logging.Logger
 import javax.sql.DataSource
 
 // Dependency injection for tests
@@ -21,66 +18,12 @@ object TestDependencyInjection {
     // Use the database from MongoTestListener directly
     val database by lazy { MongoTestListener.database }
 
-    // Use PostgreSQL from PostgresTestListener
-    val postgresDataSource by lazy {
-        // Create a DataSource that uses the test container connection
-        val jdbcUrl = PostgresTestListener.jdbcUrl()
-        // TODO: move this to PostgresTestListener, find a cleaner approach that aligns with current project patterns
-        object : DataSource {
-            override fun getConnection() =
-                DriverManager.getConnection(jdbcUrl, PostgresTestListener.username, PostgresTestListener.password)
-
-            override fun getConnection(
-                username: String?,
-                password: String?
-            ) = DriverManager.getConnection(jdbcUrl, username, password)
-
-            override fun getLogWriter() = throw UnsupportedOperationException("Can't get LogWriter")
-
-            override fun setLogWriter(out: PrintWriter?) = Unit
-
-            override fun getLoginTimeout() = 0
-
-            override fun setLoginTimeout(seconds: Int) = Unit
-
-            override fun getParentLogger() = Logger.getLogger("")
-
-            override fun <T : Any?> unwrap(iface: Class<T>?) = throw UnsupportedOperationException("Can't unwrap")
-
-            override fun isWrapperFor(iface: Class<*>?) = false
-        }
-    }
+    val postgresDataSource by lazy { PostgresTestListener.dataSource }
 
     fun postgresDataSource(
         username: String,
         password: String
-    ): DataSource {
-        // Create a DataSource that uses the test container connection
-        val jdbcUrl = PostgresTestListener.jdbcUrl()
-        // TODO: move this to PostgresTestListener, find a cleaner approach that aligns with current project patterns
-        return object : DataSource {
-            override fun getConnection() = DriverManager.getConnection(jdbcUrl, username, password)
-
-            override fun getConnection(
-                username: String?,
-                password: String?
-            ) = DriverManager.getConnection(jdbcUrl, username, password)
-
-            override fun getLogWriter() = throw UnsupportedOperationException("Can't get LogWriter")
-
-            override fun setLogWriter(out: PrintWriter?) = Unit
-
-            override fun getLoginTimeout() = 0
-
-            override fun setLoginTimeout(seconds: Int) = Unit
-
-            override fun getParentLogger() = Logger.getLogger("")
-
-            override fun <T : Any?> unwrap(iface: Class<T>?) = throw UnsupportedOperationException("Can't unwrap")
-
-            override fun isWrapperFor(iface: Class<*>?) = false
-        }
-    }
+    ): DataSource = PostgresTestListener.createDataSource(username, password)
 
     val applicationRepository by lazy {
         MongoApplicationRepository(database)

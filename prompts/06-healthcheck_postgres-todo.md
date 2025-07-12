@@ -28,7 +28,7 @@ You need to refactor the PostgresHealthRepository class in `src/main/kotlin/io/s
 
 ## Task 3: Refactor Test Infrastructure and DataSource Management
 
-- [ ] **Move DataSource creation logic to appropriate test listeners and clean up test setup**
+- [x] **Move DataSource creation logic to appropriate test listeners and clean up test setup**
 
 **Description:**
 Refactor the test infrastructure to move DataSource creation and setup logic from individual test classes to the appropriate PostgresTestListener. Clean up the test dependency injection and remove redundant initialization blocks.
