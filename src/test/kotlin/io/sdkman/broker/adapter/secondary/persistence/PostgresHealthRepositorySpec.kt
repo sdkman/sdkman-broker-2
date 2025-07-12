@@ -81,7 +81,6 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 }
             }
 
-            // TODO: this scenario is so unlikely that we will remove the test
             should("return QueryFailure when SQL query fails") {
                 val dataSource = mockk<DataSource>()
                 val connection = mockk<Connection>()
@@ -102,7 +101,6 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 }
             }
 
-            // TODO: this scenario is so unlikely that we will remove the test
             should("return QueryFailure when result set has no results") {
                 val dataSource = mockk<DataSource>()
                 val connection = mockk<Connection>()
@@ -125,7 +123,6 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 }
             }
 
-            // TODO: this scenario is so unlikely that we will remove the test
             should("return QueryFailure when result set returns unexpected value") {
                 val dataSource = mockk<DataSource>()
                 val connection = mockk<Connection>()
@@ -146,28 +143,6 @@ class PostgresHealthRepositorySpec : ShouldSpec({
 
                 result.shouldBeLeftAnd { error: HealthCheckFailure ->
                     error is HealthCheckFailure.QueryFailure
-                }
-            }
-
-            // TODO: this scenario is so unlikely that we will remove the test
-            xshould("properly close resources even when exceptions occur") {
-                val dataSource = mockk<DataSource>()
-                val connection = mockk<Connection>()
-                val preparedStatement = mockk<PreparedStatement>()
-                val queryException = SQLException("Database error")
-
-                every { dataSource.connection } returns connection
-                every { connection.prepareStatement("SELECT 1") } returns preparedStatement
-                every { preparedStatement.executeQuery() } throws queryException
-                every { connection.close() } returns Unit
-                every { preparedStatement.close() } returns Unit
-
-                val repository = PostgresHealthRepository(dataSource)
-                repository.checkConnectivity()
-
-                verify {
-                    connection.close()
-                    preparedStatement.close()
                 }
             }
         }

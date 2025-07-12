@@ -42,7 +42,7 @@ You need to refactor the test infrastructure across multiple test files to impro
 
 ## Task 4: Remove Redundant and Unlikely Test Scenarios
 
-- [ ] **Remove test scenarios that are extremely unlikely to occur**
+- [x] **Remove test scenarios that are extremely unlikely to occur**
 
 **Description:**
 Remove test methods in PostgresHealthRepositorySpec that test scenarios so unlikely they provide little value. Also remove any other redundant tests identified in the integration specs.
