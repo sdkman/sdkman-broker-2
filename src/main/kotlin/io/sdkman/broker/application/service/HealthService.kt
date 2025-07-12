@@ -1,10 +1,13 @@
 package io.sdkman.broker.application.service
 
 import arrow.core.Either
+import arrow.core.Option
+import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
+import arrow.core.some
 import arrow.core.toOption
 import io.sdkman.broker.domain.model.ApplicationError
 import io.sdkman.broker.domain.repository.ApplicationRepository
@@ -29,31 +32,28 @@ class HealthServiceImpl(
 
         val databaseStatus = DatabaseHealthStatus(mongoStatus, postgresStatus)
 
-        // TODO: use accumulation of errors using zipOrAccumulate as described here:
-        // https://arrow-kt.io/learn/typed-errors/validation/#fail-first-vs-accumulation
-        return when {
-            // TODO: Do NOT use isLeft()
-            mongoHealthResult.isLeft() && postgresHealthResult.isLeft() -> {
-                // TODO: Do NOT use nullable types
-                val mongoError = mongoHealthResult.fold({ it }, { null })
-                // TODO: Do NOT use nullable types
-                val postgresError = postgresHealthResult.fold({ it }, { null })
-                HealthCheckError.BothDatabasesUnavailable(mongoError, postgresError).left()
+        return mongoHealthResult.fold(
+            { mongoError ->
+                postgresHealthResult.fold(
+                    { postgresError ->
+                        HealthCheckError.BothDatabasesUnavailable(mongoError.some(), postgresError.some()).left()
+                    },
+                    {
+                        HealthCheckError.MongoDatabaseUnavailable(mongoError.some()).left()
+                    }
+                )
+            },
+            {
+                postgresHealthResult.fold(
+                    { postgresError ->
+                        HealthCheckError.PostgresDatabaseUnavailable(postgresError.some()).left()
+                    },
+                    {
+                        databaseStatus.right()
+                    }
+                )
             }
-            // TODO: Do NOT use isLeft()
-            mongoHealthResult.isLeft() -> {
-                // TODO: Do NOT use nullable types
-                val mongoError = mongoHealthResult.fold({ it }, { null })
-                HealthCheckError.MongoDatabaseUnavailable(mongoError).left()
-            }
-            // TODO: Do NOT use isLeft()
-            postgresHealthResult.isLeft() -> {
-                // TODO: Do NOT use nullable types
-                val postgresError = postgresHealthResult.fold({ it }, { null })
-                HealthCheckError.PostgresDatabaseUnavailable(postgresError).left()
-            }
-            else -> databaseStatus.right()
-        }
+        )
     }
 
     private fun checkMongoHealth(): Either<HealthCheckError, Unit> =
@@ -114,13 +114,12 @@ sealed class HealthCheckError {
 
     data class InvalidApplicationState(val error: ApplicationError) : HealthCheckError()
 
-    data class MongoDatabaseUnavailable(val mongoError: HealthCheckError?) : HealthCheckError()
+    data class MongoDatabaseUnavailable(val mongoError: Option<HealthCheckError>) : HealthCheckError()
 
-    data class PostgresDatabaseUnavailable(val postgresError: HealthCheckError?) : HealthCheckError()
+    data class PostgresDatabaseUnavailable(val postgresError: Option<HealthCheckError>) : HealthCheckError()
 
-    // TODO: Do NOT use nullable types. Use `Option` instead!
     data class BothDatabasesUnavailable(
-        val mongoError: HealthCheckError?,
-        val postgresError: HealthCheckError?
+        val mongoError: Option<HealthCheckError>,
+        val postgresError: Option<HealthCheckError>
     ) : HealthCheckError()
 }
