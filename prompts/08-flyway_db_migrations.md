@@ -23,6 +23,8 @@
 - Handling of existing database schema if present
 - Migration script validation and testing
 - Rollback strategy for failed migrations
+- Keep it simple! Try to do this in the fewest lines of code possible
+- No need for new components like services
 
 ## Implementation Notes
 
@@ -30,8 +32,11 @@
 - Configure Flyway through application configuration (not embedded programmatically)
 - Place migration scripts in `src/main/resources/db/migration/` following Flyway conventions
 - Use standard versioning for migration scripts: `V1__Initial_schema.sql`
+- Use a standard generated UUID Primary Key for the `audit` table
 - Implement migration execution as part of application startup lifecycle
 - Use database-specific SQL for optimal performance
+- Configure Flyway in the simplest way possible
+- Do not configure Flyway programmatically
 
 ## Specification by Example
 
