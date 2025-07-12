@@ -1,6 +1,7 @@
 package io.sdkman.broker.config
 
 import arrow.core.Option
+import arrow.core.getOrElse
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 
@@ -18,6 +19,8 @@ interface AppConfig {
     val serverPort: Int
     val serverHost: String
     val flywayUrl: String
+    val flywayUsername: String
+    val flywayPassword: String
 }
 
 class DefaultAppConfig : AppConfig {
@@ -43,4 +46,6 @@ class DefaultAppConfig : AppConfig {
 
     // Flyway settings - use postgres credentials
     override val flywayUrl: String = "jdbc:postgresql://$postgresHost:$postgresPort/$postgresDatabase"
+    override val flywayUsername: String = postgresUsername.getOrElse { "postgres" }
+    override val flywayPassword: String = postgresPassword.getOrElse { "postgres" }
 }

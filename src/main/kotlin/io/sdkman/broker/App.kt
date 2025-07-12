@@ -1,6 +1,5 @@
 package io.sdkman.broker
 
-import arrow.core.getOrElse
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -39,12 +38,9 @@ object App {
         val postgresDataSource = postgresConnectivity.dataSource()
 
         // Run Flyway migrations
-        //TODO: expose these flyway variable in the AppConfig, do not getOrElse them here!
-        val flywayUser = config.postgresUsername.getOrElse { "postgres" }
-        val flywayPassword = config.postgresPassword.getOrElse { "postgres" }
         val flyway =
             Flyway.configure()
-                .dataSource(config.flywayUrl, flywayUser, flywayPassword)
+                .dataSource(config.flywayUrl, config.flywayUsername, config.flywayPassword)
                 .locations("classpath:db/migration")
                 .baselineOnMigrate(true)
                 .validateOnMigrate(true)
