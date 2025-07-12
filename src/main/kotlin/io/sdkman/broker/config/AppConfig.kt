@@ -17,6 +17,7 @@ interface AppConfig {
     val postgresPassword: Option<String>
     val serverPort: Int
     val serverHost: String
+    val flywayUrl: String
 }
 
 class DefaultAppConfig : AppConfig {
@@ -39,4 +40,7 @@ class DefaultAppConfig : AppConfig {
     // Server settings
     override val serverPort: Int = config.getIntOrDefault("server.port", 8080)
     override val serverHost: String = config.getStringOrDefault("server.host", "127.0.0.1")
+
+    // Flyway settings - use postgres credentials
+    override val flywayUrl: String = "jdbc:postgresql://$postgresHost:$postgresPort/$postgresDatabase"
 }

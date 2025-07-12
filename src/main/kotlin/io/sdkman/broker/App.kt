@@ -1,5 +1,6 @@
 package io.sdkman.broker
 
+import arrow.core.getOrElse
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -22,6 +23,7 @@ import io.sdkman.broker.application.service.VersionServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import org.flywaydb.core.Flyway
 
 object App {
     @JvmStatic
@@ -35,6 +37,19 @@ object App {
         // Create Postgres connection
         val postgresConnectivity = PostgresConnectivity(config)
         val postgresDataSource = postgresConnectivity.dataSource()
+
+        // Run Flyway migrations
+        //TODO: expose these flyway variable in the AppConfig, do not getOrElse them here!
+        val flywayUser = config.postgresUsername.getOrElse { "postgres" }
+        val flywayPassword = config.postgresPassword.getOrElse { "postgres" }
+        val flyway =
+            Flyway.configure()
+                .dataSource(config.flywayUrl, flywayUser, flywayPassword)
+                .locations("classpath:db/migration")
+                .baselineOnMigrate(true)
+                .validateOnMigrate(true)
+                .load()
+        flyway.migrate()
 
         // Initialize repositories
         val applicationRepository = MongoApplicationRepository(database)
