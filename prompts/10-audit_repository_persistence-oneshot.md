@@ -53,21 +53,25 @@ sealed class PersistenceFailure {
 - Use Arrow's `Either` for functional error handling
 - Implement proper SQL PreparedStatement usage for security
 - The repository should NOT be wired into the application yet - that's for a future prompt
+- Use the Jetbrains Exposed framework for persistence
+- Use Exposed Tables for the persistence
+- Use the latest version of Exposed
+- Ensure that `PersistenceFailure` may be used by all future entities
 
 ## Testing Considerations
 
 - Create integration test following `PostgresHealthRepositoryIntegrationSpec` patterns
 - Use `PostgresTestListener` for test database setup
 - Test both successful save operations and error conditions
-- Include test for reading back saved audit entries to verify persistence
+- Assert reading back saved audit entries in happy path to verify persistence
 - Use `@Tag("integration")` annotation
 
 ## Verification
 
 - [ ] `Audit` domain class created with proper data types
 - [ ] `AuditRepository` interface defined in domain layer
-- [ ] `PostgresAuditRepository` implemented with save functionality
-- [ ] Integration test covers save operation and read-back verification
+- [ ] `PostgresAuditRepository` implemented with *only* save functionality
+- [ ] Integration test covers save operation and read-back verification via test support
 - [ ] Integration test covers error scenarios (invalid connection, etc.)
 - [ ] All tests pass
 - [ ] Code follows existing patterns and conventions
