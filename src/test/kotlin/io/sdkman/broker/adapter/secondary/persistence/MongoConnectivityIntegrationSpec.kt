@@ -29,6 +29,9 @@ class MongoConnectivityIntegrationSpec : ShouldSpec({
                 override val postgresPassword: Option<String> = None
                 override val serverPort: Int = 8080
                 override val serverHost: String = "127.0.0.1"
+                override val flywayUrl: String = "jdbc:postgresql://$postgresHost:$postgresDatabase"
+                override val flywayUsername: String = "postgres"
+                override val flywayPassword: String = "postgres"
             }
         val connectivity = MongoConnectivity(config)
 

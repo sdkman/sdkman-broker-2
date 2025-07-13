@@ -30,6 +30,9 @@ class PostgresConnectivityIntegrationSpec : ShouldSpec({
                 override val postgresPassword: Option<String> = PostgresTestListener.password.some()
                 override val serverPort: Int = 8080
                 override val serverHost: String = "127.0.0.1"
+                override val flywayUrl: String = "jdbc:postgresql://$postgresHost:$postgresDatabase"
+                override val flywayUsername: String = "postgres"
+                override val flywayPassword: String = "postgres"
             }
         val connectivity = PostgresConnectivity(config)
 

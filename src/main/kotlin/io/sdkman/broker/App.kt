@@ -22,6 +22,7 @@ import io.sdkman.broker.application.service.VersionServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import org.flywaydb.core.Flyway
 
 object App {
     @JvmStatic
@@ -35,6 +36,16 @@ object App {
         // Create Postgres connection
         val postgresConnectivity = PostgresConnectivity(config)
         val postgresDataSource = postgresConnectivity.dataSource()
+
+        // Run Flyway migrations
+        val flyway =
+            Flyway.configure()
+                .dataSource(config.flywayUrl, config.flywayUsername, config.flywayPassword)
+                .locations("classpath:db/migration")
+                .baselineOnMigrate(true)
+                .validateOnMigrate(true)
+                .load()
+        flyway.migrate()
 
         // Initialize repositories
         val applicationRepository = MongoApplicationRepository(database)

@@ -69,6 +69,8 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("com.typesafe:config:1.4.3")
     implementation("ch.qos.logback:logback-classic:1.4.14")
+    implementation("org.flywaydb:flyway-core:11.10.2")
+    implementation("org.flywaydb:flyway-database-postgresql:11.10.2")
 
     // Testing
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
