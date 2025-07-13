@@ -2,6 +2,7 @@ package io.sdkman.broker.support
 
 import io.kotest.core.listeners.TestListener
 import io.kotest.core.spec.Spec
+import org.flywaydb.core.Flyway
 import org.testcontainers.containers.PostgreSQLContainer
 import java.io.PrintWriter
 import java.sql.DriverManager
@@ -32,6 +33,20 @@ object PostgresTestListener : TestListener {
 
         // Set up environment for tests
         setSystemProperties()
+
+        // Run migrations once per container lifecycle
+        runMigrations()
+    }
+
+    private fun runMigrations() {
+        val flyway =
+            Flyway.configure()
+                .dataSource(jdbcUrl(), username, password)
+                .locations("classpath:db/migration")
+                .baselineOnMigrate(true)
+                .validateOnMigrate(true)
+                .load()
+        flyway.migrate()
     }
 
     // Sets system properties for tests using TypeSafe Config format

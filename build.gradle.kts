@@ -69,8 +69,6 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("com.typesafe:config:1.4.3")
     implementation("ch.qos.logback:logback-classic:1.4.14")
-    implementation("org.flywaydb:flyway-core:11.10.2")
-    implementation("org.flywaydb:flyway-database-postgresql:11.10.2")
 
     // Testing
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
@@ -82,6 +80,8 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:1.19.3")
     testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")
     testImplementation("io.mockk:mockk:1.13.9")
+    testImplementation("org.flywaydb:flyway-core:11.10.2")
+    testImplementation("org.flywaydb:flyway-database-postgresql:11.10.2")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
