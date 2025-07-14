@@ -39,7 +39,7 @@ class PostgresAuditRepository(private val dataSource: DataSource) : AuditReposit
         Either.catch {
             transaction(database) {
                 AuditTable.insert {
-                    //TODO: allow for this value to be optional, allowing auto-generation of the PK in the database
+                    // TODO: allow for this value to be optional, allowing auto-generation of the PK in the database
                     it[id] = audit.id
                     it[command] = audit.command
                     it[candidate] = audit.candidate
@@ -55,7 +55,7 @@ class PostgresAuditRepository(private val dataSource: DataSource) : AuditReposit
             }
         }
             .mapLeft { exception ->
-                //TODO: extract this to an appropriately named extension method on Throwable for reuse and conciseness
+                // TODO: extract this to an appropriately named extension method on Throwable for reuse and conciseness
                 logger.error("Failed to save audit record: {}", exception.message, exception)
                 val errorMessage = exception.message.toOption().getOrElse { "" }
                 when {

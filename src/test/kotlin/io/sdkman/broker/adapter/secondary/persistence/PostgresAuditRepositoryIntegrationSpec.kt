@@ -18,17 +18,17 @@ import org.junit.jupiter.api.Tag
 import java.util.UUID
 
 @Tag("integration")
-class PostgresAuditRepositoryIntegrationSpec : ShouldSpec() {
-    init {
-        listeners(PostgresTestListener)
+class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
+    listeners(PostgresTestListener)
 
-        val repository = PostgresAuditRepository(PostgresTestListener.dataSource)
-        val database = Database.connect(PostgresTestListener.dataSource)
+    val repository = PostgresAuditRepository(PostgresTestListener.dataSource)
+    val database = Database.connect(PostgresTestListener.dataSource)
 
-        context("PostgresAuditRepository Integration Tests") {
+    context("PostgresAuditRepository Integration Tests") {
 
-            should("successfully save audit record to PostgreSQL container") {
-                val audit = Audit(
+        should("successfully save audit record to PostgreSQL container") {
+            val audit =
+                Audit(
                     id = UUID.randomUUID(),
                     command = "install",
                     candidate = "java",
@@ -41,32 +41,34 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec() {
                     timestamp = Clock.System.now()
                 )
 
-                val result = repository.save(audit)
+            val result = repository.save(audit)
 
-                result.shouldBeRightAnd { true }
+            result.shouldBeRightAnd { true }
 
-                // Verify the record was actually saved by querying the database
-                //TODO: Move this to a Postgres test support class
-                val savedRecord = transaction(database) {
+            // Verify the record was actually saved by querying the database
+            // TODO: Move this to a Postgres test support class
+            val savedRecord =
+                transaction(database) {
                     AuditTable.selectAll().where { AuditTable.id eq audit.id }.singleOrNull()
                 }
 
-                //TODO: introduce new reusable helper extension like shouldNotBeNullAnd { ... } for type T
-                savedRecord.shouldNotBeNull()
-                savedRecord.let {
-                    it[AuditTable.command] shouldBe audit.command
-                    it[AuditTable.candidate] shouldBe audit.candidate
-                    it[AuditTable.version] shouldBe audit.version
-                    it[AuditTable.platform] shouldBe audit.platform
-                    it[AuditTable.vendor] shouldBe audit.vendor.getOrNull()
-                    it[AuditTable.host] shouldBe audit.host
-                    it[AuditTable.agent] shouldBe audit.agent
-                    it[AuditTable.dist] shouldBe audit.dist
-                }
+            // TODO: introduce new reusable helper extension like shouldNotBeNullAnd { ... } for type T
+            savedRecord.shouldNotBeNull()
+            savedRecord.let {
+                it[AuditTable.command] shouldBe audit.command
+                it[AuditTable.candidate] shouldBe audit.candidate
+                it[AuditTable.version] shouldBe audit.version
+                it[AuditTable.platform] shouldBe audit.platform
+                it[AuditTable.vendor] shouldBe audit.vendor.getOrNull()
+                it[AuditTable.host] shouldBe audit.host
+                it[AuditTable.agent] shouldBe audit.agent
+                it[AuditTable.dist] shouldBe audit.dist
             }
+        }
 
-            should("successfully save audit record with null vendor") {
-                val audit = Audit(
+        should("successfully save audit record with null vendor") {
+            val audit =
+                Audit(
                     id = UUID.randomUUID(),
                     command = "install",
                     candidate = "java",
@@ -79,33 +81,35 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec() {
                     timestamp = Clock.System.now()
                 )
 
-                val result = repository.save(audit)
+            val result = repository.save(audit)
 
-                result.shouldBeRightAnd { true }
+            result.shouldBeRightAnd { true }
 
-                // Verify the record was actually saved by querying the database
-                //TODO: Move this to a Postgres test support class
-                val savedRecord = transaction(database) {
+            // Verify the record was actually saved by querying the database
+            // TODO: Move this to a Postgres test support class
+            val savedRecord =
+                transaction(database) {
                     AuditTable.selectAll().where { AuditTable.id eq audit.id }.singleOrNull()
                 }
 
-                //TODO: introduce new reusable helper extension like shouldNotBeNullAnd { ... } for type T
-                savedRecord.shouldNotBeNull()
-                savedRecord.let {
-                    it[AuditTable.vendor] shouldBe null
-                }
+            // TODO: introduce new reusable helper extension like shouldNotBeNullAnd { ... } for type T
+            savedRecord.shouldNotBeNull()
+            savedRecord.let {
+                it[AuditTable.vendor] shouldBe null
             }
+        }
 
-            should("return DatabaseConnectionFailure when connecting to invalid database URL") {
-                val invalidDataSource =
-                    PostgresTestListener.createDataSource(
-                        "jdbc:postgresql://invalid-host:5432/invalid-db",
-                        "invalid-user",
-                        "invalid-password"
-                    )
-                val invalidRepository = PostgresAuditRepository(invalidDataSource)
+        should("return DatabaseConnectionFailure when connecting to invalid database URL") {
+            val invalidDataSource =
+                PostgresTestListener.createDataSource(
+                    "jdbc:postgresql://invalid-host:5432/invalid-db",
+                    "invalid-user",
+                    "invalid-password"
+                )
+            val invalidRepository = PostgresAuditRepository(invalidDataSource)
 
-                val audit = Audit(
+            val audit =
+                Audit(
                     id = UUID.randomUUID(),
                     command = "install",
                     candidate = "java",
@@ -118,21 +122,22 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec() {
                     timestamp = Clock.System.now()
                 )
 
-                val result = invalidRepository.save(audit)
+            val result = invalidRepository.save(audit)
 
-                result.shouldBeLeftAnd { error: PersistenceFailure ->
-                    //TODO: move this to a well-named helper method
-                    //TODO: check for an appropriate message
-                    error is PersistenceFailure.DatabaseConnectionFailure
-                }
+            result.shouldBeLeftAnd { error: PersistenceFailure ->
+                // TODO: move this to a well-named helper method
+                // TODO: check for an appropriate message
+                error is PersistenceFailure.DatabaseConnectionFailure
             }
+        }
 
-            should("return DatabaseConnectionFailure when connecting with invalid credentials") {
-                val invalidUser = "invalid-user"
-                val invalidDataSource = PostgresTestListener.createDataSource(invalidUser, "invalid-password")
-                val invalidRepository = PostgresAuditRepository(invalidDataSource)
+        should("return DatabaseConnectionFailure when connecting with invalid credentials") {
+            val invalidUser = "invalid-user"
+            val invalidDataSource = PostgresTestListener.createDataSource(invalidUser, "invalid-password")
+            val invalidRepository = PostgresAuditRepository(invalidDataSource)
 
-                val audit = Audit(
+            val audit =
+                Audit(
                     id = UUID.randomUUID(),
                     command = "install",
                     candidate = "java",
@@ -145,15 +150,14 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec() {
                     timestamp = Clock.System.now()
                 )
 
-                val result = invalidRepository.save(audit)
+            val result = invalidRepository.save(audit)
 
-                result.shouldBeLeftAnd { error: PersistenceFailure ->
-                    //TODO: move this to a well-named helper method
-                    error is PersistenceFailure.DatabaseConnectionFailure &&
-                        //TODO: find a better way than toString() to retrieve the message
-                        error.toString().contains("FATAL: password authentication failed for user \"$invalidUser\"")
-                }
+            result.shouldBeLeftAnd { error: PersistenceFailure ->
+                // TODO: move this to a well-named helper method
+                error is PersistenceFailure.DatabaseConnectionFailure &&
+                    // TODO: find a better way than toString() to retrieve the message
+                    error.toString().contains("FATAL: password authentication failed for user \"$invalidUser\"")
             }
         }
     }
-}
+})
