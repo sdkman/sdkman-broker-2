@@ -154,7 +154,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
 
             result.shouldBeLeftAnd { error: PersistenceFailure ->
                 // TODO: move this to a well-named helper method
-                error is PersistenceFailure.DatabaseConnectionFailure &&
+                error is PersistenceFailure.QueryExecutionFailure &&
                     // TODO: find a better way than toString() to retrieve the message
                     error.toString().contains("FATAL: password authentication failed for user \"$invalidUser\"")
             }
