@@ -22,6 +22,7 @@ class PostgresHealthRepository(private val dataSource: DataSource) : HealthRepos
         }
             .map { HealthCheckSuccess }
             .mapLeft { exception ->
+                //TODO: extract this to an appropriately named extension method on Throwable for reuse and conciseness
                 logger.error("PostgreSQL health check failed: {}", exception.message, exception)
                 val errorMessage = exception.message.toOption().getOrElse { "" }
                 when {

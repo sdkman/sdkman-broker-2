@@ -54,6 +54,7 @@ repositories {
 val kotestVersion = "5.8.0"
 val ktorVersion = "2.3.7"
 val arrowVersion = "1.2.1"
+val exposedVersion = "0.61.0"
 
 dependencies {
     // Arrow for functional programming
@@ -69,6 +70,13 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("com.typesafe:config:1.4.3")
     implementation("ch.qos.logback:logback-classic:1.4.14")
+
+    // Exposed ORM
+    //TODO: remove any unneeded dependencies, do we need jdbc and dao?
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
 
     // Testing
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
