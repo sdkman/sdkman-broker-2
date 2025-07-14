@@ -25,6 +25,7 @@ Observe all the following rules:
     - "chore: remove deprecated methods"
 - Use a prefix like feat, fix, docs, refactor, chore
 - No lengthy descriptions in commit body
+- A single line commit message
 - Make small, incremental commits after each change
+- Exclude a "Co-Authored-By" message
 - Exclude "🤖 Generated with [Claude Code](https://claude.ai/code)"
-
