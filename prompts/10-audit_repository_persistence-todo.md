@@ -2,7 +2,7 @@
 
 ## Task 0: Fix broken build
 
-- [ ] Correct versions in build file to ensure compatibility
+- [X] Correct versions in build file to ensure compatibility
 
 **Description**: The previous oneshot introduce exposed core to the build for persistence. This has bumped kotlinx-coroutines-core to a higher version. This bump has a knock-on effect and is causing the build to break.
 
@@ -16,7 +16,7 @@ Current Exposed dependencies that need to be changed:
 
 ## Task 1: Create Reusable Exception Handling Extension Method
 
-- [ ] Extract exception handling logic to reusable extension method
+- [X] Extract exception handling logic to reusable extension method
 
 **Description**: Both PostgresHealthRepository and PostgresAuditRepository contain similar exception handling logic that maps database exceptions to domain failures. This logic should be extracted to a reusable extension method on Throwable for better code reuse and conciseness.
 
