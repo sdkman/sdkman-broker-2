@@ -14,7 +14,7 @@ import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.HealthStatus
 import io.sdkman.broker.domain.model.Application
 import io.sdkman.broker.domain.repository.ApplicationRepository
-import io.sdkman.broker.domain.repository.HealthCheckFailure
+import io.sdkman.broker.domain.repository.DatabaseFailure
 import io.sdkman.broker.domain.repository.HealthCheckSuccess
 import io.sdkman.broker.domain.repository.HealthRepository
 import io.sdkman.broker.domain.repository.RepositoryError
@@ -72,7 +72,7 @@ class HealthServiceSpec : ShouldSpec({
             every { mockApplicationRepo.findApplication() } returns Some(applicationOK).right()
             every {
                 mockPostgresHealthRepo.checkConnectivity()
-            } returns HealthCheckFailure.ConnectionFailure(RuntimeException("Connection failed")).left()
+            } returns DatabaseFailure.ConnectionFailure(RuntimeException("Connection failed")).left()
 
             val service = HealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
 
@@ -92,7 +92,7 @@ class HealthServiceSpec : ShouldSpec({
             every { mockApplicationRepo.findApplication() } returns Either.Left(dbError)
             every {
                 mockPostgresHealthRepo.checkConnectivity()
-            } returns HealthCheckFailure.QueryFailure(RuntimeException("PostgreSQL error")).left()
+            } returns DatabaseFailure.QueryExecutionFailure(RuntimeException("PostgreSQL error")).left()
 
             val service = HealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
 
@@ -129,7 +129,7 @@ class HealthServiceSpec : ShouldSpec({
             every { mockApplicationRepo.findApplication() } returns Some(applicationOK).right()
             every {
                 mockPostgresHealthRepo.checkConnectivity()
-            } returns HealthCheckFailure.QueryFailure(RuntimeException("Query failed")).left()
+            } returns DatabaseFailure.QueryExecutionFailure(RuntimeException("Query failed")).left()
 
             val service = HealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
 
@@ -150,7 +150,7 @@ class HealthServiceSpec : ShouldSpec({
             every { mockApplicationRepo.findApplication() } returns Either.Left(dbError)
             every {
                 mockPostgresHealthRepo.checkConnectivity()
-            } returns HealthCheckFailure.ConnectionFailure(RuntimeException("PostgreSQL connection error")).left()
+            } returns DatabaseFailure.ConnectionFailure(RuntimeException("PostgreSQL connection error")).left()
 
             val service = HealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
 

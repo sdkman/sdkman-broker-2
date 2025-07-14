@@ -2,10 +2,9 @@ package io.sdkman.broker.adapter.secondary.persistence
 
 import arrow.core.Either
 import arrow.core.getOrElse
-import arrow.core.toOption
 import io.sdkman.broker.domain.model.Audit
 import io.sdkman.broker.domain.repository.AuditRepository
-import io.sdkman.broker.domain.repository.PersistenceFailure
+import io.sdkman.broker.domain.repository.DatabaseFailure
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Table
@@ -35,7 +34,7 @@ class PostgresAuditRepository(private val dataSource: DataSource) : AuditReposit
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val database: Database by lazy { Database.connect(dataSource) }
 
-    override fun save(audit: Audit): Either<PersistenceFailure, Unit> =
+    override fun save(audit: Audit): Either<DatabaseFailure, Unit> =
         Either.catch {
             transaction(database) {
                 AuditTable.insert {
@@ -55,14 +54,7 @@ class PostgresAuditRepository(private val dataSource: DataSource) : AuditReposit
             }
         }
             .mapLeft { exception ->
-                // TODO: extract this to an appropriately named extension method on Throwable for reuse and conciseness
                 logger.error("Failed to save audit record: {}", exception.message, exception)
-                val errorMessage = exception.message.toOption().getOrElse { "" }
-                when {
-                    errorMessage.contains("connect", ignoreCase = true) ->
-                        PersistenceFailure.DatabaseConnectionFailure(exception)
-
-                    else -> PersistenceFailure.QueryExecutionFailure(exception)
-                }
+                exception.toDatabaseFailure()
             }
 }

@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import io.sdkman.broker.domain.repository.HealthCheckFailure
+import io.sdkman.broker.domain.repository.DatabaseFailure
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRightAnd
 import java.sql.Connection
@@ -57,8 +57,8 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 val repository = PostgresHealthRepository(dataSource)
                 val result = repository.checkConnectivity()
 
-                result.shouldBeLeftAnd { error: HealthCheckFailure ->
-                    error is HealthCheckFailure.ConnectionFailure
+                result.shouldBeLeftAnd { error: DatabaseFailure ->
+                    error is DatabaseFailure.ConnectionFailure
                 }
 
                 verify { dataSource.connection }
@@ -76,8 +76,8 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 val repository = PostgresHealthRepository(dataSource)
                 val result = repository.checkConnectivity()
 
-                result.shouldBeLeftAnd { error: HealthCheckFailure ->
-                    error is HealthCheckFailure.ConnectionFailure
+                result.shouldBeLeftAnd { error: DatabaseFailure ->
+                    error is DatabaseFailure.ConnectionFailure
                 }
             }
 
@@ -96,8 +96,8 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 val repository = PostgresHealthRepository(dataSource)
                 val result = repository.checkConnectivity()
 
-                result.shouldBeLeftAnd { error: HealthCheckFailure ->
-                    error is HealthCheckFailure.QueryFailure
+                result.shouldBeLeftAnd { error: DatabaseFailure ->
+                    error is DatabaseFailure.QueryExecutionFailure
                 }
             }
 
@@ -118,8 +118,8 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 val repository = PostgresHealthRepository(dataSource)
                 val result = repository.checkConnectivity()
 
-                result.shouldBeLeftAnd { error: HealthCheckFailure ->
-                    error is HealthCheckFailure.QueryFailure
+                result.shouldBeLeftAnd { error: DatabaseFailure ->
+                    error is DatabaseFailure.QueryExecutionFailure
                 }
             }
 
@@ -141,8 +141,8 @@ class PostgresHealthRepositorySpec : ShouldSpec({
                 val repository = PostgresHealthRepository(dataSource)
                 val result = repository.checkConnectivity()
 
-                result.shouldBeLeftAnd { error: HealthCheckFailure ->
-                    error is HealthCheckFailure.QueryFailure
+                result.shouldBeLeftAnd { error: DatabaseFailure ->
+                    error is DatabaseFailure.QueryExecutionFailure
                 }
             }
         }

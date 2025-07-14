@@ -1,7 +1,7 @@
 package io.sdkman.broker.adapter.secondary.persistence
 
 import io.kotest.core.spec.style.ShouldSpec
-import io.sdkman.broker.domain.repository.HealthCheckFailure
+import io.sdkman.broker.domain.repository.DatabaseFailure
 import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRightAnd
@@ -32,8 +32,8 @@ class PostgresHealthRepositoryIntegrationSpec : ShouldSpec({
 
             val result = invalidRepository.checkConnectivity()
 
-            result.shouldBeLeftAnd { error: HealthCheckFailure ->
-                error is HealthCheckFailure.ConnectionFailure
+            result.shouldBeLeftAnd { error: DatabaseFailure ->
+                error is DatabaseFailure.ConnectionFailure
             }
         }
 
@@ -43,7 +43,7 @@ class PostgresHealthRepositoryIntegrationSpec : ShouldSpec({
 
             val result = invalidRepository.checkConnectivity()
 
-            result.shouldBeLeftAnd { error: HealthCheckFailure ->
+            result.shouldBeLeftAnd { error: DatabaseFailure ->
                 error.toString().contains("FATAL: password authentication failed for user \"invalid-user\"")
             }
         }

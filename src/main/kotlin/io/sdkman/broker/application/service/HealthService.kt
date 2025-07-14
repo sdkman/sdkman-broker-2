@@ -10,7 +10,7 @@ import arrow.core.some
 import arrow.core.toOption
 import io.sdkman.broker.domain.model.ApplicationError
 import io.sdkman.broker.domain.repository.ApplicationRepository
-import io.sdkman.broker.domain.repository.HealthCheckFailure
+import io.sdkman.broker.domain.repository.DatabaseFailure
 import io.sdkman.broker.domain.repository.HealthRepository
 import io.sdkman.broker.domain.repository.convertToApplicationError
 
@@ -83,12 +83,12 @@ class HealthServiceImpl(
 
     private fun checkPostgresHealth(): Either<HealthCheckError, Unit> =
         postgresHealthRepository.checkConnectivity()
-            .mapLeft { healthCheckFailure ->
-                when (healthCheckFailure) {
-                    is HealthCheckFailure.ConnectionFailure ->
-                        HealthCheckError.DatabaseUnavailable("PostgreSQL", healthCheckFailure.cause)
-                    is HealthCheckFailure.QueryFailure ->
-                        HealthCheckError.DatabaseError("PostgreSQL", healthCheckFailure.cause)
+            .mapLeft { databaseFailure ->
+                when (databaseFailure) {
+                    is DatabaseFailure.ConnectionFailure ->
+                        HealthCheckError.DatabaseUnavailable("PostgreSQL", databaseFailure.exception)
+                    is DatabaseFailure.QueryExecutionFailure ->
+                        HealthCheckError.DatabaseError("PostgreSQL", databaseFailure.exception)
                 }
             }
             .map { Unit }

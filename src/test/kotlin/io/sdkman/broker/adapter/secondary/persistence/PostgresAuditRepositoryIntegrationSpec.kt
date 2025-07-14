@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.sdkman.broker.domain.model.Audit
-import io.sdkman.broker.domain.repository.PersistenceFailure
+import io.sdkman.broker.domain.repository.DatabaseFailure
 import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRightAnd
@@ -124,10 +124,10 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
 
             val result = invalidRepository.save(audit)
 
-            result.shouldBeLeftAnd { error: PersistenceFailure ->
+            result.shouldBeLeftAnd { error: DatabaseFailure ->
                 // TODO: move this to a well-named helper method
                 // TODO: check for an appropriate message
-                error is PersistenceFailure.DatabaseConnectionFailure
+                error is DatabaseFailure.ConnectionFailure
             }
         }
 
@@ -152,9 +152,9 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
 
             val result = invalidRepository.save(audit)
 
-            result.shouldBeLeftAnd { error: PersistenceFailure ->
+            result.shouldBeLeftAnd { error: DatabaseFailure ->
                 // TODO: move this to a well-named helper method
-                error is PersistenceFailure.QueryExecutionFailure &&
+                error is DatabaseFailure.QueryExecutionFailure &&
                     // TODO: find a better way than toString() to retrieve the message
                     error.toString().contains("FATAL: password authentication failed for user \"$invalidUser\"")
             }
