@@ -1,5 +1,19 @@
 # TODO List
 
+## Task 0: Fix broken build
+
+- [ ] Correct versions in build file to ensure compatibility
+
+**Description**: The previous oneshot introduce exposed core to the build for persistence. This has bumped kotlinx-coroutines-core to a higher version. This bump has a knock-on effect and is causing the build to break.
+
+**Prompt**: I have a Kotlin Ktor project with a dependency version conflict causing this error: `java.lang.NoSuchMethodError: 'void kotlinx.coroutines.internal.LockFreeLinkedListHead.addLast(kotlinx.coroutines.internal.LockFreeLinkedListNode)'`. The issue is that Exposed 0.61.0 is pulling in kotlinx-coroutines 1.10.1, but Ktor 2.3.7 was compiled against kotlinx-coroutines 1.7.1, causing an API incompatibility. Please update my build.gradle.kts file to fix this by downgrading Exposed to version 0.57.0 (which is compatible with kotlinx-coroutines 1.7.x). Keep all other dependencies the same.
+
+Current Exposed dependencies that need to be changed:
+- org.jetbrains.exposed:exposed-core:0.61.0
+- org.jetbrains.exposed:exposed-dao:0.61.0
+- org.jetbrains.exposed:exposed-jdbc:0.61.0
+- org.jetbrains.exposed:exposed-kotlin-datetime:0.61.0
+
 ## Task 1: Create Reusable Exception Handling Extension Method
 
 - [ ] Extract exception handling logic to reusable extension method
