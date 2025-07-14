@@ -73,10 +73,18 @@ dependencies {
 
     // Exposed ORM
     // TODO: remove any unneeded dependencies, do we need jdbc and dao?
-    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion") {
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    }
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion") {
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    }
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion") {
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    }
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion") {
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    }
 
     // Testing
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
