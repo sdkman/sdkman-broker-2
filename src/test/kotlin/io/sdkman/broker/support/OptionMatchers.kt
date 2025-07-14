@@ -50,3 +50,9 @@ infix fun <T> Option<T>.shouldNotBeSome(expected: T) = this shouldNot beSome(exp
 fun <T> Option<T>.shouldNotBeSome() = this shouldNot beSome()
 
 fun <T> Option<T>.shouldNotBeNone() = this shouldNot beNone()
+
+// Extension function for asserting Some with additional validation
+infix fun <T> Option<T>.shouldBeSomeAnd(assertion: (T) -> Unit) {
+    this.shouldBeSome()
+    this.map(assertion)
+}

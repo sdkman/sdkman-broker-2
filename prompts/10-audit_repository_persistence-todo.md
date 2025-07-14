@@ -29,11 +29,11 @@ Current Exposed dependencies that need to be changed:
 
 ## Task 2: Create Postgres Test Support Helper Class
 
-- [ ] Move database test verification logic to reusable support class
+- [X] Move database read logic in tests to reusable support class
 
-**Description**: PostgresAuditRepositoryIntegrationSpec contains repeated logic for verifying saved records in the database. This logic should be moved to a Postgres test support class for better reusability across integration tests.
+**Description**: PostgresAuditRepositoryIntegrationSpec contains repeated logic for reading a saved record from the database. This logic should be moved to a Postgres test support class for better reusability across integration tests and for removing clutter from the tests.
 
-**Prompt**: Create a PostgresTestSupport class or extension functions that provide helper methods for verifying saved records in PostgreSQL integration tests. Move the transaction-based verification logic from PostgresAuditRepositoryIntegrationSpec to this new support class. The helpers should be generic enough to work with different table types while maintaining type safety with Exposed.
+**Prompt**: Create a PostgresTestSupport class that provides a helper method for reading a saved record from PostgreSQL integration tests.
 
 **Files affected**:
 - `src/test/kotlin/io/sdkman/broker/adapter/secondary/persistence/PostgresAuditRepositoryIntegrationSpec.kt`

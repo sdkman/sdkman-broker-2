@@ -3,17 +3,16 @@ package io.sdkman.broker.adapter.secondary.persistence
 import arrow.core.None
 import arrow.core.Some
 import io.kotest.core.spec.style.ShouldSpec
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.sdkman.broker.domain.model.Audit
 import io.sdkman.broker.domain.repository.DatabaseFailure
 import io.sdkman.broker.support.PostgresTestListener
+import io.sdkman.broker.support.PostgresTestSupport
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRightAnd
+import io.sdkman.broker.support.shouldBeSomeAnd
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Tag
 import java.util.UUID
 
@@ -46,23 +45,17 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
             result.shouldBeRightAnd { true }
 
             // Verify the record was actually saved by querying the database
-            // TODO: Move this to a Postgres test support class
-            val savedRecord =
-                transaction(database) {
-                    AuditTable.selectAll().where { AuditTable.id eq audit.id }.singleOrNull()
-                }
+            val savedRecord = PostgresTestSupport.readSavedAuditRecord(database, audit.id)
 
-            // TODO: introduce new reusable helper extension like shouldNotBeNullAnd { ... } for type T
-            savedRecord.shouldNotBeNull()
-            savedRecord.let {
-                it[AuditTable.command] shouldBe audit.command
-                it[AuditTable.candidate] shouldBe audit.candidate
-                it[AuditTable.version] shouldBe audit.version
-                it[AuditTable.platform] shouldBe audit.platform
-                it[AuditTable.vendor] shouldBe audit.vendor.getOrNull()
-                it[AuditTable.host] shouldBe audit.host
-                it[AuditTable.agent] shouldBe audit.agent
-                it[AuditTable.dist] shouldBe audit.dist
+            savedRecord shouldBeSomeAnd { record ->
+                record[AuditTable.command] shouldBe audit.command
+                record[AuditTable.candidate] shouldBe audit.candidate
+                record[AuditTable.version] shouldBe audit.version
+                record[AuditTable.platform] shouldBe audit.platform
+                record[AuditTable.vendor] shouldBe audit.vendor.getOrNull()
+                record[AuditTable.host] shouldBe audit.host
+                record[AuditTable.agent] shouldBe audit.agent
+                record[AuditTable.dist] shouldBe audit.dist
             }
         }
 
@@ -86,16 +79,10 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
             result.shouldBeRightAnd { true }
 
             // Verify the record was actually saved by querying the database
-            // TODO: Move this to a Postgres test support class
-            val savedRecord =
-                transaction(database) {
-                    AuditTable.selectAll().where { AuditTable.id eq audit.id }.singleOrNull()
-                }
+            val savedRecord = PostgresTestSupport.readSavedAuditRecord(database, audit.id)
 
-            // TODO: introduce new reusable helper extension like shouldNotBeNullAnd { ... } for type T
-            savedRecord.shouldNotBeNull()
-            savedRecord.let {
-                it[AuditTable.vendor] shouldBe null
+            savedRecord shouldBeSomeAnd { record ->
+                record[AuditTable.vendor] shouldBe null
             }
         }
 
