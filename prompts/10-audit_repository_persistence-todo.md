@@ -41,7 +41,7 @@ Current Exposed dependencies that need to be changed:
 
 ## Task 3: Create shouldNotBeNullAnd Helper Extension
 
-- [ ] Introduce reusable helper extension for null checks with type safety
+- [X] Introduce reusable helper extension for null checks with type safety
 
 **Description**: The integration tests use a pattern of checking if a value is not null and then performing operations on it. This should be extracted to a reusable helper extension like `shouldNotBeNullAnd { ... }` for better type safety and readability.
 
