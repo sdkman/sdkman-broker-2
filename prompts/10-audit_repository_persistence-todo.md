@@ -65,7 +65,7 @@ Current Exposed dependencies that need to be changed:
 
 ## Task 5: Make Audit ID Optional for Auto-Generation
 
-- [ ] Allow optional ID in Audit entity for database auto-generation
+- [X] Allow optional ID in Audit entity for database auto-generation
 
 **Description**: The PostgresAuditRepository currently requires a UUID to be provided for the audit ID. This should be made optional to allow for auto-generation of the primary key in the database, providing more flexibility in how audit records are created.
 

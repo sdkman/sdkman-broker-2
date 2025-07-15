@@ -38,8 +38,7 @@ class PostgresAuditRepository(private val dataSource: DataSource) : AuditReposit
         Either.catch {
             transaction(database) {
                 AuditTable.insert {
-                    // TODO: allow for this value to be optional, allowing auto-generation of the PK in the database
-                    it[id] = audit.id
+                    audit.id.map { auditId -> it[id] = auditId }
                     it[command] = audit.command
                     it[candidate] = audit.candidate
                     it[version] = audit.version

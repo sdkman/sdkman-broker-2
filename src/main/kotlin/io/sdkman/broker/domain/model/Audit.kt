@@ -5,7 +5,7 @@ import kotlinx.datetime.Instant
 import java.util.UUID
 
 data class Audit(
-    val id: UUID,
+    val id: Option<UUID>,
     val command: String,
     val candidate: String,
     val version: String,

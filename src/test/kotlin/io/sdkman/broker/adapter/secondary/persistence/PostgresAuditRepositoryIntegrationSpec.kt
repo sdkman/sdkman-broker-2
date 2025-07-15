@@ -4,6 +4,7 @@ import arrow.core.None
 import arrow.core.Some
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.sdkman.broker.domain.model.Audit
 import io.sdkman.broker.domain.repository.DatabaseFailure
 import io.sdkman.broker.support.PostgresTestListener
@@ -27,9 +28,10 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
     context("PostgresAuditRepository Integration Tests") {
 
         should("successfully save audit record to PostgreSQL container") {
+            val auditId = UUID.randomUUID()
             val audit =
                 Audit(
-                    id = UUID.randomUUID(),
+                    id = Some(auditId),
                     command = "install",
                     candidate = "java",
                     version = "17.0.2-open",
@@ -46,7 +48,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
             result.shouldBeRightAnd { true }
 
             // Verify the record was actually saved by querying the database
-            val savedRecord = PostgresTestSupport.readSavedAuditRecord(database, audit.id)
+            val savedRecord = PostgresTestSupport.readSavedAuditRecord(database, auditId)
 
             savedRecord shouldBeSomeAnd { record ->
                 record[AuditTable.command] shouldBe audit.command
@@ -61,9 +63,10 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
         }
 
         should("successfully save audit record with null vendor") {
+            val auditId = UUID.randomUUID()
             val audit =
                 Audit(
-                    id = UUID.randomUUID(),
+                    id = Some(auditId),
                     command = "install",
                     candidate = "java",
                     version = "17.0.2-open",
@@ -80,10 +83,52 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
             result.shouldBeRightAnd { true }
 
             // Verify the record was actually saved by querying the database
-            val savedRecord = PostgresTestSupport.readSavedAuditRecord(database, audit.id)
+            val savedRecord = PostgresTestSupport.readSavedAuditRecord(database, auditId)
 
             savedRecord shouldBeSomeAnd { record ->
                 record[AuditTable.vendor] shouldBe null
+            }
+        }
+
+        should("successfully save audit record with auto-generated ID") {
+            val audit =
+                Audit(
+                    id = None,
+                    command = "list",
+                    candidate = "kotlin",
+                    version = "1.9.22",
+                    platform = "linux64",
+                    vendor = Some("jetbrains"),
+                    host = "test-host",
+                    agent = "test-agent",
+                    dist = "test-dist",
+                    timestamp = Clock.System.now()
+                )
+
+            val result = repository.save(audit)
+
+            result.shouldBeRightAnd { true }
+
+            // Verify the record was actually saved by querying the database using known values
+            val savedRecord =
+                PostgresTestSupport.readSavedAuditRecord(
+                    database = database,
+                    candidate = audit.candidate,
+                    vendor = audit.vendor.getOrNull(),
+                    platform = audit.platform
+                )
+
+            savedRecord shouldBeSomeAnd { record ->
+                record[AuditTable.command] shouldBe audit.command
+                record[AuditTable.candidate] shouldBe audit.candidate
+                record[AuditTable.version] shouldBe audit.version
+                record[AuditTable.platform] shouldBe audit.platform
+                record[AuditTable.vendor] shouldBe audit.vendor.getOrNull()
+                record[AuditTable.host] shouldBe audit.host
+                record[AuditTable.agent] shouldBe audit.agent
+                record[AuditTable.dist] shouldBe audit.dist
+                // Verify that an ID was auto-generated
+                record[AuditTable.id] shouldNotBe null
             }
         }
 
@@ -98,7 +143,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
 
             val audit =
                 Audit(
-                    id = UUID.randomUUID(),
+                    id = Some(UUID.randomUUID()),
                     command = "install",
                     candidate = "java",
                     version = "17.0.2-open",
@@ -125,7 +170,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
 
             val audit =
                 Audit(
-                    id = UUID.randomUUID(),
+                    id = Some(UUID.randomUUID()),
                     command = "install",
                     candidate = "java",
                     version = "17.0.2-open",
