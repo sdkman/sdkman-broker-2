@@ -5,6 +5,7 @@ import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldNot
+import io.sdkman.broker.domain.repository.DatabaseFailure
 
 fun <L, R> beRight(expected: R): Matcher<Either<L, R>> =
     object : Matcher<Either<L, R>> {
@@ -94,7 +95,9 @@ infix fun <L, R> Either<L, R>.shouldBeLeft(expected: L) = this should beLeft(exp
 
 infix fun <L, R> Either<L, R>.shouldNotBeLeft(expected: L) = this shouldNot beLeft(expected)
 
-// Additional extension functions for predicate-based assertions
 infix fun <L, R> Either<L, R>.shouldBeRightAnd(predicate: (R) -> Boolean) = this should beRightAnd(predicate)
 
 infix fun <L, R> Either<L, R>.shouldBeLeftAnd(predicate: (L) -> Boolean) = this should beLeftAnd(predicate)
+
+infix fun DatabaseFailure.shouldContainMessage(content: String): Boolean =
+    this.exception.message?.contains(content) == true

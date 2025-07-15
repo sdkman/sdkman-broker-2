@@ -53,7 +53,7 @@ Current Exposed dependencies that need to be changed:
 
 ## Task 4: Improve Error Assertion Helper Methods
 
-- [ ] Create well-named helper methods for error assertions in tests
+- [X] Create well-named helper methods for error assertions in tests
 
 **Description**: The integration tests contain TODO comments indicating that error assertion logic should be moved to well-named helper methods. Additionally, there's a need for a better way to retrieve exception messages than using toString().
 

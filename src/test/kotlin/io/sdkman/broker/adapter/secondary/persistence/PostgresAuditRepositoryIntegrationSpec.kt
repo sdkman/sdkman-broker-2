@@ -11,6 +11,7 @@ import io.sdkman.broker.support.PostgresTestSupport
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRightAnd
 import io.sdkman.broker.support.shouldBeSomeAnd
+import io.sdkman.broker.support.shouldContainMessage
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.Database
 import org.junit.jupiter.api.Tag
@@ -112,9 +113,8 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
             val result = invalidRepository.save(audit)
 
             result.shouldBeLeftAnd { error: DatabaseFailure ->
-                // TODO: move this to a well-named helper method
-                // TODO: check for an appropriate message
-                error is DatabaseFailure.ConnectionFailure
+                error is DatabaseFailure.ConnectionFailure &&
+                    error shouldContainMessage "The connection attempt failed"
             }
         }
 
@@ -140,10 +140,9 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
             val result = invalidRepository.save(audit)
 
             result.shouldBeLeftAnd { error: DatabaseFailure ->
-                // TODO: move this to a well-named helper method
                 error is DatabaseFailure.QueryExecutionFailure &&
-                    // TODO: find a better way than toString() to retrieve the message
-                    error.toString().contains("FATAL: password authentication failed for user \"$invalidUser\"")
+                    error shouldContainMessage "FATAL: password authentication failed" &&
+                    error shouldContainMessage invalidUser
             }
         }
     }
