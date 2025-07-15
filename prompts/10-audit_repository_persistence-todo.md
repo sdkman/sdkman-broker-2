@@ -78,7 +78,7 @@ Current Exposed dependencies that need to be changed:
 
 ## Task 6: Remove Unused Exposed Dependencies
 
-- [ ] Review and remove unnecessary Exposed dependencies from build script
+- [X] Review and remove unnecessary Exposed dependencies from build script
 
 **Description**: The build.gradle.kts file contains a TODO comment questioning whether all Exposed dependencies (core, dao, jdbc, kotlin-datetime) are needed. A review should be conducted to identify and remove any unused dependencies.
 

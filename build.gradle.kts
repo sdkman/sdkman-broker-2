@@ -72,11 +72,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.4.14")
 
     // Exposed ORM
-    // TODO: remove any unneeded dependencies, do we need jdbc and dao?
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion") {
-        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
-    }
-    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion") {
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
     }
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion") {
