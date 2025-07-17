@@ -15,7 +15,7 @@ sealed class Platform(val code: String, val persistentId: String) {
 
     data object WindowsX64 : Platform("windowsx64", "WINDOWS_64")
 
-    data object Exotic : Platform("exotic", "Exotic")
+    data object Exotic : Platform("exotic", "EXOTIC")
 
     data object Universal : Platform("universal", "UNIVERSAL")
 
