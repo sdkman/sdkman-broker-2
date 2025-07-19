@@ -13,6 +13,7 @@ import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
 
+// TODO: tag this as "acceptance" test
 class VersionDownloadAcceptanceSpec : ShouldSpec({
     listener(MongoTestListener)
 

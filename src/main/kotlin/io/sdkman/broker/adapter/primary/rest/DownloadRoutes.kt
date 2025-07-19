@@ -1,9 +1,11 @@
 package io.sdkman.broker.adapter.primary.rest
 
+import arrow.core.Option
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
+import io.ktor.server.request.header
 import io.ktor.server.response.header
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.get
@@ -18,7 +20,15 @@ fun Application.downloadRoutes(versionService: VersionService) {
             val version = call.parameters["version"] ?: return@get call.respondBadRequest()
             val platform = call.parameters["platform"] ?: return@get call.respondBadRequest()
 
-            versionService.downloadVersion(candidate, version, platform)
+            val auditContext =
+                AuditContext(
+                    host = Option.fromNullable(call.request.header("X-Real-IP")),
+                    agent = Option.fromNullable(call.request.header("User-Agent"))
+                )
+
+            // TODO: Introduce a new DownloadResponse class in the rest package that
+            //  converts DownloadInfo to DownloadResponse
+            versionService.downloadVersion(candidate, version, platform, auditContext)
                 .fold(
                     { error -> call.handleVersionError(error) },
                     { response ->

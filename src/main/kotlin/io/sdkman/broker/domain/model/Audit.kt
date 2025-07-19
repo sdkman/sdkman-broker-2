@@ -10,9 +10,9 @@ data class Audit(
     val candidate: String,
     val version: String,
     val platform: String,
-    val vendor: Option<String>,
-    val host: String,
-    val agent: String,
     val dist: String,
+    val vendor: Option<String>,
+    val host: Option<String>,
+    val agent: Option<String>,
     val timestamp: Instant
 )

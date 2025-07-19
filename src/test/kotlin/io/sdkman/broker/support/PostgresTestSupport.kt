@@ -19,6 +19,7 @@ object PostgresTestSupport {
             AuditTable.selectAll().where { AuditTable.id eq id }.singleOrNull().toOption()
         }
 
+    // TODO: Remove this method and cut over any remaining callsites to readSavedAuditRecordByVersion
     fun readSavedAuditRecord(
         database: Database,
         candidate: String,
@@ -29,6 +30,21 @@ object PostgresTestSupport {
             AuditTable.selectAll().where {
                 (AuditTable.candidate eq candidate) and
                     (AuditTable.vendor eq vendor) and
+                    (AuditTable.platform eq platform)
+            }.singleOrNull().toOption()
+        }
+
+    // TODO: Enhance this to also include optional `vendor`
+    fun readSavedAuditRecordByVersion(
+        database: Database,
+        candidate: String,
+        version: String,
+        platform: String
+    ): Option<ResultRow> =
+        transaction(database) {
+            AuditTable.selectAll().where {
+                (AuditTable.candidate eq candidate) and
+                    (AuditTable.version eq version) and
                     (AuditTable.platform eq platform)
             }.singleOrNull().toOption()
         }

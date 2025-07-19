@@ -13,6 +13,7 @@ import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
 
+// TODO: tag this as "acceptance" test
 class HealthCheckAcceptanceSpec : ShouldSpec() {
     override suspend fun beforeSpec(spec: io.kotest.core.spec.Spec) {
         listeners(MongoTestListener, PostgresTestListener)

@@ -11,6 +11,7 @@ import io.sdkman.broker.adapter.primary.rest.metaRoutes
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
+import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.application.service.HealthService
@@ -40,11 +41,12 @@ object App {
         val applicationRepository = MongoApplicationRepository(database)
         val versionRepository = MongoVersionRepository(database)
         val postgresHealthRepository = PostgresHealthRepository(postgresDataSource)
+        val auditRepository = PostgresAuditRepository(postgresDataSource)
 
         // Initialize services
         val healthService = HealthServiceImpl(applicationRepository, postgresHealthRepository)
         val releaseService = ReleaseServiceImpl()
-        val versionService = VersionServiceImpl(versionRepository)
+        val versionService = VersionServiceImpl(versionRepository, auditRepository)
 
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {

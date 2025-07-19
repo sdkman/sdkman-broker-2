@@ -22,8 +22,8 @@ object AuditTable : Table("audit") {
     val version: Column<String> = text("version")
     val platform: Column<String> = text("platform")
     val vendor: Column<String?> = text("vendor").nullable()
-    val host: Column<String> = text("host")
-    val agent: Column<String> = text("agent")
+    val host: Column<String?> = text("host").nullable()
+    val agent: Column<String?> = text("agent").nullable()
     val dist: Column<String> = text("dist")
     val timestamp = timestamp("timestamp")
 
@@ -44,8 +44,8 @@ class PostgresAuditRepository(private val dataSource: DataSource) : AuditReposit
                     it[version] = audit.version
                     it[platform] = audit.platform
                     it[vendor] = audit.vendor.getOrElse { null }
-                    it[host] = audit.host
-                    it[agent] = audit.agent
+                    it[host] = audit.host.getOrElse { null }
+                    it[agent] = audit.agent.getOrElse { null }
                     it[dist] = audit.dist
                     it[timestamp] = audit.timestamp
                 }

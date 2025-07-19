@@ -2,6 +2,7 @@ package io.sdkman.broker.support
 
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
+import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.ReleaseServiceImpl
@@ -41,6 +42,10 @@ object TestDependencyInjection {
         PostgresHealthRepository(postgresDataSource("invalid", "invalid"))
     }
 
+    val auditRepository by lazy {
+        PostgresAuditRepository(postgresDataSource)
+    }
+
     val healthService by lazy {
         HealthServiceImpl(applicationRepository, postgresHealthRepository)
     }
@@ -54,6 +59,6 @@ object TestDependencyInjection {
     }
 
     val versionService by lazy {
-        VersionServiceImpl(versionRepository)
+        VersionServiceImpl(versionRepository, auditRepository)
     }
 }
