@@ -61,9 +61,6 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
 
             response.status shouldBe HttpStatusCode.Found
 
-            // TODO: DO NOT use thread sleeps! Use an await retry strategy instead
-            Thread.sleep(200)
-
             val savedRecord =
                 PostgresTestSupport.readSavedAuditRecordByVersion(
                     database = database,
@@ -124,9 +121,6 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
 
             response.status shouldBe HttpStatusCode.Found
 
-            // TODO: DO NOT use thread sleeps! Use an await retry strategy instead
-            Thread.sleep(200)
-
             val savedRecord =
                 PostgresTestSupport.readSavedAuditRecordByVersion(
                     database = database,
@@ -186,9 +180,6 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
 
             response.status shouldBe HttpStatusCode.Found
 
-            // TODO: DO NOT use thread sleeps! Use an await retry strategy instead
-            Thread.sleep(200)
-
             val savedRecord =
                 PostgresTestSupport.readSavedAuditRecordByVersion(
                     database = database,
@@ -246,8 +237,6 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 }
 
             response.status shouldBe HttpStatusCode.Found
-
-            Thread.sleep(200)
 
             val savedRecord =
                 PostgresTestSupport.readSavedAuditRecordByVersion(

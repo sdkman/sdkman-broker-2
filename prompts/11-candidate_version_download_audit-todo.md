@@ -82,7 +82,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 9: Replace Thread Sleeps with Await Retry Strategy
 
-- [ ] Replace Thread.sleep with proper await retry strategy
+- [X] Replace Thread.sleep with proper await retry strategy
 
 **Prompt**: Replace all `Thread.sleep` calls in `VersionDownloadAuditAcceptanceSpec.kt` (lines 65, 128, 190) with proper await retry strategies. Thread sleeps make tests flaky and slow. Implement a robust retry mechanism that waits for the expected condition to be met.
 

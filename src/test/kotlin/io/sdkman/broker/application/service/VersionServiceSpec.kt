@@ -40,6 +40,7 @@ class VersionServiceSpec : ShouldSpec({
                 checksums = mapOf("SHA-256" to "abc123")
             )
         every { mockVersionRepository.findByQuery("java", "17.0.2-tem", "MAC_ARM64") } returns Some(version).right()
+        every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading version
         val result = service.downloadVersion("java", "17.0.2-tem", "darwinarm64", testAuditContext)
@@ -66,6 +67,7 @@ class VersionServiceSpec : ShouldSpec({
         every {
             mockVersionRepository.findByQuery("groovy", "4.0.0", "UNIVERSAL")
         } returns Some(universalVersion).right()
+        every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading version for Linux
         val result = service.downloadVersion("groovy", "4.0.0", "linuxx64", testAuditContext)
@@ -155,6 +157,7 @@ class VersionServiceSpec : ShouldSpec({
         every { mockVersionRepository.findByQuery("gradle", "7.0", "UNIVERSAL") } returns Some(zipVersion).right()
         every { mockVersionRepository.findByQuery("maven", "3.8.1", "UNIVERSAL") } returns Some(tarGzVersion).right()
         every { mockVersionRepository.findByQuery("ant", "1.10.12", "UNIVERSAL") } returns Some(tgzVersion).right()
+        every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading different archive types
         val zipResult = service.downloadVersion("gradle", "7.0", "universal", testAuditContext)
@@ -178,6 +181,7 @@ class VersionServiceSpec : ShouldSpec({
                 checksums = emptyMap()
             )
         every { mockVersionRepository.findByQuery("kotlin", "1.5.31", "UNIVERSAL") } returns Some(version).right()
+        every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading version
         val result = service.downloadVersion("kotlin", "1.5.31", "universal", testAuditContext)
@@ -203,6 +207,7 @@ class VersionServiceSpec : ShouldSpec({
                     )
             )
         every { mockVersionRepository.findByQuery("scala", "2.13.8", "UNIVERSAL") } returns Some(version).right()
+        every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading version
         val result = service.downloadVersion("scala", "2.13.8", "universal", testAuditContext)
