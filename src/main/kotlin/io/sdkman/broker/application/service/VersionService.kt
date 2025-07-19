@@ -33,7 +33,21 @@ data class AuditCommand(
     val actualDist: String,
     val versionEntity: Version,
     val auditContext: AuditContext
-)
+) {
+    fun toAudit(): Audit =
+        Audit(
+            id = Option.fromNullable(UUID.randomUUID()),
+            command = "install",
+            candidate = candidate,
+            version = version,
+            platform = platform.persistentId,
+            dist = actualDist,
+            vendor = versionEntity.vendor,
+            host = auditContext.host,
+            agent = auditContext.agent,
+            timestamp = Clock.System.now()
+        )
+}
 
 interface VersionService {
     fun downloadVersion(
@@ -105,22 +119,7 @@ class VersionServiceImpl(
 
     private fun createAuditEntry(auditCommand: AuditCommand) {
         auditScope.launch {
-            // TODO: move conversion logic to the AuditCommand as toAudit() method
-            val audit =
-                Audit(
-                    id = Option.fromNullable(UUID.randomUUID()),
-                    command = "install",
-                    candidate = auditCommand.candidate,
-                    version = auditCommand.version,
-                    platform = auditCommand.platform.persistentId,
-                    dist = auditCommand.actualDist,
-                    vendor = auditCommand.versionEntity.vendor,
-                    host = auditCommand.auditContext.host,
-                    agent = auditCommand.auditContext.agent,
-                    timestamp = Clock.System.now()
-                )
-
-            auditRepository.save(audit)
+            auditRepository.save(auditCommand.toAudit())
                 .mapLeft { failure ->
                     logger.error(
                         "Failed to save audit entry for download: {}",
