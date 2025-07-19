@@ -90,9 +90,59 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
             }
         }
 
-        // TODO: Add test for successfully saving audit record with null host
+        should("successfully save audit record with null host") {
+            val auditId = UUID.randomUUID()
+            val audit =
+                Audit(
+                    id = Some(auditId),
+                    command = "install",
+                    candidate = "java",
+                    version = "17.0.2-open",
+                    platform = "linux64",
+                    vendor = Some("openjdk"),
+                    host = None,
+                    agent = Some("test-agent"),
+                    dist = "test-dist",
+                    timestamp = Clock.System.now()
+                )
 
-        // TODO: Add test for successfully saving audit record with null user agent
+            val result = repository.save(audit)
+
+            result.shouldBeRightAnd { true }
+
+            val savedRecord = PostgresTestSupport.readSavedAuditRecord(database, auditId)
+
+            savedRecord shouldBeSomeAnd { record ->
+                record[AuditTable.host] shouldBe null
+            }
+        }
+
+        should("successfully save audit record with null user agent") {
+            val auditId = UUID.randomUUID()
+            val audit =
+                Audit(
+                    id = Some(auditId),
+                    command = "install",
+                    candidate = "java",
+                    version = "17.0.2-open",
+                    platform = "linux64",
+                    vendor = Some("openjdk"),
+                    host = Some("test-host"),
+                    agent = None,
+                    dist = "test-dist",
+                    timestamp = Clock.System.now()
+                )
+
+            val result = repository.save(audit)
+
+            result.shouldBeRightAnd { true }
+
+            val savedRecord = PostgresTestSupport.readSavedAuditRecord(database, auditId)
+
+            savedRecord shouldBeSomeAnd { record ->
+                record[AuditTable.agent] shouldBe null
+            }
+        }
 
         should("successfully save audit record with auto-generated ID") {
             val audit =
