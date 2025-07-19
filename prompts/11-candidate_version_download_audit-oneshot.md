@@ -13,7 +13,7 @@ provides visibility into download usage patterns.
 - Use the existing `AuditRepository` infrastructure for persistence
 - Handle audit failures gracefully without impacting download performance
 - Maintain feature parity with the legacy application's audit implementation
-- Support nullable vendor information in audit records
+- Support nullable vendor, host and agent information in audit records
 - Generate audit timestamps at the time of successful download resolution
 
 ## Rules
@@ -46,6 +46,7 @@ data class Audit(
 - Audit entries should only be created for successful downloads (HTTP 302 status)
 - Failed requests (400/404) should not generate audit entries
 - Audit logging must be asynchronous to avoid impacting download performance
+- Relax `NOT NULL` contraint on host and agent columns in audit table
 - Missing request headers (X-Real-IP, User-Agent) should be persisted as `null` in the db audit record
 - The vendor field should be populated from the resolved version record if present
 - The platform field should use the normalized platform identifier, not the raw URL parameter
