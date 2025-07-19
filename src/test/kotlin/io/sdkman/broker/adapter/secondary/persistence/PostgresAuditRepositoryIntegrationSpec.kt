@@ -113,12 +113,11 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
 
             result.shouldBeRightAnd { true }
 
-            // TODO: Use more targeted method that specifies version
             val savedRecord =
-                PostgresTestSupport.readSavedAuditRecord(
+                PostgresTestSupport.readSavedAuditRecordByVersion(
                     database = database,
                     candidate = audit.candidate,
-                    vendor = audit.vendor.getOrNull(),
+                    version = audit.version,
                     platform = audit.platform
                 )
 
