@@ -34,6 +34,15 @@ Here is an example of what each item in the TODO list should look like:
 
 ## Execution plan
 
+Please add the following section to the top of the TODO.md:
+
+```markdown
+Consider the following rules during execution of the tasks:
+- rules/git-rules.md
+- kotlin-rules.md
+- kotest-rules.md
+```
+
 Please add the following section to the end of the TODO.md:
 
 ```markdown
@@ -41,13 +50,13 @@ Please add the following section to the end of the TODO.md:
 
 The following workflow applies when executing this TODO list:
 - Execute one task at a time
-- Implement the task in **the simplest way possible**
+- Implement the task in **THE SIMPLEST WAY POSSIBLE**
 - Run the tests, format and perform static analysis on the code:
-    - ./gradlew test
     - ./gradlew ktlintFormat
+    - ./gradlew test
     - ./gradlew detekt
-- Ask me to review the task once you have completed and **wait for me**
-- Mark the TODO item as complete as [X]
+- **Ask me to review the task once you have completed and then WAIT FOR ME**
+- Mark the TODO item as complete with [X]
 - Commit the change to Git when I've approved and/or amended the code
 - Move on to the next task
 ```
