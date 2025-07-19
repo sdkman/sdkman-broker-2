@@ -20,15 +20,13 @@ import kotlinx.datetime.Clock
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
-// TODO: Rename this to DownloadInfo
-data class DownloadResponse(
+data class DownloadInfo(
     val redirectUrl: String,
     val checksumHeaders: Map<String, String>,
     val archiveType: String
 )
 
-// TODO: Rename this to AuditCommand
-data class AuditRequest(
+data class AuditCommand(
     val candidate: String,
     val version: String,
     val platform: Platform,
@@ -43,7 +41,7 @@ interface VersionService {
         version: String,
         platformCode: String,
         auditContext: AuditContext
-    ): Either<VersionError, DownloadResponse>
+    ): Either<VersionError, DownloadInfo>
 }
 
 class VersionServiceImpl(
@@ -58,7 +56,7 @@ class VersionServiceImpl(
         version: String,
         platformCode: String,
         auditContext: AuditContext
-    ): Either<VersionError, DownloadResponse> =
+    ): Either<VersionError, DownloadInfo> =
         Platform.fromCode(platformCode)
             .toEither { VersionError.InvalidPlatform(platformCode) }
             .flatMap { platform ->
@@ -79,10 +77,10 @@ class VersionServiceImpl(
                             }
 
                         createAuditEntry(
-                            AuditRequest(candidate, version, platform, actualDist, versionEntity, auditContext)
+                            AuditCommand(candidate, version, platform, actualDist, versionEntity, auditContext)
                         )
 
-                        DownloadResponse(
+                        DownloadInfo(
                             redirectUrl = versionEntity.url,
                             checksumHeaders = checksumHeaders,
                             archiveType = archiveType
@@ -111,20 +109,20 @@ class VersionServiceImpl(
                 )
             }
 
-    private fun createAuditEntry(auditRequest: AuditRequest) {
+    private fun createAuditEntry(auditCommand: AuditCommand) {
         auditScope.launch {
-            // TODO: move conversion logic to the AuditRequest/AuditCommand as toAudit() method
+            // TODO: move conversion logic to the AuditCommand as toAudit() method
             val audit =
                 Audit(
                     id = Option.fromNullable(UUID.randomUUID()),
                     command = "install",
-                    candidate = auditRequest.candidate,
-                    version = auditRequest.version,
-                    platform = auditRequest.platform.persistentId,
-                    dist = auditRequest.actualDist,
-                    vendor = auditRequest.versionEntity.vendor,
-                    host = auditRequest.auditContext.host,
-                    agent = auditRequest.auditContext.agent,
+                    candidate = auditCommand.candidate,
+                    version = auditCommand.version,
+                    platform = auditCommand.platform.persistentId,
+                    dist = auditCommand.actualDist,
+                    vendor = auditCommand.versionEntity.vendor,
+                    host = auditCommand.auditContext.host,
+                    agent = auditCommand.auditContext.agent,
                     timestamp = Clock.System.now()
                 )
 
