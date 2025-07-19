@@ -26,12 +26,11 @@ fun Application.downloadRoutes(versionService: VersionService) {
                     agent = Option.fromNullable(call.request.header("User-Agent"))
                 )
 
-            // TODO: Introduce a new DownloadResponse class in the rest package that
-            //  converts DownloadInfo to DownloadResponse
             versionService.downloadVersion(candidate, version, platform, auditContext)
                 .fold(
                     { error -> call.handleVersionError(error) },
-                    { response ->
+                    { downloadInfo ->
+                        val response = DownloadResponse.from(downloadInfo)
                         response.checksumHeaders.forEach { (header, value) ->
                             call.response.header(header, value)
                         }
