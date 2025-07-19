@@ -22,8 +22,7 @@ import org.junit.jupiter.api.Tag
 
 // TODO: only test most important paths in this acceptance spec,
 //  rely on unit and integration tests for fine grained testing
-// TODO: this is not an "integration" test. tag this as "acceptance"
-@Tag("integration")
+@Tag("acceptance")
 class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
     listeners(MongoTestListener, PostgresTestListener)
     val database = Database.connect(PostgresTestListener.dataSource)

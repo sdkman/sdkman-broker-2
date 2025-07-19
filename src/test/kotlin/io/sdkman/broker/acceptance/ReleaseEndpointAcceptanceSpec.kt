@@ -12,8 +12,9 @@ import io.sdkman.broker.application.service.ReleaseError
 import io.sdkman.broker.application.service.ReleaseService
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
+import org.junit.jupiter.api.Tag
 
-// TODO: tag this as "acceptance" test
+@Tag("acceptance")
 class ReleaseEndpointAcceptanceSpec : ShouldSpec({
 
     should("return 200 OK with release when release.properties file is present") {

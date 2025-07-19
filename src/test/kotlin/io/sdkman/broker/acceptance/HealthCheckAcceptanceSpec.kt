@@ -12,8 +12,9 @@ import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
+import org.junit.jupiter.api.Tag
 
-// TODO: tag this as "acceptance" test
+@Tag("acceptance")
 class HealthCheckAcceptanceSpec : ShouldSpec() {
     override suspend fun beforeSpec(spec: io.kotest.core.spec.Spec) {
         listeners(MongoTestListener, PostgresTestListener)

@@ -70,7 +70,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 8: Add Acceptance Test Tags
 
-- [ ] Add "acceptance" tags to test classes
+- [X] Add "acceptance" tags to test classes
 
 **Prompt**: Add "acceptance" test tags to the following test classes: `VersionDownloadAcceptanceSpec.kt`, `VersionDownloadAuditAcceptanceSpec.kt`, `HealthCheckAcceptanceSpec.kt`, and `ReleaseEndpointAcceptanceSpec.kt`. This will help categorize tests properly for test execution strategies.
 
