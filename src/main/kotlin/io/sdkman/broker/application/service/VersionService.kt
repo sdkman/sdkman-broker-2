@@ -68,13 +68,7 @@ class VersionServiceImpl(
                             }
                         val archiveType = ArchiveType.fromUrl(versionEntity.url).value
 
-                        // TODO: Move this behaviour as a well-named method on Version
-                        val actualDist =
-                            if (versionEntity.platform == Platform.Universal.persistentId) {
-                                Platform.Universal.persistentId
-                            } else {
-                                platform.persistentId
-                            }
+                        val actualDist = versionEntity.resolveActualDistribution(platform)
 
                         createAuditEntry(
                             AuditCommand(candidate, version, platform, actualDist, versionEntity, auditContext)
