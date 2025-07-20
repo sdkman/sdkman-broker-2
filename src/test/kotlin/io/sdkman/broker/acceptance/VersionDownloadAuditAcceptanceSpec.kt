@@ -22,8 +22,6 @@ import io.sdkman.broker.support.shouldBeSomeAnd
 import org.jetbrains.exposed.sql.Database
 import org.junit.jupiter.api.Tag
 
-// TODO: only test most important paths in this acceptance spec,
-//  rely on unit and integration tests for fine grained testing
 @Tag("acceptance")
 class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
     listeners(MongoTestListener, PostgresTestListener)
