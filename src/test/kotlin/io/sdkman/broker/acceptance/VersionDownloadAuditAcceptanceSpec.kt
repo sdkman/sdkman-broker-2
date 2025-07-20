@@ -187,62 +187,6 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
         }
     }
 
-    // TODO: Remove this pointless test
-    should("create audit entry with partial headers when only one is present") {
-        setupVersion(
-            Version(
-                candidate = "scala",
-                version = "2.13.8",
-                platform = "UNIVERSAL",
-                url = "https://downloads.lightbend.com/scala/2.13.8/scala-2.13.8.tgz",
-                vendor = None,
-                visible = true
-            )
-        )
-
-        testApplication {
-            application {
-                configureAppForTesting(
-                    TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
-                    TestDependencyInjection.versionService
-                )
-            }
-
-            val client = createClient { followRedirects = false }
-
-            val response =
-                client.get("/download/scala/2.13.8/darwinarm64") {
-                    header("X-Real-IP", "10.0.0.1")
-                }
-
-            response.status shouldBe HttpStatusCode.Found
-
-            val savedRecord =
-                PostgresTestSupport.readSavedAuditRecordByVersion(
-                    database = database,
-                    candidate = "scala",
-                    version = "2.13.8",
-                    platform = "MAC_ARM64"
-                )
-
-            savedRecord.isSome() shouldBe true
-            savedRecord.map { record ->
-                record[AuditTable.command] shouldBe "install"
-                record[AuditTable.candidate] shouldBe "scala"
-                record[AuditTable.version] shouldBe "2.13.8"
-                record[AuditTable.platform] shouldBe "MAC_ARM64"
-                record[AuditTable.dist] shouldBe "UNIVERSAL"
-                record[AuditTable.vendor] shouldBe null
-                record[AuditTable.host] shouldBe "10.0.0.1"
-                record[AuditTable.agent] shouldBe "Ktor client"
-                record[AuditTable.timestamp] shouldNotBe null
-                record[AuditTable.id] shouldNotBe null
-                true
-            }
-        }
-    }
-
     should("NOT create audit entry for failed requests") {
         testApplication {
             application {
