@@ -11,11 +11,4 @@ data class Version(
     val vendor: Option<String> = None,
     val visible: Boolean = true,
     val checksums: Map<String, String> = emptyMap()
-) {
-    fun resolveActualDistribution(sourcePlatform: Platform): String =
-        if (platform == Platform.Universal.persistentId) {
-            Platform.Universal.persistentId
-        } else {
-            sourcePlatform.persistentId
-        }
-}
+)

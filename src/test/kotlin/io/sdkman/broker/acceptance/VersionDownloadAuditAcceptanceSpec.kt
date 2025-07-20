@@ -65,14 +65,14 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 PostgresTestSupport.readSavedAuditRecordByVersion(
                     database = database,
                     candidate = "java",
-                    version = "17.0.2-tem",
+                    version = "17.0.2",
                     platform = "MAC_ARM64"
                 )
 
             savedRecord shouldBeSomeAnd { record ->
                 record[AuditTable.command] shouldBe "install"
                 record[AuditTable.candidate] shouldBe "java"
-                record[AuditTable.version] shouldBe "17.0.2-tem"
+                record[AuditTable.version] shouldBe "17.0.2"
                 record[AuditTable.platform] shouldBe "MAC_ARM64"
                 record[AuditTable.dist] shouldBe "MAC_ARM64"
                 record[AuditTable.vendor] shouldBe "tem"

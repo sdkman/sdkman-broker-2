@@ -44,8 +44,13 @@ class VersionServiceImpl(
                     "X-Sdkman-Checksum-${algorithm.uppercase()}"
                 }
             val archiveType = ArchiveType.fromUrl(versionEntity.url).value
-            val actualDist = versionEntity.resolveActualDistribution(platform)
-            createAuditEntry(AuditCommand(candidate, version, platform, actualDist, versionEntity, auditContext))
+            createAuditEntry(
+                AuditCommand(
+                    versionEntity = versionEntity,
+                    clientPlatform = platform,
+                    auditContext = auditContext
+                )
+            )
             val downloadInfo =
                 DownloadInfo(
                     redirectUrl = versionEntity.url,

@@ -74,7 +74,7 @@ class VersionServiceSpec : ShouldSpec({
         verify { mockAuditRepository.save(capture(auditSlot)) }
         auditSlot.captured.apply {
             command shouldBe "install"
-            version shouldBe "17.0.2-tem"
+            version shouldBe "17.0.2"
             candidate shouldBe "java"
             platform shouldBe "MAC_ARM64"
             dist shouldBe "MAC_ARM64"
