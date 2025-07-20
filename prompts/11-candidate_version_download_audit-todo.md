@@ -34,7 +34,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 4: Add Mock Verifications to Unit Tests
 
-- [ ] Add appropriate mock verifications to VersionServiceSpec
+- [X] Add appropriate mock verifications to VersionServiceSpec
 
 **Prompt**: Add appropriate mock verifications on the `mockAuditRepository` for each test scenario in `VersionServiceSpec.kt`. This will ensure that the repository methods are being called correctly with the expected parameters.
 

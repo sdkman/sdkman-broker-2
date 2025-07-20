@@ -6,9 +6,14 @@ import arrow.core.Some
 import arrow.core.left
 import arrow.core.right
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import io.sdkman.broker.adapter.primary.rest.AuditContext
+import io.sdkman.broker.domain.model.Audit
 import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.domain.model.VersionError
 import io.sdkman.broker.domain.repository.AuditRepository
@@ -16,7 +21,6 @@ import io.sdkman.broker.domain.repository.VersionRepository
 import io.sdkman.broker.support.shouldBeLeft
 import io.sdkman.broker.support.shouldBeRightAnd
 
-// TODO: Do appropriate mock verifications on the mockAuditRepository for each scenario
 class VersionServiceSpec : ShouldSpec({
     val mockVersionRepository = mockk<VersionRepository>()
     val mockAuditRepository = mockk<AuditRepository>()
@@ -28,9 +32,13 @@ class VersionServiceSpec : ShouldSpec({
             agent = Option.fromNullable("SDKMAN/5.19.0")
         )
 
-    should("return download response for exact platform match") {
+    beforeEach {
+        clearMocks(mockVersionRepository, mockAuditRepository)
+    }
+
+    should("return download response and record audit for specific platform match") {
         // given: exact platform match exists
-        val version =
+        val platformSpecificVersion =
             Version(
                 candidate = "java",
                 version = "17.0.2-tem",
@@ -39,7 +47,14 @@ class VersionServiceSpec : ShouldSpec({
                 vendor = Some("tem"),
                 checksums = mapOf("SHA-256" to "abc123")
             )
-        every { mockVersionRepository.findByQuery("java", "17.0.2-tem", "MAC_ARM64") } returns Some(version).right()
+
+        every {
+            mockVersionRepository.findByQuery(
+                "java",
+                "17.0.2-tem",
+                "MAC_ARM64"
+            )
+        } returns Some(platformSpecificVersion).right()
         every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading version
@@ -51,9 +66,23 @@ class VersionServiceSpec : ShouldSpec({
                 response.checksumHeaders == mapOf("X-Sdkman-Checksum-SHA-256" to "abc123") &&
                 response.archiveType == "tar.gz"
         }
+
+        // and: audit entry persisted
+        val auditSlot = slot<Audit>()
+        verify { mockAuditRepository.save(capture(auditSlot)) }
+        auditSlot.captured.apply {
+            command shouldBe "install"
+            version shouldBe platformSpecificVersion.version
+            candidate shouldBe platformSpecificVersion.candidate
+            platform shouldBe platformSpecificVersion.platform
+            dist shouldBe "MAC_ARM64"
+            vendor shouldBe platformSpecificVersion.vendor
+            host shouldBe testAuditContext.host
+            agent shouldBe testAuditContext.agent
+        }
     }
 
-    should("return download response for UNIVERSAL fallback when platform not found") {
+    should("return download response and record audit for UNIVERSAL fallback when platform match not found") {
         // given: no exact platform match but UNIVERSAL exists
         val universalVersion =
             Version(
@@ -79,20 +108,36 @@ class VersionServiceSpec : ShouldSpec({
                 mapOf(
                     "X-Sdkman-Checksum-SHA-256" to "def456",
                     "X-Sdkman-Checksum-MD5" to "ghi789"
-                ) &&
-                response.archiveType == "zip"
+                ) && response.archiveType == "zip"
+        }
+
+        // and: audit entry persisted
+        val auditSlot = slot<Audit>()
+        verify { mockAuditRepository.save(capture(auditSlot)) }
+        auditSlot.captured.apply {
+            command shouldBe "install"
+            version shouldBe universalVersion.version
+            candidate shouldBe universalVersion.candidate
+            platform shouldBe "LINUX_64"
+            dist shouldBe universalVersion.platform
+            vendor shouldBe universalVersion.vendor
+            host shouldBe testAuditContext.host
+            agent shouldBe testAuditContext.agent
         }
     }
 
-    should("return InvalidPlatform error for invalid platform code") {
+    should("return InvalidPlatform error with no audit for invalid platform code") {
         // when: using invalid platform
         val result = service.downloadVersion("java", "17.0.2-tem", "invalidplatform", testAuditContext)
 
         // then: InvalidPlatform error
         result shouldBeLeft VersionError.InvalidPlatform("invalidplatform")
+
+        // and: record no audit
+        verify(exactly = 0) { mockAuditRepository.save(any()) }
     }
 
-    should("return VersionNotFound error when no version exists") {
+    should("return VersionNotFound error and record no audit when no version exists") {
         // given: no version found for exact or UNIVERSAL
         every { mockVersionRepository.findByQuery("nonexistent", "1.0.0", "LINUX_64") } returns None.right()
         every { mockVersionRepository.findByQuery("nonexistent", "1.0.0", "UNIVERSAL") } returns None.right()
@@ -102,9 +147,12 @@ class VersionServiceSpec : ShouldSpec({
 
         // then: VersionNotFound error
         result shouldBeLeft VersionError.VersionNotFound("nonexistent", "1.0.0", "LINUX_64")
+
+        // and: record no audit
+        verify(exactly = 0) { mockAuditRepository.save(any()) }
     }
 
-    should("return VersionNotFound error when platform not found and no UNIVERSAL fallback") {
+    should("return VersionNotFound error and record no audit when platform not found and no UNIVERSAL fallback") {
         // given: no exact match and no UNIVERSAL fallback
         every { mockVersionRepository.findByQuery("java", "17.0.2-tem", "LINUX_64") } returns None.right()
         every { mockVersionRepository.findByQuery("java", "17.0.2-tem", "UNIVERSAL") } returns None.right()
@@ -114,9 +162,12 @@ class VersionServiceSpec : ShouldSpec({
 
         // then: VersionNotFound error
         result shouldBeLeft VersionError.VersionNotFound("java", "17.0.2-tem", "LINUX_64")
+
+        // and: record no audit
+        verify(exactly = 0) { mockAuditRepository.save(any()) }
     }
 
-    should("return DatabaseError when repository fails") {
+    should("return DatabaseError and record no audit when repository fails") {
         // given: repository error
         val dbError = RuntimeException("Database connection failed")
         every {
@@ -128,6 +179,9 @@ class VersionServiceSpec : ShouldSpec({
 
         // then: DatabaseError propagated
         result shouldBeLeft VersionError.DatabaseError(dbError)
+
+        // and: record no audit
+        verify(exactly = 0) { mockAuditRepository.save(any()) }
     }
 
     should("detect archive type from URL extensions") {
