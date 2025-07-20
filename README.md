@@ -66,7 +66,7 @@ docker run -d -p 5432:5432 --name postgres \
 Run the database migration:
 
 ```
-psql -U postgres -d sdkman -h localhost -f src/test/resources/db/migration/V1__Initial_audit_table.sql
+psql -U postgres -d sdkman -h localhost -f src/test/resources/db/migration/V1__create_audit_table.sql
 ```
 
 Initialize test data:

@@ -1,1 +1,0 @@
-ALTER TABLE audit ADD COLUMN vendor TEXT NULL;
