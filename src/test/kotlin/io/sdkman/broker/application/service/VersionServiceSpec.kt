@@ -120,7 +120,7 @@ class VersionServiceSpec : ShouldSpec({
             command shouldBe "install"
             candidate shouldBe "groovy"
             version shouldBe "4.0.0"
-            platform shouldBe "LINUX_64"
+            platform shouldBe "LINUX_X64"
             dist shouldBe "UNIVERSAL"
             vendor shouldBe none()
             host shouldBe testAuditContext.host

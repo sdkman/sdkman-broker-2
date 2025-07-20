@@ -123,14 +123,14 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                     database = database,
                     candidate = "groovy",
                     version = "4.0.0",
-                    platform = "LINUX_64"
+                    platform = "LINUX_X64"
                 )
 
             savedRecord shouldBeSomeAnd { record ->
                 record[AuditTable.command] shouldBe "install"
                 record[AuditTable.candidate] shouldBe "groovy"
                 record[AuditTable.version] shouldBe "4.0.0"
-                record[AuditTable.platform] shouldBe "LINUX_64"
+                record[AuditTable.platform] shouldBe "LINUX_X64"
                 record[AuditTable.dist] shouldBe "UNIVERSAL"
                 record[AuditTable.vendor] shouldBe null
                 record[AuditTable.host] shouldBe "192.168.1.100"
@@ -175,7 +175,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                     database = database,
                     candidate = "kotlin",
                     version = "1.6.0",
-                    platform = "WINDOWS_64"
+                    platform = "WINDOWS_X64"
                 )
 
             savedRecord shouldBeSomeAnd { record ->
@@ -210,7 +210,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                     database = database,
                     candidate = "nonexistent",
                     version = "1.0.0",
-                    platform = "LINUX_64"
+                    platform = "LINUX_X64"
                 )
 
             savedRecord.shouldBeNone()

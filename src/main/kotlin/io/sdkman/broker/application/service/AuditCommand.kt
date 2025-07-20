@@ -21,9 +21,9 @@ data class AuditCommand(
             candidate = versionEntity.candidate,
             version =
                 versionEntity.vendor
-                    .map { vendor -> versionEntity.version.replace("-$vendor", "") }
+                    .map { vendor -> versionEntity.version.removeSuffix("-$vendor") }
                     .getOrElse { versionEntity.version },
-            platform = clientPlatform.persistentId,
+            platform = clientPlatform.auditId,
             dist = versionEntity.resolveActualDistribution(clientPlatform),
             vendor = versionEntity.vendor,
             host = auditContext.host,
@@ -33,7 +33,7 @@ data class AuditCommand(
 
     private fun Version.resolveActualDistribution(sourcePlatform: Platform): String =
         when (this.platform) {
-            Platform.Universal.persistentId -> Platform.Universal.persistentId
-            else -> sourcePlatform.persistentId
+            Platform.Universal.persistentId -> Platform.Universal.auditId
+            else -> sourcePlatform.auditId
         }
 }
