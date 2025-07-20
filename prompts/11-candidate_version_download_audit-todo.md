@@ -100,7 +100,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 11: Use shouldBeNone Helper for Option Assertions
 
-- [ ] Create and use shouldBeNone helper for None assertions
+- [X] Create and use shouldBeNone helper for None assertions
 
 **Prompt**: Create a `shouldBeNone` helper method for Arrow Option assertions if it doesn't exist, and use it to replace verbose None assertion patterns in `VersionDownloadAuditAcceptanceSpec.kt` (lines 306, 339). This will improve test readability.
 

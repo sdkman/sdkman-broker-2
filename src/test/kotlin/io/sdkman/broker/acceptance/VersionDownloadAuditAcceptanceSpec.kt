@@ -17,6 +17,7 @@ import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.PostgresTestSupport
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
+import io.sdkman.broker.support.shouldBeNone
 import io.sdkman.broker.support.shouldBeSomeAnd
 import org.jetbrains.exposed.sql.Database
 import org.junit.jupiter.api.Tag
@@ -283,8 +284,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                     platform = "LINUX_64"
                 )
 
-            // TODO: use shouldBeNone helper for this assertion. create it if it doesn't exist
-            savedRecord.isNone() shouldBe true
+            savedRecord.shouldBeNone()
         }
     }
 
@@ -316,8 +316,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                     platform = "invalidplatform"
                 )
 
-            // TODO: use shouldBeNone helper for this assertion. create it if it doesn't exist
-            savedRecord.isNone() shouldBe true
+            savedRecord.shouldBeNone()
         }
     }
 })
