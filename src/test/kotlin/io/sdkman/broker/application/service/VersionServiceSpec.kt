@@ -4,7 +4,9 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.left
+import arrow.core.none
 import arrow.core.right
+import arrow.core.some
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
@@ -72,11 +74,11 @@ class VersionServiceSpec : ShouldSpec({
         verify { mockAuditRepository.save(capture(auditSlot)) }
         auditSlot.captured.apply {
             command shouldBe "install"
-            version shouldBe platformSpecificVersion.version
-            candidate shouldBe platformSpecificVersion.candidate
-            platform shouldBe platformSpecificVersion.platform
+            version shouldBe "17.0.2-tem"
+            candidate shouldBe "java"
+            platform shouldBe "MAC_ARM64"
             dist shouldBe "MAC_ARM64"
-            vendor shouldBe platformSpecificVersion.vendor
+            vendor shouldBe "tem".some()
             host shouldBe testAuditContext.host
             agent shouldBe testAuditContext.agent
         }
@@ -116,11 +118,11 @@ class VersionServiceSpec : ShouldSpec({
         verify { mockAuditRepository.save(capture(auditSlot)) }
         auditSlot.captured.apply {
             command shouldBe "install"
-            version shouldBe universalVersion.version
-            candidate shouldBe universalVersion.candidate
+            candidate shouldBe "groovy"
+            version shouldBe "4.0.0"
             platform shouldBe "LINUX_64"
-            dist shouldBe universalVersion.platform
-            vendor shouldBe universalVersion.vendor
+            dist shouldBe "UNIVERSAL"
+            vendor shouldBe none()
             host shouldBe testAuditContext.host
             agent shouldBe testAuditContext.agent
         }
