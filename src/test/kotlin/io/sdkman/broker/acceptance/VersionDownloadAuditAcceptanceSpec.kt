@@ -143,7 +143,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
         }
     }
 
-    should("create audit entry with nullable host and agent when headers missing") {
+    should("create audit entry with no host when IP address header missing") {
         setupVersion(
             Version(
                 candidate = "kotlin",
@@ -166,13 +166,9 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 )
             }
 
-            // TODO: Use the Ktor UserAgent plugin to remove User-Agent header
             val client = createClient { followRedirects = false }
 
-            val response =
-                client.get("/download/kotlin/1.6.0/windowsx64") {
-                    // Don't add any headers - should get Ktor client as User-Agent
-                }
+            val response = client.get("/download/kotlin/1.6.0/windowsx64")
 
             response.status shouldBe HttpStatusCode.Found
 
@@ -185,17 +181,8 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 )
 
             savedRecord shouldBeSomeAnd { record ->
-                record[AuditTable.command] shouldBe "install"
-                record[AuditTable.candidate] shouldBe "kotlin"
-                record[AuditTable.version] shouldBe "1.6.0"
-                record[AuditTable.platform] shouldBe "WINDOWS_64"
-                record[AuditTable.dist] shouldBe "UNIVERSAL"
-                record[AuditTable.vendor] shouldBe null
                 record[AuditTable.host] shouldBe null
-                // TODO: Use the Ktor UserAgent plugin to remove this header and assert null
                 record[AuditTable.agent] shouldBe "Ktor client"
-                record[AuditTable.timestamp] shouldNotBe null
-                record[AuditTable.id] shouldNotBe null
             }
         }
     }

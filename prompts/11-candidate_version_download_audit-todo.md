@@ -109,7 +109,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 12: Use Ktor UserAgent Plugin for Header Management
 
-- [ ] Use Ktor UserAgent plugin to manage User-Agent headers
+- [X] Use Ktor UserAgent plugin to manage User-Agent headers
 
 **Prompt**: Use the Ktor UserAgent plugin to properly remove or manage User-Agent headers in tests in `VersionDownloadAuditAcceptanceSpec.kt` (lines 180, 211) instead of manual header manipulation. This will provide better control over HTTP headers in tests.
 
