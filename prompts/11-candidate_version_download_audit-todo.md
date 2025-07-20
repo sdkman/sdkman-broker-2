@@ -91,7 +91,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 10: Use shouldBeSomeAnd Helper for Assertions
 
-- [ ] Create and use shouldBeSomeAnd helper for Option assertions
+- [X] Create and use shouldBeSomeAnd helper for Option assertions
 
 **Prompt**: Create a `shouldBeSomeAnd` helper method for Arrow Option assertions and use it to replace the verbose assertion patterns in `VersionDownloadAuditAcceptanceSpec.kt` (lines 76, 139, 201). This will make the test assertions more readable and concise.
 

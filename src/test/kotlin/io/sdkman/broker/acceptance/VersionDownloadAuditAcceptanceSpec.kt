@@ -17,6 +17,7 @@ import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.PostgresTestSupport
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
+import io.sdkman.broker.support.shouldBeSomeAnd
 import org.jetbrains.exposed.sql.Database
 import org.junit.jupiter.api.Tag
 
@@ -69,9 +70,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                     platform = "MAC_ARM64"
                 )
 
-            // TODO: use shouldBeSomeAnd helper for these assertions
-            savedRecord.isSome() shouldBe true
-            savedRecord.map { record ->
+            savedRecord shouldBeSomeAnd { record ->
                 record[AuditTable.command] shouldBe "install"
                 record[AuditTable.candidate] shouldBe "java"
                 record[AuditTable.version] shouldBe "17.0.2-tem"
@@ -82,7 +81,6 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 record[AuditTable.agent] shouldBe "curl/7.68.0"
                 record[AuditTable.timestamp] shouldNotBe null
                 record[AuditTable.id] shouldNotBe null
-                true
             }
         }
     }
@@ -129,9 +127,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                     platform = "LINUX_64"
                 )
 
-            // TODO: use shouldBeSomeAnd helper for these assertions
-            savedRecord.isSome() shouldBe true
-            savedRecord.map { record ->
+            savedRecord shouldBeSomeAnd { record ->
                 record[AuditTable.command] shouldBe "install"
                 record[AuditTable.candidate] shouldBe "groovy"
                 record[AuditTable.version] shouldBe "4.0.0"
@@ -142,7 +138,6 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 record[AuditTable.agent] shouldBe "SDKMAN/5.19.0"
                 record[AuditTable.timestamp] shouldNotBe null
                 record[AuditTable.id] shouldNotBe null
-                true
             }
         }
     }
@@ -188,9 +183,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                     platform = "WINDOWS_64"
                 )
 
-            // TODO: use shouldBeSomeAnd helper for these assertions
-            savedRecord.isSome() shouldBe true
-            savedRecord.map { record ->
+            savedRecord shouldBeSomeAnd { record ->
                 record[AuditTable.command] shouldBe "install"
                 record[AuditTable.candidate] shouldBe "kotlin"
                 record[AuditTable.version] shouldBe "1.6.0"
@@ -202,7 +195,6 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 record[AuditTable.agent] shouldBe "Ktor client"
                 record[AuditTable.timestamp] shouldNotBe null
                 record[AuditTable.id] shouldNotBe null
-                true
             }
         }
     }
