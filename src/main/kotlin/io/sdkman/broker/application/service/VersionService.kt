@@ -1,7 +1,7 @@
 package io.sdkman.broker.application.service
 
 import arrow.core.Either
-import arrow.core.Option
+import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.raise.either
@@ -34,7 +34,7 @@ data class AuditCommand(
 ) {
     fun toAudit(): Audit =
         Audit(
-            id = Option.fromNullable(UUID.randomUUID()),
+            id = Some(UUID.randomUUID()),
             command = "install",
             candidate = candidate,
             version = version,
@@ -79,11 +79,12 @@ class VersionServiceImpl(
             val archiveType = ArchiveType.fromUrl(versionEntity.url).value
             val actualDist = versionEntity.resolveActualDistribution(platform)
             createAuditEntry(AuditCommand(candidate, version, platform, actualDist, versionEntity, auditContext))
-            val downloadInfo = DownloadInfo(
-                redirectUrl = versionEntity.url,
-                checksumHeaders = checksumHeaders,
-                archiveType = archiveType
-            )
+            val downloadInfo =
+                DownloadInfo(
+                    redirectUrl = versionEntity.url,
+                    checksumHeaders = checksumHeaders,
+                    archiveType = archiveType
+                )
             return downloadInfo.right()
         }
 
@@ -93,8 +94,8 @@ class VersionServiceImpl(
         platformId: String
     ): Either<VersionError, Version> =
         versionRepository.findByQuery(candidate, version, platformId)
-            .flatMap { versionOption ->
-                versionOption.fold(
+            .flatMap { platformSpecificOption ->
+                platformSpecificOption.fold(
                     { // Try UNIVERSAL fallback
                         versionRepository.findByQuery(candidate, version, Platform.Universal.persistentId)
                             .flatMap { universalOption ->
