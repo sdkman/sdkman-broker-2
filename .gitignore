@@ -24,4 +24,6 @@ bin/
 .DS_Store
 
 # Application
-application-*.properties 
+application-*.properties
+
+.attach_pid*
