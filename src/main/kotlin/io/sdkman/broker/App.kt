@@ -14,12 +14,12 @@ import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
+import io.sdkman.broker.application.service.CandidateDownloadService
+import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.ReleaseService
 import io.sdkman.broker.application.service.ReleaseServiceImpl
-import io.sdkman.broker.application.service.VersionService
-import io.sdkman.broker.application.service.VersionServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -46,7 +46,7 @@ object App {
         // Initialize services
         val healthService = HealthServiceImpl(applicationRepository, postgresHealthRepository)
         val releaseService = ReleaseServiceImpl()
-        val versionService = VersionServiceImpl(versionRepository, auditRepository)
+        val versionService = CandidateDownloadServiceImpl(versionRepository, auditRepository)
 
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
@@ -59,7 +59,7 @@ object App {
 fun Application.configureApp(
     healthService: HealthService,
     releaseService: ReleaseService,
-    versionService: VersionService
+    candidateDownloadService: CandidateDownloadService
 ) {
     // Install plugins
     install(ContentNegotiation) {
@@ -76,5 +76,5 @@ fun Application.configureApp(
 
     // Configure routes
     metaRoutes(healthService, releaseService)
-    downloadRoutes(versionService)
+    downloadRoutes(candidateDownloadService)
 }

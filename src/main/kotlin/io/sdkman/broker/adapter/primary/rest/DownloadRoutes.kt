@@ -10,10 +10,10 @@ import io.ktor.server.response.header
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import io.sdkman.broker.application.service.VersionService
+import io.sdkman.broker.application.service.CandidateDownloadService
 import io.sdkman.broker.domain.model.VersionError
 
-fun Application.downloadRoutes(versionService: VersionService) {
+fun Application.downloadRoutes(candidateDownloadService: CandidateDownloadService) {
     routing {
         get("/download/{candidate}/{version}/{platform}") {
             val candidate = call.parameters["candidate"] ?: return@get call.respondBadRequest()
@@ -26,7 +26,7 @@ fun Application.downloadRoutes(versionService: VersionService) {
                     agent = Option.fromNullable(call.request.header("User-Agent"))
                 )
 
-            versionService.downloadVersion(candidate, version, platform, auditContext)
+            candidateDownloadService.downloadVersion(candidate, version, platform, auditContext)
                 .fold(
                     { error -> call.handleVersionError(error) },
                     { downloadInfo ->

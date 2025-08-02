@@ -14,7 +14,7 @@ import io.sdkman.broker.domain.repository.AuditRepository
 import io.sdkman.broker.domain.repository.VersionRepository
 import org.slf4j.LoggerFactory
 
-interface VersionService {
+interface CandidateDownloadService {
     fun downloadVersion(
         candidate: String,
         version: String,
@@ -23,10 +23,10 @@ interface VersionService {
     ): Either<VersionError, DownloadInfo>
 }
 
-class VersionServiceImpl(
+class CandidateDownloadServiceImpl(
     private val versionRepository: VersionRepository,
     private val auditRepository: AuditRepository
-) : VersionService {
+) : CandidateDownloadService {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     override fun downloadVersion(

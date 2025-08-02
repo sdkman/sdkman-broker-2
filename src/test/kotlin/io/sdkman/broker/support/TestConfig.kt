@@ -1,15 +1,15 @@
 package io.sdkman.broker.support
 
 import io.ktor.server.application.Application
+import io.sdkman.broker.application.service.CandidateDownloadService
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.ReleaseService
-import io.sdkman.broker.application.service.VersionService
 import io.sdkman.broker.configureApp
 
 fun Application.configureAppForTesting(
     healthService: HealthService,
     releaseService: ReleaseService,
-    versionService: VersionService
+    candidateDownloadService: CandidateDownloadService
 ) {
-    configureApp(healthService, releaseService, versionService)
+    configureApp(healthService, releaseService, candidateDownloadService)
 }

@@ -23,10 +23,10 @@ import io.sdkman.broker.domain.repository.VersionRepository
 import io.sdkman.broker.support.shouldBeLeft
 import io.sdkman.broker.support.shouldBeRightAnd
 
-class VersionServiceSpec : ShouldSpec({
+class CandidateDownloadServiceSpec : ShouldSpec({
     val mockVersionRepository = mockk<VersionRepository>()
     val mockAuditRepository = mockk<AuditRepository>()
-    val service = VersionServiceImpl(mockVersionRepository, mockAuditRepository)
+    val underTest = CandidateDownloadServiceImpl(mockVersionRepository, mockAuditRepository)
 
     val testAuditContext =
         AuditContext(
@@ -60,7 +60,7 @@ class VersionServiceSpec : ShouldSpec({
         every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading version
-        val result = service.downloadVersion("java", "17.0.2-tem", "darwinarm64", testAuditContext)
+        val result = underTest.downloadVersion("java", "17.0.2-tem", "darwinarm64", testAuditContext)
 
         // then: download response with exact match
         result shouldBeRightAnd { response ->
@@ -101,7 +101,7 @@ class VersionServiceSpec : ShouldSpec({
         every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading version for Linux
-        val result = service.downloadVersion("groovy", "4.0.0", "linuxx64", testAuditContext)
+        val result = underTest.downloadVersion("groovy", "4.0.0", "linuxx64", testAuditContext)
 
         // then: download response with UNIVERSAL fallback
         result shouldBeRightAnd { response ->
@@ -130,7 +130,7 @@ class VersionServiceSpec : ShouldSpec({
 
     should("return InvalidPlatform error with no audit for invalid platform code") {
         // when: using invalid platform
-        val result = service.downloadVersion("java", "17.0.2-tem", "invalidplatform", testAuditContext)
+        val result = underTest.downloadVersion("java", "17.0.2-tem", "invalidplatform", testAuditContext)
 
         // then: InvalidPlatform error
         result shouldBeLeft VersionError.InvalidPlatform("invalidplatform")
@@ -145,7 +145,7 @@ class VersionServiceSpec : ShouldSpec({
         every { mockVersionRepository.findByQuery("nonexistent", "1.0.0", "UNIVERSAL") } returns None.right()
 
         // when: downloading non-existent version
-        val result = service.downloadVersion("nonexistent", "1.0.0", "linuxx64", testAuditContext)
+        val result = underTest.downloadVersion("nonexistent", "1.0.0", "linuxx64", testAuditContext)
 
         // then: VersionNotFound error
         result shouldBeLeft VersionError.VersionNotFound("nonexistent", "1.0.0", "LINUX_64")
@@ -160,7 +160,7 @@ class VersionServiceSpec : ShouldSpec({
         every { mockVersionRepository.findByQuery("java", "17.0.2-tem", "UNIVERSAL") } returns None.right()
 
         // when: downloading version for unsupported platform
-        val result = service.downloadVersion("java", "17.0.2-tem", "linuxx64", testAuditContext)
+        val result = underTest.downloadVersion("java", "17.0.2-tem", "linuxx64", testAuditContext)
 
         // then: VersionNotFound error
         result shouldBeLeft VersionError.VersionNotFound("java", "17.0.2-tem", "LINUX_64")
@@ -177,7 +177,7 @@ class VersionServiceSpec : ShouldSpec({
         } returns VersionError.DatabaseError(dbError).left()
 
         // when: downloading version
-        val result = service.downloadVersion("java", "17.0.2-tem", "darwinarm64", testAuditContext)
+        val result = underTest.downloadVersion("java", "17.0.2-tem", "darwinarm64", testAuditContext)
 
         // then: DatabaseError propagated
         result shouldBeLeft VersionError.DatabaseError(dbError)
@@ -216,9 +216,9 @@ class VersionServiceSpec : ShouldSpec({
         every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading different archive types
-        val zipResult = service.downloadVersion("gradle", "7.0", "universal", testAuditContext)
-        val tarGzResult = service.downloadVersion("maven", "3.8.1", "universal", testAuditContext)
-        val tgzResult = service.downloadVersion("ant", "1.10.12", "universal", testAuditContext)
+        val zipResult = underTest.downloadVersion("gradle", "7.0", "universal", testAuditContext)
+        val tarGzResult = underTest.downloadVersion("maven", "3.8.1", "universal", testAuditContext)
+        val tgzResult = underTest.downloadVersion("ant", "1.10.12", "universal", testAuditContext)
 
         // then: correct archive types detected
         zipResult shouldBeRightAnd { response -> response.archiveType == "zip" }
@@ -240,7 +240,7 @@ class VersionServiceSpec : ShouldSpec({
         every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading version
-        val result = service.downloadVersion("kotlin", "1.5.31", "universal", testAuditContext)
+        val result = underTest.downloadVersion("kotlin", "1.5.31", "universal", testAuditContext)
 
         // then: empty checksum headers
         result shouldBeRightAnd { response ->
@@ -266,7 +266,7 @@ class VersionServiceSpec : ShouldSpec({
         every { mockAuditRepository.save(any()) } returns Unit.right()
 
         // when: downloading version
-        val result = service.downloadVersion("scala", "2.13.8", "universal", testAuditContext)
+        val result = underTest.downloadVersion("scala", "2.13.8", "universal", testAuditContext)
 
         // then: checksum headers use uppercase algorithm names
         result shouldBeRightAnd { response ->

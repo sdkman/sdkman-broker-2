@@ -4,9 +4,9 @@ import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
+import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.ReleaseServiceImpl
-import io.sdkman.broker.application.service.VersionServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
 import javax.sql.DataSource
 
@@ -59,6 +59,6 @@ object TestDependencyInjection {
     }
 
     val versionService by lazy {
-        VersionServiceImpl(versionRepository, auditRepository)
+        CandidateDownloadServiceImpl(versionRepository, auditRepository)
     }
 }
