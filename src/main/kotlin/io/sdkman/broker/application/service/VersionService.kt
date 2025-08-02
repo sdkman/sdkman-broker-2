@@ -37,13 +37,13 @@ class VersionServiceImpl(
     ): Either<VersionError, DownloadInfo> =
         either<VersionError, DownloadInfo> {
             val platform =
-                Platform.fromCode(platformCode).toEither { VersionError.InvalidPlatform(platformCode) }.bind()
+                Platform.fromCode(platformCode)
+                    .toEither { VersionError.InvalidPlatform(platformCode) }.bind()
             val versionEntity = findVersionWithFallback(candidate, version, platform.persistentId).bind()
             val checksumHeaders =
                 versionEntity.checksums.mapKeys { (algorithm, _) ->
                     "X-Sdkman-Checksum-${algorithm.uppercase()}"
                 }
-            val archiveType = ArchiveType.fromUrl(versionEntity.url).value
             createAuditEntry(
                 AuditCommand(
                     versionEntity = versionEntity,
@@ -51,6 +51,12 @@ class VersionServiceImpl(
                     auditContext = auditContext
                 )
             )
+            logger.info(
+                "Downloading $candidate version $version; " +
+                    "requested: ${platform.persistentId}; " +
+                    "distributed: ${versionEntity.platform}"
+            )
+            val archiveType = ArchiveType.fromUrl(versionEntity.url).value
             val downloadInfo =
                 DownloadInfo(
                     redirectUrl = versionEntity.url,
