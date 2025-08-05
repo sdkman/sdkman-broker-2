@@ -1,344 +1,144 @@
----
-description: Guidelines for implementing Hexagonal (Ports and Adapters) Architecture to isolate domain logic from external concerns
-globs: 
-alwaysApply: false
----
-# Hexagonal Architecture (Ports and Adapters)
+# Hexagonal Architecture (Ports & Adapters)
 
-*Cursor rules file – guidelines for implementing the Hexagonal Architecture pattern in Kotlin services.*
+Rules governing the implementation of Hexagonal Architecture as defined by Alistair Cockburn. These rules ensure proper separation of concerns, dependency inversion, and testability through the Ports & Adapters pattern.
 
-> **Intent**  
-> Create a system architecture that **isolates the domain core** from external concerns.  
-> Make the application **equally driven by users, programs, automated tests, or batch scripts**.  
-> Decouple the application from external services through **ports and adapters**.  
-> Enable **technology substitution** without affecting the core business logic.
+## Context
 
----
+Provide structural guidance for implementing hexagonal architecture to achieve isolation of business logic from external concerns.
 
-## 1 Core Concepts
+*Applies to:* All application layers, particularly domain logic, infrastructure, and integration points  
+*Level:* Strategic - foundational architectural decisions  
+*Audience:* Developers and Architects implementing business applications  
 
-| Concept | Description |
-|---------|-------------|
-| **Domain/Application Core** | Central hexagon containing pure business logic, free from external dependencies. |
-| **Ports** | Interfaces or APIs that define how the application core interacts with the outside world. |
-| **Adapters** | Implementations that connect external systems to the application's ports. |
-| **Inside/Outside Boundary** | Clear separation between domain logic and external concerns. |
-| **Technology Independence** | Core business logic remains unaffected by UI, database, or external service changes. |
-| **Dependency Rule** | Dependencies always point inward toward the domain core. |
+## Core Principles
 
----
+1. *Isolation:* Business logic must be completely isolated from external concerns (UI, database, frameworks)
+2. *Dependency Inversion:* External systems depend on the application core, never the reverse
+3. *Testability:* All business logic must be testable in isolation without external dependencies
+4. *Symmetric Design:* All external interactions are treated equally through ports and adapters
 
-## 2 Port Types
+## Rules
 
-### 2.1 Primary/Driving Ports
+### Must Have (Critical)
 
-* Interfaces that the application **exposes** to the outside world
-* Define how external actors can use the application
-* Implemented by the domain/application core
-* Examples: service interfaces, REST API contracts, use cases
+- *RULE-001:* Domain/business logic MUST NOT depend on any infrastructure concerns (databases, frameworks, UI)
+- *RULE-002:* All external interactions MUST go through ports (interfaces) defined in the application core
+- *RULE-003:* Adapters MUST implement ports and handle translation between external systems and domain models
+- *RULE-004:* Domain entities and value objects MUST NOT reference infrastructure types or annotations
+- *RULE-005:* Application services MUST coordinate domain operations without knowledge of persistence or presentation
 
-```kotlin
-// Primary/Driving Port
-interface VersionService {
-    fun findById(id: String): Either<DomainError, Version>
-    fun findAllByCandidate(candidate: String): Either<DomainError, List<Version>>
-    fun register(version: VersionRequest): Either<DomainError, Version>
-}
-```
+### Should Have (Important)
 
-### 2.2 Secondary/Driven Ports
+- *RULE-101:* Ports SHOULD be defined as interfaces in the domain or application layer
+- *RULE-102:* Adapters SHOULD be organized by the external system they integrate with
+- *RULE-103:* Domain events SHOULD be used for cross-aggregate communication
+- *RULE-104:* Application services SHOULD orchestrate domain operations and coordinate with ports
+- *RULE-105:* Configuration SHOULD happen at the application boundary, not within the domain
 
-* Interfaces that the application **requires** from the outside world
-* Define how the application uses external resources
-* Implemented by adapters in the infrastructure layer
-* Examples: repository interfaces, messaging interfaces, email sender interfaces
+### Could Have (Preferred)
+
+- *RULE-201:* Consider using dedicated DTOs for adapter boundaries to prevent external model leakage
+- *RULE-202:* Consider implementing anti-corruption layers for complex external integrations
+- *RULE-203:* Consider using dependency injection containers to wire adapters to ports
+- *RULE-204:* Consider organizing packages by feature rather than technical layer
+
+## Patterns & Anti-Patterns
+
+### ✅ Do This
 
 ```kotlin
-// Secondary/Driven Port
-interface VersionRepository {
-    fun findById(id: String): Either<RepositoryError, Version>
-    fun findAllByCandidate(candidate: String): Either<RepositoryError, List<Version>>
-    fun save(version: Version): Either<RepositoryError, Version>
-}
-```
-
----
-
-## 3 Adapter Types
-
-### 3.1 Primary/Driving Adapters
-
-* Connect external actors to the application's primary ports
-* Transform external requests into calls to the application core
-* Examples: REST controllers, CLI applications, message consumers
-
-```kotlin
-// Primary/Driving Adapter
-class VersionController(private val versionService: VersionService) {
-    fun getVersion(id: String): HttpResponse =
-        versionService.findById(id).fold(
-            { error -> mapToErrorResponse(error) },
-            { version -> HttpResponse.ok(version) }
-        )
-    
-    // Other controller methods
-}
-```
-
-### 3.2 Secondary/Driven Adapters
-
-* Implement the application's secondary ports
-* Connect the application to external systems/infrastructure
-* Examples: database repositories, HTTP clients, message publishers
-
-```kotlin
-// Secondary/Driven Adapter
-class MongoVersionRepository(private val database: MongoDatabase) : VersionRepository {
-    override fun findById(id: String): Either<RepositoryError, Version> =
-        try {
-            database.getCollection("versions")
-                .find(eq("_id", id))
-                .firstOrNull()
-                ?.let { document -> document.toVersion().right() }
-                ?: RepositoryError.NotFound(id).left()
-        } catch (e: Exception) {
-            RepositoryError.DatabaseError(e).left()
-        }
-    
-    // Other repository methods
-}
-```
-
----
-
-## 4 Package Structure
-
-### 4.1 Layered By Concept
-
-```
-io.sdkman.broker
-├── domain/               # Domain model and business logic
-│   ├── version/          # Version domain entity and related logic
-│   └── candidate/        # Candidate domain entity and related logic
-├── application/          # Application services, use cases, primary ports
-│   ├── version/          # Version-related application services
-│   └── candidate/        # Candidate-related application services
-├── adapter/              # All adapter implementations
-│   ├── primary/          # Primary/driving adapters
-│   │   ├── rest/         # REST API controllers
-│   │   └── messaging/    # Message consumers
-│   └── secondary/        # Secondary/driven adapters
-│       ├── persistence/  # Database repositories
-│       ├── http/         # HTTP clients
-│       └── messaging/    # Message publishers
-└── config/               # Application configuration and wiring
-```
-
----
-
-## 5 Implementation Guidelines
-
-### 5.1 Domain/Application Core
-
-* Contains pure business logic with no external dependencies
-* Uses domain entities and value objects
-* Implements primary ports (service interfaces)
-* Uses secondary ports (repository interfaces)
-* Has no knowledge of specific technologies (HTTP, databases, etc.)
-
-```kotlin
-// Application Service implementing a primary port
-class VersionServiceImpl(private val versionRepository: VersionRepository) : VersionService {
-    override fun findById(id: String): Either<DomainError, Version> =
-        versionRepository.findById(id)
-            .mapLeft { it.toDomainError() }
-    
-    override fun register(request: VersionRequest): Either<DomainError, Version> =
-        validateVersion(request)
-            .flatMap { version -> versionRepository.save(version) }
-            .mapLeft { it.toDomainError() }
-            
-    // Private methods for validation, etc.
-}
-```
-
-### 5.2 Clean Dependencies
-
-* Dependencies always point inward
-* Domain core has no outward dependencies
-* Adapters depend on ports, not directly on domain classes
-* Use dependency injection to wire everything together
-
-```kotlin
-// Configuration showing dependency direction
-val versionModule = module {
-    // Domain/Application (core)
-    single<VersionService> { VersionServiceImpl(get()) }
-    
-    // Secondary/Driven Adapters (infrastructure)
-    single<VersionRepository> { MongoVersionRepository(get()) }
-    
-    // Primary/Driving Adapters (input)
-    single { VersionController(get()) }
-}
-```
-
-### 5.3 Error Handling
-
-* Domain errors are defined in the domain layer
-* Infrastructure errors are mapped to domain errors at the adapter boundary
-* Use Either or similar constructs to make errors explicit
-
-```kotlin
-// Secondary port defines generic repository errors
-sealed class RepositoryError {
-    data class NotFound(val id: String) : RepositoryError()
-    data class DatabaseError(val cause: Throwable) : RepositoryError()
-}
-
-// Domain errors are defined in the domain layer
-sealed class DomainError {
-    data class EntityNotFound(val id: String) : DomainError()
-    data class ValidationError(val message: String) : DomainError()
-    data class SystemError(val message: String) : DomainError()
-}
-
-// Extension function to map repository errors to domain errors
-fun RepositoryError.toDomainError(): DomainError = when (this) {
-    is RepositoryError.NotFound -> DomainError.EntityNotFound(id)
-    is RepositoryError.DatabaseError -> DomainError.SystemError(cause.message ?: "Unknown error")
-}
-```
-
----
-
-## 6 Testing Strategies
-
-### 6.1 Domain/Application Testing
-
-* Unit tests focused on business logic
-* No mocking frameworks required for domain logic
-* Mock/stub secondary ports (repositories) for application services
-
-```kotlin
-class VersionServiceSpec : ShouldSpec({
-    val mockRepo = mockk<VersionRepository>()
-    val service = VersionServiceImpl(mockRepo)
-    
-    should("return version when found") {
-        // given
-        val version = Version("gradle", "7.2")
-        every { mockRepo.findById("gradle-7.2") } returns version.right()
-        
-        // when
-        val result = service.findById("gradle-7.2")
-        
-        // then
-        result shouldBeRight version
+// Domain service with port dependency
+class CandidateService(private val repository: CandidateRepository) {
+    fun findByPlatform(platform: Platform): List<Candidate> {
+        return repository.findByPlatform(platform)
     }
-})
+}
+
+// Port definition in domain
+interface CandidateRepository {
+    fun findByPlatform(platform: Platform): List<Candidate>
+}
+
+// Adapter implementation
+class MongoCandidateRepository : CandidateRepository {
+    override fun findByPlatform(platform: Platform): List<Candidate> {
+        // MongoDB-specific implementation
+    }
+}
 ```
 
-### 6.2 Adapter Testing
-
-* Test adapters in isolation
-* Primary adapters: test conversion from external format to domain calls
-* Secondary adapters: test against real external systems (databases, APIs)
+### ❌ Don't Do This
 
 ```kotlin
-class MongoVersionRepositorySpec : ShouldSpec({
-    listener(MongoContainerListener)
-    val mongo = MongoClient(MongoContainerListener.connectionString)
-    val repo = MongoVersionRepository(mongo.getDatabase("test"))
+// Domain service directly depending on infrastructure
+class CandidateService {
+    private val mongoClient = MongoClient.create()
     
-    beforeTest {
-        mongo.getDatabase("test").drop()
+    fun findByPlatform(platform: Platform): List<Candidate> {
+        return mongoClient.getCollection("candidates")
+            .find(eq("platform", platform.value))
+            .map { doc -> Candidate.fromDocument(doc) }
     }
-    
-    should("save and retrieve version") {
-        // given
-        val version = Version("gradle", "7.2")
-        
-        // when
-        val saveResult = repo.save(version)
-        val findResult = repo.findById("gradle-7.2")
-        
-        // then
-        saveResult shouldBeRight version
-        findResult shouldBeRight version
-    }
-})
+}
 ```
 
-### 6.3 End-to-End Testing
+## Decision Framework
 
-* Exercise the full hexagon through primary adapters
-* Use real or test doubles for secondary adapters
-* Focus on testing complete use cases
+*When rules conflict:*
+1. Prioritize domain isolation over convenience
+2. Choose explicit ports over implicit dependencies
+3. Favor composition over inheritance for adapters
 
----
+*When facing edge cases:*
+- If unsure about layer placement, put it in the outermost layer that needs it
+- When external APIs change frequently, add an anti-corruption layer
+- For simple CRUD operations, repository patterns are sufficient
 
-## 7 Common Anti-Patterns
+## Exceptions & Waivers
 
-### 7.1 Leaky Abstractions
+*Valid reasons for exceptions:*
+- Framework requirements that mandate specific annotations (document with // TODO: remove when framework updated)
+- Performance-critical paths where abstraction overhead is prohibitive (measure first)
+- Legacy integration constraints during migration periods (time-boxed)
 
-| Anti-Pattern | Better Approach |
-|--------------|-----------------|
-| Exposing infrastructure details in the domain | Define domain-specific interfaces and convert at boundaries |
-| Domain entities with ORM annotations | Keep entities clean; use mapping layers in adapters |
-| Domain services with HTTP knowledge | Domain services should be completely agnostic of delivery mechanism |
+*Process for exceptions:*
+1. Document the exception and rationale in code comments
+2. Create a technical debt item with removal timeline
+3. Review exceptions quarterly for removal opportunities
 
-### 7.2 Dependency Violations
+## Quality Gates
 
-| Anti-Pattern | Better Approach |
-|--------------|-----------------|
-| Domain importing infrastructure packages | Domain should have zero external dependencies |
-| Circular dependencies between layers | Maintain strict layering with inward dependencies only |
-| Concrete adapter implementations in core | Reference only port interfaces in the domain/application core |
+- *Automated checks:* Dependency analysis tools to verify layer dependencies don't violate rules
+- *Code review focus:* Verify no infrastructure imports in domain packages, check port/adapter relationships
+- *Testing requirements:* Domain logic must have unit tests without test containers or external dependencies
 
----
+## Related Rules
 
-## 8 Real-World Considerations
+- rules/ddd-rules.md - Domain modeling complements hexagonal structure
+- rules/kotlin-rules.md - Language-specific implementation patterns
+- rules/kotest-rules.md - Testing approaches for isolated domain logic
 
-### 8.1 Balancing Purity and Pragmatism
+## References
 
-* Be pragmatic about the depth of abstraction
-* Not every external call needs its own port and adapter
-* Focus on protecting the domain from external concerns
-* Consider future change likelihood when deciding on abstractions
-
-### 8.2 Migration Strategy
-
-* Start by identifying the domain core
-* Extract interfaces for existing infrastructure dependencies
-* Gradually refactor toward the hexagonal model
-* Apply more strictly to new features
-
-### 8.3 Performance Considerations
-
-* Avoid excessive mapping between layers
-* Use efficient data structures at boundaries
-* Consider bulk operations in repository interfaces
+- [Hexagonal Architecture by Alistair Cockburn](https://alistair.cockburn.us/hexagonal-architecture/) - Original pattern definition
+- [Ports & Adapters Pattern](https://jmgarridopaz.github.io/content/hexagonalarchitecture.html) - Detailed implementation guide
+- [Clean Architecture by Uncle Bob](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) - Complementary architectural principles
 
 ---
 
-## 9 Implementation Considerations
+## TL;DR
 
-* Focus on the principles of isolation and dependency direction
-* Apply ports and adapters regardless of programming language
-* Balance theoretical purity with practical needs of your specific system
-* Consider testability when designing your ports and adapters
+*Key Principles:*
+- Business logic is isolated from all external concerns through ports and adapters
+- Dependencies point inward toward the domain core, never outward
+- All external integrations are symmetric and testable in isolation
+- Adapters translate between external protocols and domain models
 
----
+*Critical Rules:*
+- Must define ports as interfaces in the application core
+- Must implement adapters that depend on ports, not the reverse
+- Must never import infrastructure types into domain code
+- Must be able to test business logic without external dependencies
 
-### TL;DR
-
-1. **Isolate domain logic** in a central hexagon with no external dependencies.
-2. Define **ports** (interfaces) for all interactions with the outside world.
-3. Implement **adapters** that connect external systems to your ports.
-4. Ensure all dependencies point **inward** toward the domain.
-5. **Primary adapters** drive your application; **secondary adapters** are driven by it.
-6. Map between **domain-specific** and **external** data models at the boundaries.
-7. Test each component in **isolation** using the appropriate strategy.
-
-Place this file with your other Cursor rules to guide AI-generated code toward a clean hexagonal architecture.
+*Quick Decision Guide:*
+When in doubt: If it's not core business logic, put it behind a port with an adapter implementation.
