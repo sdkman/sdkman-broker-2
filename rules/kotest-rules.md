@@ -1,183 +1,143 @@
----
-description: Kotlin testing conventions with Kotest, Testcontainers, and Wiremock for structured test layers
-globs:
-alwaysApply: false
----
-# Kotlin Testing Rules
+# Kotest Testing Rules
 
-*Cursor rules file – testing conventions for **sdkman‑broker** and future Kotlin services.*
+Testing conventions for **sdkman-broker** using Kotest, Testcontainers, and MockK for structured test layers that align with hexagonal architecture and outside-in development practices.
 
-> **Intent**
-> Provide a repeatable recipe for writing **clear, reliable tests** that align with the functional Kotlin style guide.
-> The rules emphasize meaningful assertions, readable structure, and just‑enough coverage across **acceptance, integration, unit, and property** test layers.
+## Context
 
----
+*Applies to:* All Kotlin services following hexagonal architecture patterns  
+*Level:* Tactical - guides daily testing decisions and implementation  
+*Audience:* Developers writing and maintaining tests
 
-## 1 Test Layers & Purpose
+## Core Principles
 
-| Layer | Scope | Tooling |
-|-------|-------|---------|
-| **Acceptance** | Exercise the application **through its public HTTP API** against a *running instance* backed by a real datastore (Testcontainers Mongo/Postgres). Cover **happy path + relevant unhappy paths**. | Ktor test application or embedded server, Testcontainers, Wiremock (for outbound HTTP stubs). |
-| **Integration** | Verify **hexagonal boundaries**: repository classes against real datastores, HTTP client wrappers against Wiremock. No web server. | Kotest + Testcontainers (db) + Wiremock (HTTP) |
-| **Unit** | Isolate **pure functions / small helpers** with no side effects. Only used when logic is non‑trivial. | Kotest ShouldSpec |
-| **Property‑Based** | Optional: apply to pure functions when *logical boundaries* benefit from data generators. | Kotest property testing |
+1. *Outside-In Testing:* Start with acceptance tests for business value, then integration tests for adapters, finally unit tests for domain logic
+2. *Test Layer Isolation:* Each test layer has a distinct purpose and scope - don't blur the boundaries
+3. *Meaningful Assertions:* Tests should clearly express intent and provide actionable failure messages
+4. *Just-Enough Coverage:* Focus on critical paths and edge cases rather than achieving arbitrary coverage metrics
 
----
+## Rules
 
-## 2 Framework & Dependencies
+### Must Have (Critical)
 
-* **Kotest 5.x** — the single test framework (`ShouldSpec` style everywhere).
-* **Wiremock 3** for stubbing outbound HTTP calls.
-* **Testcontainers** for MongoDB and (future) auxiliary services.
+- *RULE-001:* Use Kotest ShouldSpec exclusively - no mixing of test frameworks
+- *RULE-002:* Follow the three-layer testing strategy: Acceptance (end-to-end), Integration (adapters), Unit (services/domain)
+- *RULE-003:* Tag slow tests with `@Tag("acceptance")` or `@Tag("integration")` for selective execution
+- *RULE-004:* Use Testcontainers for all database interactions in acceptance and integration tests
+- *RULE-005:* Use MockK for unit test isolation - never mock across hexagon boundaries in integration tests
 
-Gradle (Kotlin DSL) snippet:
+### Should Have (Important)
 
-```kotlin
-dependencies {
-    testImplementation("io.kotest:kotest-runner-junit5:_")
-    testImplementation("io.kotest:kotest-assertions-core:_")
-    testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:_")
-    testImplementation("org.testcontainers:mongodb:_")
-    testImplementation("org.testcontainers:postgresql:_")
-    testImplementation("org.wiremock:wiremock-standalone:_")
-}
-```
+- *RULE-101:* Name test classes as `<TypeUnderTest><Layer>Spec` (e.g., `DownloadRouteAcceptanceSpec`)
+- *RULE-102:* Structure tests with given/when/then comments for clarity
+- *RULE-103:* Use descriptive test names that explain the scenario and expected outcome
+- *RULE-104:* Provide clues with assertions using `withClue` for easier debugging
+- *RULE-105:* Keep acceptance tests focused on happy paths and critical unhappy paths only
+- *RULE-106:* Assert only the one thing stated in the test's intention - avoid multiple unrelated assertions
 
----
+### Could Have (Preferred)
 
-## 3 Naming & Organisation
+- *RULE-201:* Use singleton Testcontainers with `withReuse(true)` for faster test execution
+- *RULE-202:* Apply property-based testing to pure functions with complex logical boundaries
+- *RULE-203:* Group related test utilities in companion objects or separate utility classes
+- *RULE-204:* Use Wiremock for stubbing external HTTP dependencies in integration tests
 
-| Convention | Rule |
-|------------|------|
-| **File names** | End with `*Spec.kt`. |
-| **One class per file** | Each `ShouldSpec` resides alone. |
-| **Package** | Mirror production code hierarchy (`io.sdkman.broker.download`). |
-| **Class name** | `<TypeUnderTest><Facet>Spec`, e.g. `DownloadRouteAcceptanceSpec`, `AuditRepoIntegrationSpec`, `ChecksumUtilSpec`. |
-| **Tags** | `@Tag("acceptance")`, `@Tag("integration")` for slow layers; unit tests untagged. |
+## Patterns & Anti-Patterns
 
----
-
-## 4 ShouldSpec Guidelines
-
-Keep tests **flat** with top‑level `should` blocks. Delineate phases with comments:
+### ✅ Do This
 
 ```kotlin
 class DownloadRouteAcceptanceSpec : ShouldSpec({
-
     val mongo = MongoContainerListener
     val app = testApplication { application { module() } }
 
-    should("redirect to the universal artefact when platform match is absent") {
-        // given: versions collection seeded with UNIVERSAL artefact
-        seedVersions(mongo, "spark", "2.3.1")
+    should("redirect to universal artifact when platform is unavailable") {
+        // given: version exists with UNIVERSAL platform only
+        seedVersions(mongo, "spark", "2.3.1", Platform.UNIVERSAL)
 
-        // when: client requests non-existent MAC_OSX build
-        val call = app.client.get("/download/spark/2.3.1/MAC_OSX")
+        // when: client requests MAC_OSX platform
+        val response = app.client.get("/download/spark/2.3.1/MAC_OSX")
 
-        // then: redirect to UNIVERSAL artefact with checksum header
-        call.status shouldBe HttpStatusCode.Found
-        call.headers["Location"] shouldContain "spark-2.3.1.tgz"
+        // then: redirect to universal artifact
+        response.status shouldBe HttpStatusCode.Found withClue {
+            "Should redirect when requested platform unavailable"
+        }
+        response.headers["Location"] shouldContain "spark-2.3.1.tgz"
     }
 })
 ```
 
----
-
-## 5 Assertions & Clues
-
-* Use Kotest matchers (`shouldBe`, `shouldContain`, etc.).
-* Provide **clues** for fast triage:
+### ❌ Don't Do This
 
 ```kotlin
-call.status shouldBe HttpStatusCode.Found withClue {
-    "request=/download/$candidate/$version/$platform"
+class DownloadServiceTest { // Wrong framework and naming
+    @Test
+    fun test() { // Non-descriptive name
+        val service = DownloadService(mockRepo, mockClient) // Mocking across boundaries
+        val result = service.download("spark", "2.3.1")
+        assertTrue(result.isSuccess) // Weak assertion
+        assertEquals("spark-2.3.1.tgz", result.filename) // Multiple unrelated assertions
+        assertNotNull(result.checksum) // Testing more than the stated intention
+    }
 }
 ```
 
----
+## Decision Framework
 
-## 6 Testcontainers & Datastore Rules
+*When choosing test layer:*
+1. Can this be tested through the public API? → Acceptance test
+2. Does this test an adapter (repository, HTTP client)? → Integration test  
+3. Is this pure business logic or service coordination? → Unit test
 
-* **Singleton** containers via Kotest `Listener` objects (`withReuse(true)` where CI allows).
-* Acceptance tests spin up **entire app** wired to the container URI.
-* Integration tests talk directly to repositories.
+*When facing test complexity:*
+- Simplify the test scenario before adding more sophisticated tooling
+- Consider if the complexity indicates a design problem in the production code
+- Prefer explicit setup over clever test utilities that obscure intent
 
-```kotlin
-object MongoContainerListener : KMongoContainer("mongo:6").withReuse(true), TestListener
-```
+## Exceptions & Waivers
 
----
+*Valid reasons for exceptions:*
+- Legacy code migration where immediate full compliance is not feasible
+- Performance-critical scenarios where test execution time is prohibitive
+- Third-party integration constraints that require alternative approaches
 
-## 7 Wiremock for Outbound Stubs
+*Process for exceptions:*
+1. Document the exception and rationale in test comments
+2. Create technical debt ticket for future alignment
+3. Review exceptions quarterly to identify systemic issues
 
-* Declare a **WireMockExtension** as Kotest listener:
+## Quality Gates
 
-```kotlin
-object ServiceMock : WireMockExtension.newInstance()
-    .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-    .build()
-```
+- *Automated checks:* Detekt rules enforce test naming conventions and prevent empty test blocks
+- *Code review focus:* Verify correct test layer selection and meaningful assertions
+- *Testing requirements:* All tests must have descriptive names and appropriate tags for CI pipeline execution
 
-* Integration tests for HTTP client wrappers:
+## Related Rules
 
-```kotlin
-class PaymentClientIntegrationSpec : ShouldSpec({
-    listener(ServiceMock)
+- rules/hexagonal-architecture-rules.md - Defines the architectural boundaries that testing layers should respect
+- rules/kotlin-rules.md - General Kotlin coding standards that apply to test code
+- rules/ddd-rules.md - Domain modeling principles that inform unit test structure
 
-    should("return success response") {
-        // given
-        ServiceMock.stubFor(
-            post("/charge").willReturn(okJson("{\\"status\\":\\"ok\\"}"))
-        )
+## References
 
-        // when
-        val result = client.charge(100)
-
-        // then
-        result shouldBeRight PaymentSuccess
-    }
-})
-```
-
-* Acceptance tests: configure the application under test to call the Wiremock URL via environment override.
+- [Kotest Documentation](https://kotest.io/) - Framework capabilities and best practices
+- [Testcontainers Documentation](https://testcontainers.com/) - Container management for integration testing
+- [MockK Documentation](https://mockk.io/) - Mocking framework for Kotlin
 
 ---
 
-## 8 Property‑Based Testing
+## TL;DR
 
-* Use sparingly—only when boundary conditions warrant.
-* Default iterations: 100; adjust as needed.
-* Generators live in `Generators.kt`; reuse across specs.
+*Key Principles:*
+- Test outside-in: acceptance → integration → unit, following hexagonal architecture
+- Each test layer has distinct scope and tooling - don't blur boundaries
+- Focus on meaningful assertions with clear failure messages
+- Use just-enough coverage on critical paths rather than chasing metrics
 
----
+*Critical Rules:*
+- Must use Kotest ShouldSpec exclusively
+- Must follow three-layer strategy: acceptance (E2E), integration (adapters), unit (services/domain)
+- Must use Testcontainers for database tests and MockK for unit test isolation
+- Must tag slow tests for selective CI execution
 
-## 9 Gradle Tasks
-
-| Task | Layers |
-|------|--------|
-| `test` | Unit, property, fast HTTP tests. |
-| `integrationTest` | Specs tagged `integration`. |
-| `acceptanceTest` | Specs tagged `acceptance`. |
-
-CI pipeline order: `test` → `integrationTest` → `acceptanceTest`.
-
----
-
-## 10 Linting & Quality
-
-* Detekt/kotlinter rules forbid:
-  * `shouldBe true/false`
-  * Empty `should` blocks
-  * Non‑descriptive test names
-* Every `@Ignore` requires a **reason**.
-
----
-
-### TL;DR
-
-1. **ShouldSpec** everywhere—flat, readable.
-2. **Acceptance / Integration / Unit / PBT** layers each serve a distinct purpose.
-3. **Wiremock + Testcontainers** simulate external boundaries.
-4. **Descriptive assertions with clues** make failures self‑explanatory.
-
-Place this file with your other Cursor rules to steer AI‑generated tests.
+*Quick Decision Guide:*
+When in doubt: Start with an acceptance test that proves business value, then work inward to cover the components that make it work.
