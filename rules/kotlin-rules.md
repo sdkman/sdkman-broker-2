@@ -1,237 +1,167 @@
----
-description: Functional Kotlin guidelines with Arrow for AI-generated code
-globs: ["**/*.kt"]
-alwaysApply: true
----
-# Kotlin Functional Programming Style Guide
+# Functional Kotlin with Arrow
 
-*Functional Kotlin guidelines with Arrow for AI-generated code.*
+Functional programming guidelines for Kotlin development using Arrow FP library. Emphasizes immutability, type safety, and explicit error handling while completely avoiding nullable types in favor of Arrow's `Option`.
 
-## 1. Core Principles
+## Context
 
-- **Immutability First**: Default to `val` and immutable collections
-- **Expression Over Statement**: Favor expressions that return values over statements with side effects
-- **Type Safety**: Make impossible states unrepresentable
-- **Pure Functions**: Functions with no side effects, same output for same input
-- **Explicit Error Handling**: Use Arrow's `Either`, `Option`, `Validated` instead of nullables and exceptions
-- **Composition**: Build complex logic by composing smaller, focused functions
-- **No Exception Throwing**: Use Arrow's `Either.catch {}` for exception handling
+*Applies to:* All Kotlin source code, domain models, business logic, and data access layers  
+*Level:* Tactical - Direct impact on code quality and maintainability  
+*Audience:* All Kotlin developers working on this codebase  
 
-**FAVOR SIMPLE SOLUTIONS OVER COMPLEX ONES!**
+## Core Principles
 
-## 2. Project & Code Organization
+1. *Null Safety:* NEVER use nullable types (`?`). Always use Arrow's `Option<A>` for optional values
+2. *Immutability First:* Default to `val` and immutable data structures to prevent accidental mutations  
+3. *Explicit Error Handling:* Use Arrow's `Either<E,A>` instead of exceptions for recoverable errors
+4. *Type Safety:* Make impossible states unrepresentable through algebraic data types
+5. *Pure Functions:* Prefer functions without side effects that return the same output for the same input
+6. *Composition Over Complexity:* Build complex logic by composing smaller, focused functions
 
-### File Structure
+## Rules
 
-One file can contain multiple related classes/functions (cohesive unit)
+### Must Have (Critical)
 
-### Naming Conventions
-- **Packages**: lowercase (`io.sdkman.state.version`)
-- **Classes/Interfaces**: PascalCase (`VersionRepository`)
-- **Functions**: camelCase (`findById()`)
-- **Properties**: camelCase (`username`)
-- **Constants**: UPPER_SNAKE_CASE (`MAX_RETRY_ATTEMPTS`)
+- *RULE-001:* NEVER use nullable types (`String?`, `Int?`, etc.). Convert external nullable APIs to `Option<A>` immediately at boundaries
+- *RULE-002:* Use `Either.catch {}` for exception handling instead of try-catch blocks
+- *RULE-003:* All public functions must have explicit return types
+- *RULE-004:* Use `val` for all variable declarations unless mutation is absolutely required
+- *RULE-005:* Convert nullable external API results to `Option<A>` using `.toOption()` at the earliest opportunity
+- *RULE-006:* Use Arrow's `Either<E,A>` for operations that can fail instead of throwing exceptions
 
-## 3. Type System & Error Handling
+### Should Have (Important)
 
-### Algebraic Data Types
+- *RULE-101:* Prefer immutable collection interfaces (`List`, `Set`, `Map`) over mutable variants
+- *RULE-102:* Use sealed classes for representing finite sets of types and domain states  
+- *RULE-103:* Implement smart constructors for domain types that can fail validation
+- *RULE-104:* Use `@JvmInline value class` for type-safe primitives (IDs, quantities, etc.)
+- *RULE-105:* Chain collection operations (`map`, `filter`, `fold`) instead of imperative loops
+- *RULE-106:* Use expression bodies for simple functions: `fun transform(x: String): Int = x.length`
+
+### Could Have (Preferred)
+
+- *RULE-201:* Group related functions and data classes in the same file when cohesive
+- *RULE-202:* Use `Validated` for accumulating multiple validation errors
+- *RULE-203:* Prefer function composition over deeply nested if-else chains
+- *RULE-204:* Use descriptive function names that eliminate need for comments
+- *RULE-205:* Organize imports: standard library, third-party, Arrow, local packages
+
+## Patterns & Anti-Patterns
+
+### ✅ Do This
+
 ```kotlin
-sealed class Result<out A> {
-    data class Success<A>(val value: A) : Result<A>()
-    data class Failure(val error: DomainError) : Result<Nothing>()
-}
-```
+// Option instead of nullable
+fun findUser(id: UserId): Option<User> = 
+    userRepository.findById(id).toOption()
 
-### Avoiding Nulls(**IMPORTANT**)
-Use Arrow's `Option<A>` instead of nullable types:
-```kotlin
-// Instead of: fun findUser(id: String): User?
-fun findUser(id: String): Option<User>
-```
+// Either for error handling  
+fun validateEmail(email: String): Either<ValidationError, Email> =
+    if (email.matches(EMAIL_REGEX)) Email(email).right()
+    else ValidationError("Invalid email").left()
 
-### Error Handling
-Use `Either<E, A>` for operations that can fail:
-```kotlin
-// NEVER do this:
-try {
-    parseData(input)
-} catch (e: Exception) {
-    handleError(e)
-}
-
-// ALWAYS do this:
-Either.catch {
-    parseData(input)
-}.mapLeft { e -> DomainError.ParseError(e) }
-```
-
-### Smart Constructors
-```kotlin
-data class Email private constructor(val value: String) {
+// Smart constructor
+data class Age private constructor(val value: Int) {
     companion object {
-        fun of(value: String): Either<ValidationError, Email> =
-            if (value.matches(EMAIL_REGEX)) Email(value).right()
-            else ValidationError("Invalid email format").left()
+        fun of(value: Int): Either<ValidationError, Age> =
+            if (value in 0..150) Age(value).right()
+            else ValidationError("Age must be 0-150").left()
     }
 }
-```
 
-## 4. Functions and Collections
-
-### Function Design
-- Keep functions small and focused
-- Prefer pure functions without side effects
-- Specify explicit return types for public functions
-- Prefer expression bodies for simple functions:
-```kotlin
-fun transform(input: String): Int = input.length
-```
-
-### Immutable Collections
-- Use immutable collection interfaces (`List`, `Set`, `Map`)
-- Create new collections instead of modifying existing ones:
-```kotlin
-// Instead of:
-val items = mutableListOf<Item>()
-items.add(newItem)
-
-// Prefer:
+// Immutable collections
 val updatedItems = items + newItem
+val filtered = users.filter { it.isActive }
+
+// Chain operations instead of loops
+val result = orders
+    .filter { it.isValid() }
+    .map { it.calculateTotal() }
+    .fold(Money.ZERO) { acc, total -> acc + total }
 ```
 
-### Collection Operations
+### ❌ Don't Do This
+
 ```kotlin
-// Instead of:
-val result = mutableListOf<String>()
+// NEVER use nullable types
+fun findUser(id: String): User? = null  // ❌
+
+// NEVER use try-catch for business logic
+try {
+    val result = parseInput(data)
+    return result
+} catch (e: Exception) {  // ❌
+    log.error("Parse failed", e)
+    return null
+}
+
+// NEVER mutate collections
+val items = mutableListOf<String>()  // ❌
+items.add("new item")
+
+// NEVER use imperative loops when functional alternatives exist
+val results = mutableListOf<String>()  // ❌
 for (item in items) {
     if (item.isValid()) {
-        result.add(item.name.uppercase())
+        results.add(item.process())
     }
 }
-
-// Prefer:
-val result = items
-    .filter { it.isValid() }
-    .map { it.name.uppercase() }
 ```
 
-## 5. Arrow for Functional Programming
+## Decision Framework
 
-### Option
+*When rules conflict:*
+1. Prioritize null safety - always choose `Option<A>` over nullable types
+2. Prefer explicit error handling with `Either<E,A>` over exceptions
+3. Choose immutability and pure functions when performance impact is acceptable
 
-Convert nullable types to `Option` **as soon as possible** to avoid null checks throughout the codebase:
+*When facing edge cases:*
+- Convert external nullable APIs to `Option<A>` at the boundary immediately
+- Use `Either.catch {}` to wrap legacy exception-throwing code
+- Document any temporary violations with TODO comments and timeline for resolution
 
-```kotlin
-fun findConfig(key: String): Option<Config> =
-    configs[key].toOption()
-```
+## Exceptions & Waivers
 
-### Either
-```kotlin
-fun validateInput(input: String): Either<ValidationError, Input> =
-    when {
-        input.isEmpty() -> ValidationError("Input cannot be empty").left()
-        else -> Input(input).right()
-    }
-```
+*Valid reasons for exceptions:*
+- Interoperating with Java/Android APIs that require nullable types (convert immediately)
+- Performance-critical code where immutability creates unacceptable overhead
+- Third-party library constraints that cannot be wrapped effectively
 
-### Validated
-For accumulating multiple errors:
-```kotlin
-fun validateForm(name: String, email: String): ValidatedNel<ValidationError, Form> =
-    ValidatedNel.applicative(Nel.semigroup<ValidationError>()).map(
-        validateName(name).toValidatedNel(),
-        validateEmail(email).toValidatedNel()
-    ) { (validName, validEmail) ->
-        Form(validName, validEmail)
-    }.fix()
-```
+*Process for exceptions:*
+1. Document the exception with clear rationale in code comments
+2. Create TODO item to revisit and eliminate the exception when possible
+3. Isolate exceptional code in boundary layers away from core business logic
 
-## 6. Domain Modeling
+## Quality Gates
 
-### Data Classes
-```kotlin
-data class MyDomain(
-    val a: String,
-    val b: String,
-)
-```
+- *Automated checks:* Detekt rules for nullable usage, mutable collection detection
+- *Code review focus:* Verify Option/Either usage, check for null safety violations
+- *Testing requirements:* Test error cases using Either.Left, verify Option handling for missing values
 
-### Sealed Classes
-```kotlin
-sealed class MyPlatform {
-    data object Universal : Platform()
-    data class Linux(val arch: Architecture) : Platform()
-}
-```
+## Related Rules
 
-### Value Types
-```kotlin
-@JvmInline
-value class EntityId(val value: String)
-```
+- rules/ddd-rules.md - Domain modeling aligns with functional types and smart constructors
+- rules/hexagonal-architecture-rules.md - Boundary conversions from nullable to Option types
+- rules/kotest-rules.md - Testing patterns for functional code with Arrow types
 
-## 7. Repository Pattern & Effect Management
+## References
 
-```kotlin
-interface VersionRepository {
-    fun findById(id: VersionId): Either<RepositoryError, Option<Version>>
-    fun save(version: Version): Either<RepositoryError, Version>
-}
+- [Arrow Documentation](https://arrow-kt.io/) - Comprehensive Arrow FP library guide
+- [Kotlin Functional Programming](https://kotlinlang.org/docs/lambdas.html) - Official Kotlin functional features
+- [Domain Modeling Made Functional](https://pragprog.com/titles/swdddf/domain-modeling-made-functional/) - F# but applicable principles
 
-class MongoVersionRepository(private val db: MongoDatabase) : VersionRepository {
-    override fun findById(id: VersionId): Either<RepositoryError, Option<Version>> =
-        Either.catch {
-            db.collection("versions")
-                .find(Filters.eq("_id", id.value))
-                .firstOrNull()
-                .toOption()
-                .map{ it.toVersion() }
-        }.mapLeft { RepositoryError.DatabaseError(it) }
-}
-```
-
-## 8. Self-Documenting Code
-
-### Clear Naming Over Comments
-```kotlin
-// AVOID this:
-/**
- * Processes the customer order by validating it and charging the payment
- * @param orderId The ID of the order to process
- * @return true if order was processed successfully
- */
-fun process(orderId: String): Boolean
-
-// PREFER this:
-fun validateAndProcessCustomerOrder(orderId: String): Either<OrderProcessingError, ProcessedOrder>
-```
-
-### Naming Guidelines
-- **Classes**: Nouns describing the entity
-- **Methods**: Verb phrases describing the action
-- **Variables**: Descriptive nouns indicating purpose
-- **Boolean variables/functions**: Use prefixes like `is`, `has`, or `should`
-
-### Functions as Documentation
-```kotlin
-// AVOID:
-// Check if user is active and has admin privileges
-if (user.status == "ACTIVE" && user.role == "ADMIN") { /* ... */ }
-
-// PREFER:
-fun isActiveAdministrator(user: User): Boolean =
-    user.status == "ACTIVE" && user.role == "ADMIN"
-
-if (isActiveAdministrator(user)) { /* ... */ }
-```
+---
 
 ## TL;DR
 
-1. **Immutability**: Use `val`, immutable collections, and data classes
-2. **Type Safety**: Use sealed classes and custom types to prevent invalid states
-3. **Functional Style**: Expressions over statements, pure functions, function composition
-4. **Error Handling**: Use Arrow's `Either`, `Option`, `Validated`
-5. **Null Avoidance**: Convert nullable types to `Option<A>` as soon as possible
-6. **Collections**: Use functional operators (`map`, `filter`, `fold`) instead of loops
-7. **Self-Documenting Code**: Clear naming over comments; no JavaDoc
+*Key Principles:*
+- Never use nullable types, always use Arrow's `Option<A>` for optional values
+- Handle errors explicitly with `Either<E,A>` instead of throwing exceptions  
+- Default to immutable data structures and pure functions
+
+*Critical Rules:*
+- Must convert nullable external APIs to `Option<A>` immediately at boundaries
+- Must use `Either.catch {}` instead of try-catch for business logic
+- Must use `val` and immutable collections unless mutation absolutely required
+
+*Quick Decision Guide:*
+When in doubt: Choose the more type-safe, explicit option that makes invalid states impossible to represent
