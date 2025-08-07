@@ -21,29 +21,20 @@
 
 ## Domain
 
-```kotlin
-// URL Construction Logic
-data class SdkmanCliDownloadRequest(
-    val command: String,        // "install" or "selfupdate"
-    val version: String,        // e.g. "5.19.0" or "latest+b8d230b"
-    val platform: String        // platform identifier (validated but not used in URL)
-)
-
-// URL patterns:
-// Stable: https://github.com/sdkman/sdkman-cli/releases/download/{version}/sdkman-cli-{version}.zip
-// Beta (contains '+'): https://github.com/sdkman/sdkman-cli/releases/download/latest/sdkman-cli-{version}.zip
-```
+No domain changes required apart from the service port.
 
 ## Extra Considerations
 
 - Platform parameter should be validated but not used in URL construction (SDKMAN CLI is platform-agnostic)
 - Platform parameter will be used for auditing in later feature
-- Beta versions are identified by containing '+' character in version string
 - Beta versions consist of the prefix "latest+" followed by the abbreviated commit hash
 - Command parameter should be validated but not impact URL construction
 - Command parameter must be one of `install` or `selfupdate` and will be used for audit purposes
 - Must follow hexagonal architecture patterns with proper handler/use case separation
 - Use Arrow Option types instead of nullable types
+- URLs always follow the following pattern:
+  - Stable: https://github.com/sdkman/sdkman-cli/releases/download/5.12.0/sdkman-cli-5.12.0.zip
+  - Beta: https://github.com/sdkman/sdkman-cli/releases/download/latest/sdkman-cli-latest+b8d230b.zip
 
 ## Testing Considerations
 
@@ -51,6 +42,10 @@ data class SdkmanCliDownloadRequest(
 - Acceptance tests verifying complete request/response flow
 - Acceptance tests verify HTTP response codes and headers
 - Parameter validation tested for invalid commands, empty versions, invalid platforms
+- Make `TestConfig` more flexible by providing default parameters for any test services in `configureAppForTesting`.
+- Default parameters will allow us to call `configureAppForTesting()` without parameters in most tests
+- Update all tests to make use of `configureAppForTesting()` where possible
+- Only pass in mock/test service overrides if needed for a test
 
 ## Implementation Notes
 
