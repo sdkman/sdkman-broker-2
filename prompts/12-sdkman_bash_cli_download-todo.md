@@ -9,7 +9,7 @@ Consider the following rules during execution of the tasks:
 
 ### Task 1: Move Service Interface to Domain Package
 
-- [ ] Refactor SdkmanCliDownloadService interface to follow hexagonal architecture
+- [X] Refactor SdkmanCliDownloadService interface to follow hexagonal architecture
 
 **Description**: The SdkmanCliDownloadService interface is currently located in the application.service package but should be moved to the domain package to properly follow hexagonal architecture principles. In hexagonal architecture, domain service interfaces should be defined in the domain layer, with implementations in the application layer.
 

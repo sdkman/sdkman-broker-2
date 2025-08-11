@@ -11,8 +11,8 @@ import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.sdkman.broker.application.service.CandidateDownloadService
-import io.sdkman.broker.application.service.SdkmanCliDownloadService
 import io.sdkman.broker.domain.model.VersionError
+import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 
 fun Application.downloadRoutes(
     candidateDownloadService: CandidateDownloadService,

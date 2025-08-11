@@ -20,9 +20,9 @@ import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.ReleaseService
 import io.sdkman.broker.application.service.ReleaseServiceImpl
-import io.sdkman.broker.application.service.SdkmanCliDownloadService
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
+import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 

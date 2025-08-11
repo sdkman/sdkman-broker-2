@@ -6,15 +6,8 @@ import arrow.core.left
 import arrow.core.right
 import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.VersionError
-
-// TODO: Move the service interface to the domain package as described in hexagonal architecture
-interface SdkmanCliDownloadService {
-    fun downloadSdkmanCli(
-        command: String,
-        version: String,
-        platformCode: String
-    ): Either<VersionError, SdkmanCliDownloadInfo>
-}
+import io.sdkman.broker.domain.service.SdkmanCliDownloadInfo
+import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 
 class SdkmanCliDownloadServiceImpl : SdkmanCliDownloadService {
     private val validCommands = setOf("install", "selfupdate")
@@ -54,8 +47,3 @@ class SdkmanCliDownloadServiceImpl : SdkmanCliDownloadService {
         return SdkmanCliDownloadInfo("$githubReleasesUrl/$tag/$filename")
     }
 }
-
-data class SdkmanCliDownloadInfo(
-    val downloadUrl: String,
-    val archiveType: String = "zip"
-)
