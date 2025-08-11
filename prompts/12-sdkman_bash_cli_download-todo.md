@@ -21,7 +21,7 @@ Consider the following rules during execution of the tasks:
 
 ### Task 2: Improve Error Messages for Empty/Blank Input Validation
 
-- [ ] Update error messages for empty and blank input validation to use "[empty/blank]" format
+- [X] Update error messages for empty and blank input validation to use "[empty/blank]" format
 
 **Description**: The test cases for empty and blank input validation currently use the actual empty/blank values as error messages. The TODO comments suggest these should be changed to a more descriptive "[empty/blank]" format for better error reporting and consistency.
 

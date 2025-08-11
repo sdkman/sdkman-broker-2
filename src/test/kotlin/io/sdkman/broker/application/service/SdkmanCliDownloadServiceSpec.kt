@@ -77,15 +77,13 @@ class SdkmanCliDownloadServiceSpec : ShouldSpec({
             should("return InvalidVersion error for empty version") {
                 val result = underTest.downloadSdkmanCli("install", "", "linuxx64")
 
-                // TODO: change error message to [empty/blank]
-                result shouldBeLeft VersionError.InvalidVersion("")
+                result shouldBeLeft VersionError.InvalidVersion("[empty/blank]")
             }
 
             should("return InvalidVersion error for blank version") {
                 val result = underTest.downloadSdkmanCli("install", "   ", "linuxx64")
 
-                // TODO: change error message to [empty/blank]
-                result shouldBeLeft VersionError.InvalidVersion("   ")
+                result shouldBeLeft VersionError.InvalidVersion("[empty/blank]")
             }
         }
 
@@ -99,8 +97,7 @@ class SdkmanCliDownloadServiceSpec : ShouldSpec({
             should("return InvalidPlatform error for empty platform") {
                 val result = underTest.downloadSdkmanCli("install", "5.19.0", "")
 
-                // TODO: change error message to [empty/blank]
-                result shouldBeLeft VersionError.InvalidPlatform("")
+                result shouldBeLeft VersionError.InvalidPlatform("[empty/blank]")
             }
         }
 

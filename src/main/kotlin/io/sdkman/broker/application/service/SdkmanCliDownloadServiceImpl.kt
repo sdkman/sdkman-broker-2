@@ -34,12 +34,16 @@ class SdkmanCliDownloadServiceImpl : SdkmanCliDownloadService {
         if (version.isNotBlank()) {
             version.right()
         } else {
-            VersionError.InvalidVersion(version).left()
+            VersionError.InvalidVersion("[empty/blank]").left()
         }
 
     private fun validatePlatform(platformCode: String): Either<VersionError, Platform> =
-        Platform.fromCode(platformCode)
-            .toEither { VersionError.InvalidPlatform(platformCode) }
+        if (platformCode.isBlank()) {
+            VersionError.InvalidPlatform("[empty/blank]").left()
+        } else {
+            Platform.fromCode(platformCode)
+                .toEither { VersionError.InvalidPlatform(platformCode) }
+        }
 
     private fun constructDownloadInfo(version: String): SdkmanCliDownloadInfo {
         val tag = if (version.startsWith("latest+")) "latest" else version
