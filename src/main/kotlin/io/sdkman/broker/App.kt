@@ -20,6 +20,8 @@ import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
 import io.sdkman.broker.application.service.ReleaseService
 import io.sdkman.broker.application.service.ReleaseServiceImpl
+import io.sdkman.broker.application.service.SdkmanCliDownloadService
+import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -47,10 +49,11 @@ object App {
         val healthService = HealthServiceImpl(applicationRepository, postgresHealthRepository)
         val releaseService = ReleaseServiceImpl()
         val versionService = CandidateDownloadServiceImpl(versionRepository, auditRepository)
+        val sdkmanCliDownloadService = SdkmanCliDownloadServiceImpl()
 
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
-            configureApp(healthService, releaseService, versionService)
+            configureApp(healthService, releaseService, versionService, sdkmanCliDownloadService)
         }.start(wait = true)
     }
 }
@@ -59,7 +62,8 @@ object App {
 fun Application.configureApp(
     healthService: HealthService,
     releaseService: ReleaseService,
-    candidateDownloadService: CandidateDownloadService
+    candidateDownloadService: CandidateDownloadService,
+    sdkmanCliDownloadService: SdkmanCliDownloadService
 ) {
     // Install plugins
     install(ContentNegotiation) {
@@ -76,5 +80,5 @@ fun Application.configureApp(
 
     // Configure routes
     metaRoutes(healthService, releaseService)
-    downloadRoutes(candidateDownloadService)
+    downloadRoutes(candidateDownloadService, sdkmanCliDownloadService)
 }

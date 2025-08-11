@@ -11,9 +11,13 @@ import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.sdkman.broker.application.service.CandidateDownloadService
+import io.sdkman.broker.application.service.SdkmanCliDownloadService
 import io.sdkman.broker.domain.model.VersionError
 
-fun Application.downloadRoutes(candidateDownloadService: CandidateDownloadService) {
+fun Application.downloadRoutes(
+    candidateDownloadService: CandidateDownloadService,
+    sdkmanCliDownloadService: SdkmanCliDownloadService
+) {
     routing {
         get("/download/{candidate}/{version}/{platform}") {
             val candidate = call.parameters["candidate"] ?: return@get call.respondBadRequest()
@@ -39,12 +43,29 @@ fun Application.downloadRoutes(candidateDownloadService: CandidateDownloadServic
                     }
                 )
         }
+
+        get("/download/sdkman/{command}/{version}/{platform}") {
+            val command = call.parameters["command"] ?: return@get call.respondBadRequest()
+            val version = call.parameters["version"] ?: return@get call.respondBadRequest()
+            val platform = call.parameters["platform"] ?: return@get call.respondBadRequest()
+
+            sdkmanCliDownloadService.downloadSdkmanCli(command, version, platform)
+                .fold(
+                    { error -> call.handleVersionError(error) },
+                    { downloadInfo ->
+                        call.response.header("X-Sdkman-ArchiveType", downloadInfo.archiveType)
+                        call.respondRedirect(downloadInfo.downloadUrl, permanent = false)
+                    }
+                )
+        }
     }
 }
 
 private fun ApplicationCall.handleVersionError(error: VersionError) =
     when (error) {
+        is VersionError.InvalidCommand -> respondWithStatus(HttpStatusCode.BadRequest)
         is VersionError.InvalidPlatform -> respondWithStatus(HttpStatusCode.BadRequest)
+        is VersionError.InvalidVersion -> respondWithStatus(HttpStatusCode.BadRequest)
         is VersionError.VersionNotFound -> respondWithStatus(HttpStatusCode.NotFound)
         is VersionError.DatabaseError -> respondWithStatus(HttpStatusCode.InternalServerError)
     }
