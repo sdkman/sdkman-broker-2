@@ -18,13 +18,13 @@ import io.sdkman.broker.application.service.CandidateDownloadService
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
-import io.sdkman.broker.application.service.NativeDownloadServiceImpl
 import io.sdkman.broker.application.service.ReleaseService
 import io.sdkman.broker.application.service.ReleaseServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
+import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
-import io.sdkman.broker.domain.service.NativeDownloadService
 import io.sdkman.broker.domain.service.SdkmanCliDownloadService
+import io.sdkman.broker.domain.service.SdkmanNativeDownloadService
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
@@ -52,11 +52,17 @@ object App {
         val releaseService = ReleaseServiceImpl()
         val versionService = CandidateDownloadServiceImpl(versionRepository, auditRepository)
         val sdkmanCliDownloadService = SdkmanCliDownloadServiceImpl()
-        val nativeDownloadService = NativeDownloadServiceImpl()
+        val sdkmanNativeDownloadService = SdkmanNativeDownloadServiceImpl()
 
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
-            configureApp(healthService, releaseService, versionService, sdkmanCliDownloadService, nativeDownloadService)
+            configureApp(
+                healthService,
+                releaseService,
+                versionService,
+                sdkmanCliDownloadService,
+                sdkmanNativeDownloadService
+            )
         }.start(wait = true)
     }
 }
@@ -67,7 +73,7 @@ fun Application.configureApp(
     releaseService: ReleaseService,
     candidateDownloadService: CandidateDownloadService,
     sdkmanCliDownloadService: SdkmanCliDownloadService,
-    nativeDownloadService: NativeDownloadService
+    sdkmanNativeDownloadService: SdkmanNativeDownloadService
 ) {
     // Install plugins
     install(ContentNegotiation) {
@@ -84,5 +90,5 @@ fun Application.configureApp(
 
     // Configure routes
     metaRoutes(healthService, releaseService)
-    downloadRoutes(candidateDownloadService, sdkmanCliDownloadService, nativeDownloadService)
+    downloadRoutes(candidateDownloadService, sdkmanCliDownloadService, sdkmanNativeDownloadService)
 }

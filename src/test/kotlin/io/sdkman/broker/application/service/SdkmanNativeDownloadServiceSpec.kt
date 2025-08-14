@@ -5,9 +5,8 @@ import io.sdkman.broker.domain.model.VersionError
 import io.sdkman.broker.support.shouldBeLeft
 import io.sdkman.broker.support.shouldBeRightAnd
 
-// TODO: rename to `SdkmanNativeDownloadServiceSpec`
-class NativeDownloadServiceSpec : ShouldSpec({
-    val underTest = NativeDownloadServiceImpl()
+class SdkmanNativeDownloadServiceSpec : ShouldSpec({
+    val underTest = SdkmanNativeDownloadServiceImpl()
 
     context("downloadNativeCli") {
         context("with valid inputs") {

@@ -9,10 +9,8 @@ import io.ktor.server.testing.testApplication
 import io.sdkman.broker.support.configureAppForTesting
 import org.junit.jupiter.api.Tag
 
-// TODO. Rename to `SdkmanNativeDownloadAcceptanceSpec`.
-// TODO: Test only essential cases in the acceptance test, test fine-grained aspects at the unit test level
 @Tag("acceptance")
-class NativeDownloadAcceptanceSpec : ShouldSpec({
+class SdkmanNativeDownloadAcceptanceSpec : ShouldSpec({
 
     context("Native CLI download endpoint") {
         should("redirect to GitHub release for linuxx64 platform with install command") {

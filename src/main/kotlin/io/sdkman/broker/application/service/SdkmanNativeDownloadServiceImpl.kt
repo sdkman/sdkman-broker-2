@@ -9,10 +9,9 @@ import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.TargetTriple
 import io.sdkman.broker.domain.model.VersionError
 import io.sdkman.broker.domain.service.NativeDownloadInfo
-import io.sdkman.broker.domain.service.NativeDownloadService
+import io.sdkman.broker.domain.service.SdkmanNativeDownloadService
 
-// TODO: rename this to `SdkmanNativeDownloadServiceImpl`. also rename all associated variable names.
-class NativeDownloadServiceImpl : NativeDownloadService {
+class SdkmanNativeDownloadServiceImpl : SdkmanNativeDownloadService {
     private val githubReleasesUrl = "https://github.com/sdkman/sdkman-cli-native/releases/download"
 
     override fun downloadNativeCli(
