@@ -18,10 +18,12 @@ import io.sdkman.broker.application.service.CandidateDownloadService
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
+import io.sdkman.broker.application.service.NativeDownloadServiceImpl
 import io.sdkman.broker.application.service.ReleaseService
 import io.sdkman.broker.application.service.ReleaseServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
+import io.sdkman.broker.domain.service.NativeDownloadService
 import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -50,10 +52,11 @@ object App {
         val releaseService = ReleaseServiceImpl()
         val versionService = CandidateDownloadServiceImpl(versionRepository, auditRepository)
         val sdkmanCliDownloadService = SdkmanCliDownloadServiceImpl()
+        val nativeDownloadService = NativeDownloadServiceImpl()
 
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
-            configureApp(healthService, releaseService, versionService, sdkmanCliDownloadService)
+            configureApp(healthService, releaseService, versionService, sdkmanCliDownloadService, nativeDownloadService)
         }.start(wait = true)
     }
 }
@@ -63,7 +66,8 @@ fun Application.configureApp(
     healthService: HealthService,
     releaseService: ReleaseService,
     candidateDownloadService: CandidateDownloadService,
-    sdkmanCliDownloadService: SdkmanCliDownloadService
+    sdkmanCliDownloadService: SdkmanCliDownloadService,
+    nativeDownloadService: NativeDownloadService
 ) {
     // Install plugins
     install(ContentNegotiation) {
@@ -80,5 +84,5 @@ fun Application.configureApp(
 
     // Configure routes
     metaRoutes(healthService, releaseService)
-    downloadRoutes(candidateDownloadService, sdkmanCliDownloadService)
+    downloadRoutes(candidateDownloadService, sdkmanCliDownloadService, nativeDownloadService)
 }
