@@ -12,11 +12,13 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.sdkman.broker.application.service.CandidateDownloadService
 import io.sdkman.broker.domain.model.VersionError
+import io.sdkman.broker.domain.service.NativeDownloadService
 import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 
 fun Application.downloadRoutes(
     candidateDownloadService: CandidateDownloadService,
-    sdkmanCliDownloadService: SdkmanCliDownloadService
+    sdkmanCliDownloadService: SdkmanCliDownloadService,
+    nativeDownloadService: NativeDownloadService
 ) {
     routing {
         get("/download/{candidate}/{version}/{platform}") {
@@ -50,6 +52,21 @@ fun Application.downloadRoutes(
             val platform = call.parameters["platform"] ?: return@get call.respondBadRequest()
 
             sdkmanCliDownloadService.downloadSdkmanCli(command, version, platform)
+                .fold(
+                    { error -> call.handleVersionError(error) },
+                    { downloadInfo ->
+                        call.response.header("X-Sdkman-ArchiveType", downloadInfo.archiveType)
+                        call.respondRedirect(downloadInfo.downloadUrl, permanent = false)
+                    }
+                )
+        }
+
+        get("/download/native/{command}/{version}/{platform}") {
+            val command = call.parameters["command"] ?: return@get call.respondBadRequest()
+            val version = call.parameters["version"] ?: return@get call.respondBadRequest()
+            val platform = call.parameters["platform"] ?: return@get call.respondBadRequest()
+
+            nativeDownloadService.downloadNativeCli(command, version, platform)
                 .fold(
                     { error -> call.handleVersionError(error) },
                     { downloadInfo ->
