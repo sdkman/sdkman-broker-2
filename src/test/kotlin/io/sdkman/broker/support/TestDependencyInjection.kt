@@ -6,9 +6,9 @@ import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.HealthServiceImpl
-import io.sdkman.broker.application.service.NativeDownloadServiceImpl
 import io.sdkman.broker.application.service.ReleaseServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
+import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
 import javax.sql.DataSource
 
@@ -68,7 +68,7 @@ object TestDependencyInjection {
         SdkmanCliDownloadServiceImpl()
     }
 
-    val nativeDownloadService by lazy {
-        NativeDownloadServiceImpl()
+    val sdkmanNativeDownloadService by lazy {
+        SdkmanNativeDownloadServiceImpl()
     }
 }
