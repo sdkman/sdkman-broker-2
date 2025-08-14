@@ -1,16 +1,16 @@
 # SDKMAN Native CLI Download Handler
 
-*Implement the SDKMAN Native CLI download endpoint that redirects to GitHub releases for both stable and beta channels. This endpoint is used by SDKMAN to download its own Native SDK binary, composing URLs that point to GitHub releases with platform-specific Rust platform triples and returning them as Location headers with 302 responses.*
+*Implement the SDKMAN Native CLI download endpoint that redirects to GitHub releases for both stable and beta channels. This endpoint is used by SDKMAN to download its own Native SDK binary, composing URLs that point to GitHub releases with platform-specific Rust target triples and returning them as Location headers with 302 responses.*
 
 ## Requirements
 
 - Implement `GET /download/native/{command}/{version}/{platform}` endpoint
 - Return 302 Found redirects with Location header pointing to GitHub releases
-- Support platform-specific URL construction using Rust platform triples
+- Support platform-specific URL construction using Rust target triples
 - Return appropriate HTTP status codes (302, 400, 404)
 - Set X-Sdkman-ArchiveType header to "zip"
 - Handle validation of command, version, and platform parameters
-- Map platform codes to appropriate Rust platform triples
+- Map platform codes to appropriate Rust target triples
 - No audit functionality required (will be added later as separate feature)
 
 ## Rules
@@ -26,7 +26,7 @@ No domain changes required apart from the service port.
 
 ## Extra Considerations
 
-- Platform parameter must be validated and mapped to Rust platform triples for URL construction
+- Platform parameter must be validated and mapped to Rust target triples for URL construction
 - Platform parameter will be used for auditing in later feature
 - Command parameter should be validated but not impact URL construction
 - Command parameter must be one of `install` or `selfupdate` and will be used for audit purposes
@@ -38,7 +38,7 @@ No domain changes required apart from the service port.
 
 ## Testing Considerations
 
-- Unit tests for URL construction logic with platform triple mapping
+- Unit tests for URL construction logic with target triple mapping
 - Acceptance tests verifying complete request/response flow
 - Acceptance tests verify HTTP response codes and headers
 - Parameter validation tested for invalid commands, empty versions, invalid platforms
@@ -55,7 +55,8 @@ No domain changes required apart from the service port.
 - Implement proper error handling with appropriate status codes
 - Use dependency injection for any external dependencies
 - Maintain stateless handler design
-- Platform triple mapping should be consistent with legacy specification
+- target triple mapping should be consistent with legacy specification
+- Introduce a `TargetTriple` enum to represent the Rust target triples
 - Use a new `Command` enum for available commands (`install`, `selfupdate`)
 
 ## Specification by Example
@@ -89,18 +90,18 @@ GET /download/native/install/0.7.4/exotic
 → 400 Bad Request
 ```
 
-## Platform Triple Mapping
+## Target triple Mapping
 
-The following platform codes must be mapped to their corresponding Rust platform triples:
+The following platform codes must be mapped to their corresponding Rust target triples:
 
-| Platform Code | Rust Platform Triple |
-|--------------|---------------------|
-| `linuxx64`   | `x86_64-unknown-linux-gnu` |
+| Platform Code | Rust Target Triple          |
+|--------------|-----------------------------|
+| `linuxx64`   | `x86_64-unknown-linux-gnu`  |
 | `linuxarm64` | `aarch64-unknown-linux-gnu` |
-| `linuxx32`   | `i686-unknown-linux-gnu` |
-| `darwinx64`  | `x86_64-apple-darwin` |
-| `darwinarm64`| `aarch64-apple-darwin` |
-| `windowsx64` | `x86_64-pc-windows-msvc` |
+| `linuxx32`   | `i686-unknown-linux-gnu`    |
+| `darwinx64`  | `x86_64-apple-darwin`       |
+| `darwinarm64`| `aarch64-apple-darwin`      |
+| `windowsx64` | `x86_64-pc-windows-msvc`    |
 
 Note: The `exotic` platform is not supported for native CLI downloads and should return 400 Bad Request.
 
@@ -108,13 +109,13 @@ Note: The `exotic` platform is not supported for native CLI downloads and should
 
 - [ ] Handler responds to GET /download/native/{command}/{version}/{platform}
 - [ ] Returns 302 Found for valid requests
-- [ ] Location header contains correct GitHub URL with proper platform triple
+- [ ] Location header contains correct GitHub URL with proper target triple
 - [ ] X-Sdkman-ArchiveType header is set to "zip"
 - [ ] Returns 400 Bad Request for invalid commands (not "install" or "selfupdate")
 - [ ] Returns 400 Bad Request for empty/null version strings
 - [ ] Returns 400 Bad Request for invalid platform identifiers including "exotic"
 - [ ] Returns 400 Bad Request for unsupported platform codes
-- [ ] URL construction works correctly with platform triple mapping
+- [ ] URL construction works correctly with target triple mapping
 - [ ] All supported platform codes (linuxx64, linuxarm64, linuxx32, darwinx64, darwinarm64, windowsx64) map correctly
 - [ ] Handler integration works within the existing application structure
 - [ ] All tests pass including unit, integration, and acceptance tests
