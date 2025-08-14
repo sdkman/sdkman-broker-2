@@ -4,14 +4,14 @@ Functional programming guidelines for Kotlin development using Arrow FP library.
 
 ## Context
 
-*Applies to:* All Kotlin source code, domain models, business logic, and data access layers  
-*Level:* Tactical - Direct impact on code quality and maintainability  
-*Audience:* All Kotlin developers working on this codebase  
+*Applies to:* All Kotlin source code, domain models, business logic, and data access layers
+*Level:* Tactical - Direct impact on code quality and maintainability
+*Audience:* All Kotlin developers working on this codebase
 
 ## Core Principles
 
 1. *Null Safety:* NEVER use nullable types (`?`). Always use Arrow's `Option<A>` for optional values
-2. *Immutability First:* Default to `val` and immutable data structures to prevent accidental mutations  
+2. *Immutability First:* Default to `val` and immutable data structures to prevent accidental mutations
 3. *Explicit Error Handling:* Use Arrow's `Either<E,A>` instead of exceptions for recoverable errors
 4. *Type Safety:* Make impossible states unrepresentable through algebraic data types
 5. *Pure Functions:* Prefer functions without side effects that return the same output for the same input
@@ -31,11 +31,12 @@ Functional programming guidelines for Kotlin development using Arrow FP library.
 ### Should Have (Important)
 
 - *RULE-101:* Prefer immutable collection interfaces (`List`, `Set`, `Map`) over mutable variants
-- *RULE-102:* Use sealed classes for representing finite sets of types and domain states  
+- *RULE-102:* Use sealed classes for representing finite sets of types and domain states
 - *RULE-103:* Implement smart constructors for domain types that can fail validation
 - *RULE-104:* Use `@JvmInline value class` for type-safe primitives (IDs, quantities, etc.)
 - *RULE-105:* Chain collection operations (`map`, `filter`, `fold`) instead of imperative loops
 - *RULE-106:* Use expression bodies for simple functions: `fun transform(x: String): Int = x.length`
+- *RULE-107:* Prefer `map`, `getOrElse` over `fold` when working with `Option<A>` or `Either<E,A>`
 
 ### Could Have (Preferred)
 
@@ -51,10 +52,10 @@ Functional programming guidelines for Kotlin development using Arrow FP library.
 
 ```kotlin
 // Option instead of nullable
-fun findUser(id: UserId): Option<User> = 
+fun findUser(id: UserId): Option<User> =
     userRepository.findById(id).toOption()
 
-// Either for error handling  
+// Either for error handling
 fun validateEmail(email: String): Either<ValidationError, Email> =
     if (email.matches(EMAIL_REGEX)) Email(email).right()
     else ValidationError("Invalid email").left()
@@ -155,7 +156,7 @@ for (item in items) {
 
 *Key Principles:*
 - Never use nullable types, always use Arrow's `Option<A>` for optional values
-- Handle errors explicitly with `Either<E,A>` instead of throwing exceptions  
+- Handle errors explicitly with `Either<E,A>` instead of throwing exceptions
 - Default to immutable data structures and pure functions
 
 *Critical Rules:*
