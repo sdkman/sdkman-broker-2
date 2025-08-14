@@ -32,7 +32,7 @@ No domain changes required apart from the service port.
 - Command parameter must be one of `install` or `selfupdate` and will be used for audit purposes
 - Must follow hexagonal architecture patterns with proper handler/use case separation
 - Use Arrow Option types instead of nullable types
-- URLs always follow the pattern: `https://github.com/sdkman/sdkman-cli-native/releases/download/{version}/cli-native-{version}-{platform-triple}.zip`
+- URLs always follow the pattern: `https://github.com/sdkman/sdkman-cli-native/releases/download/v{versisdkman-on}/cli-native-{version}-{platform-triple}.zip`
 - Platform mapping must handle all supported platforms: linuxx64, linuxarm64, linuxx32, darwinx64, darwinarm64, windowsx64
 - No beta version handling needed (native CLI doesn't use beta versioning like bash CLI)
 
@@ -56,23 +56,24 @@ No domain changes required apart from the service port.
 - Use dependency injection for any external dependencies
 - Maintain stateless handler design
 - Platform triple mapping should be consistent with legacy specification
+- Use a new `Command` enum for available commands (`install`, `selfupdate`)
 
 ## Specification by Example
 
 ```http
 GET /download/native/install/0.7.4/linuxx64
 → 302 Found
-→ Location: https://github.com/sdkman/sdkman-cli-native/releases/download/0.7.4/cli-native-0.7.4-x86_64-unknown-linux-gnu.zip
+→ Location: https://github.com/sdkman/sdkman-cli-native/releases/download/v0.7.4/sdkman-cli-native-0.7.4-x86_64-unknown-linux-gnu.zip
 → X-Sdkman-ArchiveType: zip
 
 GET /download/native/selfupdate/0.7.4/darwinarm64
 → 302 Found
-→ Location: https://github.com/sdkman/sdkman-cli-native/releases/download/0.7.4/cli-native-0.7.4-aarch64-apple-darwin.zip
+→ Location: https://github.com/sdkman/sdkman-cli-native/releases/download/v0.7.4/sdkman-cli-native-0.7.4-aarch64-apple-darwin.zip
 → X-Sdkman-ArchiveType: zip
 
 GET /download/native/install/0.8.0/windowsx64
 → 302 Found
-→ Location: https://github.com/sdkman/sdkman-cli-native/releases/download/0.8.0/cli-native-0.8.0-x86_64-pc-windows-msvc.zip
+→ Location: https://github.com/sdkman/sdkman-cli-native/releases/download/v0.8.0/sdkman-cli-native-0.8.0-x86_64-pc-windows-msvc.zip
 → X-Sdkman-ArchiveType: zip
 
 GET /download/native/invalid/0.7.4/linuxx64
