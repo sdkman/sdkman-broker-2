@@ -11,6 +11,7 @@ interface SdkmanNativeDownloadService {
     ): Either<VersionError, NativeDownloadInfo>
 }
 
+// TODO: Remove this in favour of `DownloadInfo`
 data class NativeDownloadInfo(
     val downloadUrl: String,
     val archiveType: String = "zip"

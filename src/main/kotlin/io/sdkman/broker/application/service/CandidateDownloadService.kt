@@ -14,6 +14,7 @@ import io.sdkman.broker.domain.repository.AuditRepository
 import io.sdkman.broker.domain.repository.VersionRepository
 import org.slf4j.LoggerFactory
 
+// TODO: move the interface to the domain.service package
 interface CandidateDownloadService {
     fun downloadVersion(
         candidate: String,

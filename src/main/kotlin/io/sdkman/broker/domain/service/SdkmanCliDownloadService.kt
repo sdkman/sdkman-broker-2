@@ -11,6 +11,7 @@ interface SdkmanCliDownloadService {
     ): Either<VersionError, SdkmanCliDownloadInfo>
 }
 
+// TODO: Remove this in favour of `DownloadInfo`
 data class SdkmanCliDownloadInfo(
     val downloadUrl: String,
     val archiveType: String = "zip"
