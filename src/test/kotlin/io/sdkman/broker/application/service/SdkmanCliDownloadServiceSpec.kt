@@ -14,7 +14,7 @@ class SdkmanCliDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadSdkmanCli("install", "5.19.0", "linuxx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl ==
+                    downloadInfo.redirectUrl ==
                         "https://github.com/sdkman/sdkman-cli/releases/download/" +
                         "5.19.0/sdkman-cli-5.19.0.zip" &&
                         downloadInfo.archiveType == "zip"
@@ -25,7 +25,7 @@ class SdkmanCliDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadSdkmanCli("selfupdate", "5.19.0", "darwinarm64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl ==
+                    downloadInfo.redirectUrl ==
                         "https://github.com/sdkman/sdkman-cli/releases/download/" +
                         "5.19.0/sdkman-cli-5.19.0.zip" &&
                         downloadInfo.archiveType == "zip"
@@ -36,7 +36,7 @@ class SdkmanCliDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadSdkmanCli("install", "latest+b8d230b", "linuxx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl == "https://github.com/sdkman/sdkman-cli/releases/download/" +
+                    downloadInfo.redirectUrl == "https://github.com/sdkman/sdkman-cli/releases/download/" +
                         "latest/sdkman-cli-latest+b8d230b.zip" &&
                         downloadInfo.archiveType == "zip"
                 }
@@ -46,7 +46,7 @@ class SdkmanCliDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadSdkmanCli("install", "5.19.0", "windowsx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl == "https://github.com/sdkman/sdkman-cli/releases/download/" +
+                    downloadInfo.redirectUrl == "https://github.com/sdkman/sdkman-cli/releases/download/" +
                         "5.19.0/sdkman-cli-5.19.0.zip" &&
                         downloadInfo.archiveType == "zip"
                 }
@@ -106,7 +106,7 @@ class SdkmanCliDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadSdkmanCli("install", "5.19.0", "linuxx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl ==
+                    downloadInfo.redirectUrl ==
                         "https://github.com/sdkman/sdkman-cli/releases/download/" +
                         "5.19.0/sdkman-cli-5.19.0.zip"
                 }
@@ -116,7 +116,7 @@ class SdkmanCliDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadSdkmanCli("install", "latest+a1b2c3d", "linuxx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl ==
+                    downloadInfo.redirectUrl ==
                         "https://github.com/sdkman/sdkman-cli/releases/download/" +
                         "latest/sdkman-cli-latest+a1b2c3d.zip"
                 }

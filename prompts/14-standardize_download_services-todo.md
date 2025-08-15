@@ -43,7 +43,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 4: Replace SdkmanCliDownloadInfo with DownloadInfo
 
-- [ ] Remove SdkmanCliDownloadInfo and use DownloadInfo instead
+- [X] Remove SdkmanCliDownloadInfo and use DownloadInfo instead
 
 **Description**: The SdkmanCliDownloadInfo data class duplicates functionality already provided by DownloadInfo. This violates the DRY principle and creates unnecessary code duplication. The services should be unified to use a single data transfer object.
 
