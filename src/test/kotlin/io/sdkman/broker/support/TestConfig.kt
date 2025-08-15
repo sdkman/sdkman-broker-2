@@ -1,10 +1,10 @@
 package io.sdkman.broker.support
 
 import io.ktor.server.application.Application
-import io.sdkman.broker.application.service.CandidateDownloadService
 import io.sdkman.broker.application.service.MetaHealthService
 import io.sdkman.broker.application.service.MetaReleaseService
 import io.sdkman.broker.configureApp
+import io.sdkman.broker.domain.service.CandidateDownloadService
 import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 import io.sdkman.broker.domain.service.SdkmanNativeDownloadService
 

@@ -20,7 +20,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 2: Move CandidateDownloadService Interface to Domain Layer
 
-- [ ] Relocate interface from application to domain service package
+- [X] Relocate interface from application to domain service package
 
 **Description**: The CandidateDownloadService interface is currently located in the application service package but should be moved to the domain service package to properly separate domain contracts from application layer implementations.
 

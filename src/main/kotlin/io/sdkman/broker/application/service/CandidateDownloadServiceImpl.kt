@@ -13,17 +13,8 @@ import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.domain.model.VersionError
 import io.sdkman.broker.domain.repository.AuditRepository
 import io.sdkman.broker.domain.repository.VersionRepository
+import io.sdkman.broker.domain.service.CandidateDownloadService
 import org.slf4j.LoggerFactory
-
-// TODO: move the interface to the domain.service package
-interface CandidateDownloadService {
-    fun downloadVersion(
-        candidate: String,
-        version: String,
-        platformCode: String,
-        auditContext: AuditContext
-    ): Either<VersionError, DownloadInfo>
-}
 
 class CandidateDownloadServiceImpl(
     private val versionRepository: VersionRepository,
