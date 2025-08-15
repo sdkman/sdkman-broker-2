@@ -10,7 +10,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
 
     context("downloadNativeCli") {
         context("with valid inputs") {
-            should("return download info for linuxx64 platform with install command") {
+            should("return download info for linuxx64 platform") {
                 val result = underTest.downloadNativeCli("install", "0.7.4", "linuxx64")
 
                 result shouldBeRightAnd { downloadInfo ->
@@ -21,8 +21,8 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 }
             }
 
-            should("return download info for darwinarm64 platform with selfupdate command") {
-                val result = underTest.downloadNativeCli("selfupdate", "0.7.4", "darwinarm64")
+            should("return download info for darwinarm64 platform") {
+                val result = underTest.downloadNativeCli("install", "0.7.4", "darwinarm64")
 
                 result shouldBeRightAnd { downloadInfo ->
                     downloadInfo.downloadUrl ==
@@ -73,6 +73,22 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                         "https://github.com/sdkman/sdkman-cli-native/releases/download/" +
                         "v0.7.4/sdkman-cli-native-0.7.4-x86_64-apple-darwin.zip" &&
                         downloadInfo.archiveType == "zip"
+                }
+            }
+
+            should("return download info for install command") {
+                val result = underTest.downloadNativeCli("install", "0.7.4", "linuxx64")
+
+                result shouldBeRightAnd { downloadInfo ->
+                    downloadInfo.downloadUrl.isNotBlank()
+                }
+            }
+
+            should("return download info for selfupdate command") {
+                val result = underTest.downloadNativeCli("selfupdate", "0.7.4", "linuxx64")
+
+                result shouldBeRightAnd { downloadInfo ->
+                    downloadInfo.downloadUrl.isNotBlank()
                 }
             }
         }
@@ -136,10 +152,16 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 result shouldBeLeft VersionError.InvalidPlatform("exotic")
             }
 
-            should("return InvalidPlatform error for unsupported platforms") {
+            should("return InvalidPlatform error for linuxarm32hf platform") {
                 val result = underTest.downloadNativeCli("install", "0.7.4", "linuxarm32hf")
 
                 result shouldBeLeft VersionError.InvalidPlatform("linuxarm32hf")
+            }
+
+            should("return InvalidPlatform error for linuxarm32sf platform") {
+                val result = underTest.downloadNativeCli("install", "0.7.4", "linuxarm32sf")
+
+                result shouldBeLeft VersionError.InvalidPlatform("linuxarm32sf")
             }
 
             should("return InvalidPlatform error for universal platform") {
@@ -225,6 +247,27 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
 
                 result shouldBeRightAnd { downloadInfo ->
                     downloadInfo.downloadUrl.contains("x86_64-pc-windows-msvc")
+                }
+            }
+
+            should("handle all supported platforms correctly") {
+                val platformTargetMap =
+                    mapOf(
+                        "linuxx64" to "x86_64-unknown-linux-gnu",
+                        "linuxarm64" to "aarch64-unknown-linux-gnu",
+                        "linuxx32" to "i686-unknown-linux-gnu",
+                        "darwinx64" to "x86_64-apple-darwin",
+                        "darwinarm64" to "aarch64-apple-darwin",
+                        "windowsx64" to "x86_64-pc-windows-msvc"
+                    )
+
+                platformTargetMap.forEach { (platform, targetTriple) ->
+                    val result = underTest.downloadNativeCli("install", "0.7.4", platform)
+
+                    result shouldBeRightAnd { downloadInfo ->
+                        downloadInfo.downloadUrl.contains(targetTriple) &&
+                            downloadInfo.archiveType == "zip"
+                    }
                 }
             }
         }
