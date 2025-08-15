@@ -9,14 +9,11 @@ import io.sdkman.broker.application.service.MetaHealthServiceImpl
 import io.sdkman.broker.application.service.MetaReleaseServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
-import io.sdkman.broker.config.DefaultAppConfig
 import javax.sql.DataSource
 
 // Dependency injection for tests
 // Uses the shared MongoTestListener and PostgresTestListener to provide consistent database access across all tests
 object TestDependencyInjection {
-    // Use the shared containers from test listeners
-    val config by lazy { DefaultAppConfig() }
 
     // Use the database from MongoTestListener directly
     val database by lazy { MongoTestListener.database }
