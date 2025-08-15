@@ -1,11 +1,8 @@
 ## Build System
 
-- Use Gradle for all build operations in this project.
+- Use the git-committer agent for all Git interactions
+- Use the gradle MCP server for all Gradle builds
 - Implement all "oneshot" prompts in a single operation without asking for confirmations
-
-## Kotlin Best Practices
-
-- **Never** use nullable types in Kotlin. Use Arrow's `Option` instead
 
 ## Rules
 
