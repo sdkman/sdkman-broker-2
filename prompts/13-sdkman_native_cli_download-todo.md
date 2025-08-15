@@ -21,7 +21,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 2: Refactor Acceptance Tests to Focus on Essential Cases
 
-- [ ] Simplify acceptance tests to cover only essential cases and move detailed testing to unit level
+- [X] Simplify acceptance tests to cover only essential cases and move detailed testing to unit level
 
 **Description**: The acceptance test currently contains too many detailed test cases that should be moved to the unit test level. The acceptance test should focus on essential end-to-end scenarios while fine-grained testing should be done at the unit level.
 
