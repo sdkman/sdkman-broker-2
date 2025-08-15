@@ -15,4 +15,3 @@ Observe all the following rules:
 * rules/kotest-rules.md
 * rules/kotlin-rules.md
 * rules/git-rules.md
-*
