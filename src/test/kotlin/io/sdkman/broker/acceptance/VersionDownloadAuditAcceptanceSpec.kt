@@ -46,7 +46,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -103,7 +103,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -159,7 +159,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -190,7 +190,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -222,7 +222,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }

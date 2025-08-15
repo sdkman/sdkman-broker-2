@@ -21,10 +21,10 @@ class ReleaseServiceSpec : ShouldSpec({
             mockClassLoader.getResourceAsStream("release.properties")
         } returns inputStream
 
-        val releaseService = ReleaseServiceImpl(mockClassLoader)
+        val releaseService = MetaServiceImpl(mockClassLoader)
 
         // when: getting the release
-        val result = releaseService.getRelease()
+        val result = releaseService.getReleaseVersion()
 
         // then: release is returned successfully
         result shouldBeRight "1.2.3"
@@ -40,15 +40,15 @@ class ReleaseServiceSpec : ShouldSpec({
             mockClassLoader.getResourceAsStream("release.properties")
         } returns inputStream
 
-        val releaseService = ReleaseServiceImpl(mockClassLoader)
+        val releaseService = MetaServiceImpl(mockClassLoader)
 
         // when: getting the release
-        val result = releaseService.getRelease()
+        val result = releaseService.getReleaseVersion()
 
         // then: release file error is returned
         result should
-            beLeftAnd<ReleaseError, String> { error ->
-                error.shouldBeInstanceOf<ReleaseError.ReleaseFileError>()
+            beLeftAnd<MetaError, String> { error ->
+                error.shouldBeInstanceOf<MetaError.MetaFileError>()
                 error.cause.message?.contains("Release property not found") ?: false
             }
     }
@@ -63,15 +63,15 @@ class ReleaseServiceSpec : ShouldSpec({
             mockClassLoader.getResourceAsStream("release.properties")
         } returns inputStream
 
-        val releaseService = ReleaseServiceImpl(mockClassLoader)
+        val releaseService = MetaServiceImpl(mockClassLoader)
 
         // when: getting the release
-        val result = releaseService.getRelease()
+        val result = releaseService.getReleaseVersion()
 
         // then: release file error is returned
         result should
-            beLeftAnd<ReleaseError, String> { error ->
-                error.shouldBeInstanceOf<ReleaseError.ReleaseFileError>()
+            beLeftAnd<MetaError, String> { error ->
+                error.shouldBeInstanceOf<MetaError.MetaFileError>()
                 error.cause.message?.contains("Release property not found") ?: false
             }
     }
@@ -84,15 +84,15 @@ class ReleaseServiceSpec : ShouldSpec({
             mockClassLoader.getResourceAsStream("release.properties")
         } returns null
 
-        val releaseService = ReleaseServiceImpl(mockClassLoader)
+        val releaseService = MetaServiceImpl(mockClassLoader)
 
         // when: getting the release
-        val result = releaseService.getRelease()
+        val result = releaseService.getReleaseVersion()
 
         // then: release file error is returned
         result should
-            beLeftAnd<ReleaseError, String> { error ->
-                error.shouldBeInstanceOf<ReleaseError.ReleaseFileError>()
+            beLeftAnd<MetaError, String> { error ->
+                error.shouldBeInstanceOf<MetaError.MetaFileError>()
                 error.cause.message?.contains("Could not load") ?: false
             }
     }

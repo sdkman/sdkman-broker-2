@@ -7,13 +7,13 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.sdkman.broker.application.service.HealthService
-import io.sdkman.broker.application.service.ReleaseError
-import io.sdkman.broker.application.service.ReleaseService
+import io.sdkman.broker.application.service.MetaError
+import io.sdkman.broker.application.service.MetaService
 import kotlinx.serialization.Serializable
 
 fun Application.metaRoutes(
     healthService: HealthService,
-    releaseService: ReleaseService
+    metaService: MetaService
 ) {
     routing {
         get("/meta/health") {
@@ -25,7 +25,7 @@ fun Application.metaRoutes(
         }
 
         get("/meta/release") {
-            releaseService.getRelease()
+            metaService.getReleaseVersion()
                 .fold(
                     { error ->
                         call.respond(
@@ -53,8 +53,8 @@ data class ReleaseResponse(val release: String)
 @Serializable
 data class ReleaseErrorResponse(val error: String)
 
-private val ReleaseError.cause: Throwable
+private val MetaError.cause: Throwable
     get() =
         when (this) {
-            is ReleaseError.ReleaseFileError -> cause
+            is MetaError.MetaFileError -> cause
         }

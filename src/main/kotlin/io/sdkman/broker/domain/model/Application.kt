@@ -4,9 +4,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 
-data class Application private constructor(
-    val alive: AliveStatus
-) {
+data class Application private constructor(val alive: AliveStatus) {
     companion object {
         fun of(alive: String): Either<ApplicationError, Application> =
             AliveStatus.of(alive).map { status ->

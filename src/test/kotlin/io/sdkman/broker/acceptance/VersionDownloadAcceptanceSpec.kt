@@ -38,7 +38,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -78,7 +78,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -103,7 +103,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -121,7 +121,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -150,7 +150,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -179,7 +179,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -214,7 +214,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -261,7 +261,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }

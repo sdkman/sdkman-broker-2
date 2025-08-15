@@ -8,14 +8,14 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import io.sdkman.broker.application.service.ReleaseError
-import io.sdkman.broker.application.service.ReleaseService
+import io.sdkman.broker.application.service.MetaError
+import io.sdkman.broker.application.service.MetaService
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
 import org.junit.jupiter.api.Tag
 
 @Tag("acceptance")
-class ReleaseEndpointAcceptanceSpec : ShouldSpec({
+class MetaReleaseEndpointAcceptanceSpec : ShouldSpec({
 
     should("return 200 OK with release when release.properties file is present") {
         // given: a running application and the release.properties file is present
@@ -24,7 +24,7 @@ class ReleaseEndpointAcceptanceSpec : ShouldSpec({
             application {
                 configureAppForTesting(
                     TestDependencyInjection.healthService,
-                    TestDependencyInjection.releaseService,
+                    TestDependencyInjection.metaService,
                     TestDependencyInjection.versionService
                 )
             }
@@ -46,9 +46,9 @@ class ReleaseEndpointAcceptanceSpec : ShouldSpec({
         testApplication {
             // Using a service that can't find the file
             val mockService =
-                object : ReleaseService {
-                    override fun getRelease(): Either<ReleaseError, String> =
-                        ReleaseError.ReleaseFileError(
+                object : MetaService {
+                    override fun getReleaseVersion(): Either<MetaError, String> =
+                        MetaError.MetaFileError(
                             IllegalStateException("Could not load release.properties")
                         ).left()
                 }

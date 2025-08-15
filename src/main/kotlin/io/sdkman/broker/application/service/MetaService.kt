@@ -2,28 +2,29 @@ package io.sdkman.broker.application.service
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toOption
 import java.util.Properties
 
-interface ReleaseService {
-    fun getRelease(): Either<ReleaseError, String>
+interface MetaService {
+    fun getReleaseVersion(): Either<MetaError, String>
 }
 
-class ReleaseServiceImpl(
-    private val classLoader: ClassLoader = ReleaseServiceImpl::class.java.classLoader
-) : ReleaseService {
+class MetaServiceImpl(
+    private val classLoader: ClassLoader = MetaServiceImpl::class.java.classLoader
+) : MetaService {
     companion object {
         private const val RELEASE_PROPERTIES = "release.properties"
         private const val RELEASE_KEY = "release"
     }
 
-    override fun getRelease(): Either<ReleaseError, String> =
+    override fun getReleaseVersion(): Either<MetaError, String> =
         loadPropertiesFile()
             .flatMap { properties -> getReleaseFromProperties(properties) }
 
-    private fun loadPropertiesFile(): Either<ReleaseError, Properties> =
+    private fun loadPropertiesFile(): Either<MetaError, Properties> =
         Either.catch {
             val properties = Properties()
             classLoader.getResourceAsStream(RELEASE_PROPERTIES).toOption()
@@ -34,21 +35,18 @@ class ReleaseServiceImpl(
                         properties
                     }
                 )
-        }.mapLeft { ReleaseError.ReleaseFileError(it) }
+        }.mapLeft { MetaError.MetaFileError(it) }
 
-    private fun getReleaseFromProperties(properties: Properties): Either<ReleaseError, String> =
+    private fun getReleaseFromProperties(properties: Properties): Either<MetaError, String> =
         properties.getProperty(RELEASE_KEY).toOption()
             .filter { it.isNotBlank() }
-            .fold(
-                {
-                    ReleaseError.ReleaseFileError(
-                        IllegalStateException("Release property not found in $RELEASE_PROPERTIES")
-                    ).left()
-                },
-                { it.right() }
-            )
+            .map { it.right() }
+            .getOrElse {
+                MetaError.MetaFileError(IllegalStateException("Release property not found in $RELEASE_PROPERTIES"))
+                    .left()
+            }
 }
 
-sealed class ReleaseError {
-    data class ReleaseFileError(val cause: Throwable) : ReleaseError()
+sealed class MetaError {
+    data class MetaFileError(val cause: Throwable) : MetaError()
 }

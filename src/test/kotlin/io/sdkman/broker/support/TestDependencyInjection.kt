@@ -6,7 +6,7 @@ import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.HealthServiceImpl
-import io.sdkman.broker.application.service.ReleaseServiceImpl
+import io.sdkman.broker.application.service.MetaServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
@@ -56,8 +56,8 @@ object TestDependencyInjection {
         HealthServiceImpl(applicationRepository, postgresHealthRepositoryInvalidCredentials)
     }
 
-    val releaseService by lazy {
-        ReleaseServiceImpl()
+    val metaService by lazy {
+        MetaServiceImpl()
     }
 
     val versionService by lazy {
