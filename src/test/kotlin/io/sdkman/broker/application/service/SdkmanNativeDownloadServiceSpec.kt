@@ -14,7 +14,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "linuxx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl ==
+                    downloadInfo.redirectUrl ==
                         "https://github.com/sdkman/sdkman-cli-native/releases/download/" +
                         "v0.7.4/sdkman-cli-native-0.7.4-x86_64-unknown-linux-gnu.zip" &&
                         downloadInfo.archiveType == "zip"
@@ -25,7 +25,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "darwinarm64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl ==
+                    downloadInfo.redirectUrl ==
                         "https://github.com/sdkman/sdkman-cli-native/releases/download/" +
                         "v0.7.4/sdkman-cli-native-0.7.4-aarch64-apple-darwin.zip" &&
                         downloadInfo.archiveType == "zip"
@@ -36,7 +36,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.8.0", "windowsx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl ==
+                    downloadInfo.redirectUrl ==
                         "https://github.com/sdkman/sdkman-cli-native/releases/download/" +
                         "v0.8.0/sdkman-cli-native-0.8.0-x86_64-pc-windows-msvc.zip" &&
                         downloadInfo.archiveType == "zip"
@@ -47,7 +47,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "linuxarm64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl ==
+                    downloadInfo.redirectUrl ==
                         "https://github.com/sdkman/sdkman-cli-native/releases/download/" +
                         "v0.7.4/sdkman-cli-native-0.7.4-aarch64-unknown-linux-gnu.zip" &&
                         downloadInfo.archiveType == "zip"
@@ -58,7 +58,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "linuxx32")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl ==
+                    downloadInfo.redirectUrl ==
                         "https://github.com/sdkman/sdkman-cli-native/releases/download/" +
                         "v0.7.4/sdkman-cli-native-0.7.4-i686-unknown-linux-gnu.zip" &&
                         downloadInfo.archiveType == "zip"
@@ -69,7 +69,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "darwinx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl ==
+                    downloadInfo.redirectUrl ==
                         "https://github.com/sdkman/sdkman-cli-native/releases/download/" +
                         "v0.7.4/sdkman-cli-native-0.7.4-x86_64-apple-darwin.zip" &&
                         downloadInfo.archiveType == "zip"
@@ -80,7 +80,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "linuxx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.isNotBlank()
+                    downloadInfo.redirectUrl.isNotBlank()
                 }
             }
 
@@ -88,7 +88,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("selfupdate", "0.7.4", "linuxx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.isNotBlank()
+                    downloadInfo.redirectUrl.isNotBlank()
                 }
             }
         }
@@ -176,7 +176,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "linuxx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.startsWith(
+                    downloadInfo.redirectUrl.startsWith(
                         "https://github.com/sdkman/sdkman-cli-native/releases/download/v0.7.4/"
                     )
                 }
@@ -186,7 +186,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "1.0.0", "windowsx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.endsWith(
+                    downloadInfo.redirectUrl.endsWith(
                         "sdkman-cli-native-1.0.0-x86_64-pc-windows-msvc.zip"
                     )
                 }
@@ -196,7 +196,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("selfupdate", "0.7.4", "darwinarm64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.contains("aarch64-apple-darwin")
+                    downloadInfo.redirectUrl.contains("aarch64-apple-darwin")
                 }
             }
         }
@@ -206,7 +206,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "linuxx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.contains("x86_64-unknown-linux-gnu")
+                    downloadInfo.redirectUrl.contains("x86_64-unknown-linux-gnu")
                 }
             }
 
@@ -214,7 +214,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "linuxarm64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.contains("aarch64-unknown-linux-gnu")
+                    downloadInfo.redirectUrl.contains("aarch64-unknown-linux-gnu")
                 }
             }
 
@@ -222,7 +222,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "linuxx32")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.contains("i686-unknown-linux-gnu")
+                    downloadInfo.redirectUrl.contains("i686-unknown-linux-gnu")
                 }
             }
 
@@ -230,7 +230,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "darwinx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.contains("x86_64-apple-darwin")
+                    downloadInfo.redirectUrl.contains("x86_64-apple-darwin")
                 }
             }
 
@@ -238,7 +238,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "darwinarm64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.contains("aarch64-apple-darwin")
+                    downloadInfo.redirectUrl.contains("aarch64-apple-darwin")
                 }
             }
 
@@ -246,7 +246,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                 val result = underTest.downloadNativeCli("install", "0.7.4", "windowsx64")
 
                 result shouldBeRightAnd { downloadInfo ->
-                    downloadInfo.downloadUrl.contains("x86_64-pc-windows-msvc")
+                    downloadInfo.redirectUrl.contains("x86_64-pc-windows-msvc")
                 }
             }
 
@@ -265,7 +265,7 @@ class SdkmanNativeDownloadServiceSpec : ShouldSpec({
                     val result = underTest.downloadNativeCli("install", "0.7.4", platform)
 
                     result shouldBeRightAnd { downloadInfo ->
-                        downloadInfo.downloadUrl.contains(targetTriple) &&
+                        downloadInfo.redirectUrl.contains(targetTriple) &&
                             downloadInfo.archiveType == "zip"
                     }
                 }

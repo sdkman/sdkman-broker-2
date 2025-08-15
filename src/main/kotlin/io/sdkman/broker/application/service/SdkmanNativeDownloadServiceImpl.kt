@@ -5,10 +5,10 @@ import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
 import io.sdkman.broker.domain.model.Command
+import io.sdkman.broker.domain.model.DownloadInfo
 import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.TargetTriple
 import io.sdkman.broker.domain.model.VersionError
-import io.sdkman.broker.domain.service.NativeDownloadInfo
 import io.sdkman.broker.domain.service.SdkmanNativeDownloadService
 
 class SdkmanNativeDownloadServiceImpl : SdkmanNativeDownloadService {
@@ -18,7 +18,7 @@ class SdkmanNativeDownloadServiceImpl : SdkmanNativeDownloadService {
         command: String,
         version: String,
         platformCode: String
-    ): Either<VersionError, NativeDownloadInfo> =
+    ): Either<VersionError, DownloadInfo> =
         validateCommand(command)
             .flatMap { validateVersion(version) }
             .flatMap { validatedVersion -> validatePlatform(platformCode).map { validatedVersion to it } }
@@ -59,8 +59,11 @@ class SdkmanNativeDownloadServiceImpl : SdkmanNativeDownloadService {
     private fun constructDownloadInfo(
         version: String,
         targetTriple: TargetTriple
-    ): NativeDownloadInfo {
+    ): DownloadInfo {
         val filename = "sdkman-cli-native-$version-${targetTriple.triple}.zip"
-        return NativeDownloadInfo("$githubReleasesUrl/v$version/$filename")
+        return DownloadInfo(
+            redirectUrl = "$githubReleasesUrl/v$version/$filename",
+            archiveType = "zip"
+        )
     }
 }

@@ -71,7 +71,7 @@ fun Application.downloadRoutes(
                     { error -> call.handleVersionError(error) },
                     { downloadInfo ->
                         call.response.header("X-Sdkman-ArchiveType", downloadInfo.archiveType)
-                        call.respondRedirect(downloadInfo.downloadUrl, permanent = false)
+                        call.respondRedirect(downloadInfo.redirectUrl, permanent = false)
                     }
                 )
         }

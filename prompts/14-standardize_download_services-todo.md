@@ -32,7 +32,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 3: Replace NativeDownloadInfo with DownloadInfo
 
-- [ ] Remove NativeDownloadInfo and use DownloadInfo instead
+- [X] Remove NativeDownloadInfo and use DownloadInfo instead
 
 **Description**: The NativeDownloadInfo data class duplicates functionality already provided by DownloadInfo. This violates the DRY principle and creates unnecessary code duplication. The services should be unified to use a single data transfer object.
 
