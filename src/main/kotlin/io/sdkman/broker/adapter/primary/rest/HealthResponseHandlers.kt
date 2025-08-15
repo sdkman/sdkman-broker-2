@@ -34,8 +34,7 @@ suspend fun ApplicationCall.handleDatabaseHealthStatus(databaseStatus: DatabaseH
     val overallHealthy = databaseStatus.mongodb == HealthStatus.UP && databaseStatus.postgres == HealthStatus.UP
     val statusCode = if (overallHealthy) HttpStatusCode.OK else HttpStatusCode.ServiceUnavailable
 
-    val reason = "Service is ${if (overallHealthy) "healthy" else "not healthy"}"
-    respond(statusCode, DetailedHealthResponse(mongoDbStatus, postgresStatus, reason))
+    respond(statusCode, DetailedHealthResponse(mongoDbStatus, postgresStatus))
 }
 
 suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
@@ -114,4 +113,4 @@ private fun createDatabaseErrorResponse(
 }
 
 @Serializable
-data class DetailedHealthResponse(val mongodb: String, val postgres: String, val reason: String)
+data class DetailedHealthResponse(val mongodb: String, val postgres: String, val reason: String? = null)
