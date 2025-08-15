@@ -7,6 +7,7 @@ import arrow.core.raise.either
 import arrow.core.right
 import io.sdkman.broker.adapter.primary.rest.AuditContext
 import io.sdkman.broker.domain.model.ArchiveType
+import io.sdkman.broker.domain.model.DownloadInfo
 import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.domain.model.VersionError

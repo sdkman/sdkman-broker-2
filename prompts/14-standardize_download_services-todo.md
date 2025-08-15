@@ -7,7 +7,7 @@ Consider the following rules during execution of the tasks:
 
 ## Task 1: Move DownloadInfo to Domain Layer
 
-- [ ] Relocate DownloadInfo class from application to domain layer
+- [X] Relocate DownloadInfo class from application to domain layer
 
 **Description**: The DownloadInfo class is currently located in the application service package but should be moved to the domain layer to follow Domain-Driven Design principles. This class represents core business data and should be part of the domain model.
 

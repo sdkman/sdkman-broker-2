@@ -1,6 +1,6 @@
 package io.sdkman.broker.adapter.primary.rest
 
-import io.sdkman.broker.application.service.DownloadInfo
+import io.sdkman.broker.domain.model.DownloadInfo
 
 data class DownloadResponse(
     val redirectUrl: String,
