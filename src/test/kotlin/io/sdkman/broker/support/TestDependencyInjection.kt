@@ -14,7 +14,6 @@ import javax.sql.DataSource
 // Dependency injection for tests
 // Uses the shared MongoTestListener and PostgresTestListener to provide consistent database access across all tests
 object TestDependencyInjection {
-
     // Use the database from MongoTestListener directly
     val database by lazy { MongoTestListener.database }
 

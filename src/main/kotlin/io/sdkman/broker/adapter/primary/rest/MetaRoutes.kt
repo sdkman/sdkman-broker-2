@@ -7,7 +7,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.sdkman.broker.application.service.MetaHealthService
-import io.sdkman.broker.application.service.MetaError
 import io.sdkman.broker.application.service.MetaReleaseService
 import kotlinx.serialization.Serializable
 
@@ -30,7 +29,7 @@ fun Application.metaRoutes(
                     { error ->
                         call.respond(
                             HttpStatusCode.InternalServerError,
-                            ReleaseErrorResponse("Error retrieving release: ${error.cause.message}")
+                            ReleaseErrorResponse("Error retrieving release: ${error.message}")
                         )
                     },
                     { release ->
@@ -42,16 +41,7 @@ fun Application.metaRoutes(
 }
 
 @Serializable
-data class DetailedHealthResponse(val mongodb: String, val postgres: String, val reason: String? = null)
-
-@Serializable
 data class ReleaseResponse(val release: String)
 
 @Serializable
 data class ReleaseErrorResponse(val error: String)
-
-private val MetaError.cause: Throwable
-    get() =
-        when (this) {
-            is MetaError.MetaFileError -> cause
-        }

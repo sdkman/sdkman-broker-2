@@ -3,6 +3,7 @@ package io.sdkman.broker.domain
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
+import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
 import io.kotest.core.spec.style.ShouldSpec
@@ -10,8 +11,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.sdkman.broker.application.service.DatabaseHealthStatus
 import io.sdkman.broker.application.service.HealthCheckError
-import io.sdkman.broker.application.service.MetaHealthServiceImpl
 import io.sdkman.broker.application.service.HealthStatus
+import io.sdkman.broker.application.service.MetaHealthServiceImpl
 import io.sdkman.broker.domain.model.Application
 import io.sdkman.broker.domain.repository.ApplicationRepository
 import io.sdkman.broker.domain.repository.DatabaseFailure
@@ -21,12 +22,10 @@ import io.sdkman.broker.domain.repository.RepositoryError
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRight
 
-class HealthServiceSpec : ShouldSpec({
+class MetaHealthServiceSpec : ShouldSpec({
     val applicationOK =
-        Application.of("OK").fold(
-            { error -> throw IllegalStateException("Failed to create test application: $error") },
-            { it }
-        )
+        Application.of("OK")
+            .getOrElse { throw IllegalStateException("Failed to create test application: $it") }
 
     context("HealthServiceImpl with dual database checks") {
 

@@ -8,7 +8,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import io.sdkman.broker.application.service.MetaError
+import io.sdkman.broker.application.service.MetaReleaseError
 import io.sdkman.broker.application.service.MetaReleaseService
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.configureAppForTesting
@@ -47,8 +47,8 @@ class MetaReleaseEndpointAcceptanceSpec : ShouldSpec({
             // Using a service that can't find the file
             val mockService =
                 object : MetaReleaseService {
-                    override fun getReleaseVersion(): Either<MetaError, String> =
-                        MetaError.MetaFileError(
+                    override fun getReleaseVersion(): Either<MetaReleaseError, String> =
+                        MetaReleaseError(
                             IllegalStateException("Could not load release.properties")
                         ).left()
                 }

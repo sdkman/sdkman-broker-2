@@ -9,7 +9,7 @@ import arrow.core.toOption
 import java.util.Properties
 
 interface MetaReleaseService {
-    fun getReleaseVersion(): Either<MetaError, String>
+    fun getReleaseVersion(): Either<MetaReleaseError, String>
 }
 
 class MetaReleaseServiceImpl(
@@ -20,11 +20,11 @@ class MetaReleaseServiceImpl(
         private const val RELEASE_KEY = "release"
     }
 
-    override fun getReleaseVersion(): Either<MetaError, String> =
+    override fun getReleaseVersion(): Either<MetaReleaseError, String> =
         loadPropertiesFile()
             .flatMap { properties -> getReleaseFromProperties(properties) }
 
-    private fun loadPropertiesFile(): Either<MetaError, Properties> =
+    private fun loadPropertiesFile(): Either<MetaReleaseError, Properties> =
         Either.catch {
             val properties = Properties()
             classLoader.getResourceAsStream(RELEASE_PROPERTIES).toOption()
@@ -35,18 +35,19 @@ class MetaReleaseServiceImpl(
                         properties
                     }
                 )
-        }.mapLeft { MetaError.MetaFileError(it) }
+        }.mapLeft { MetaReleaseError(it) }
 
-    private fun getReleaseFromProperties(properties: Properties): Either<MetaError, String> =
+    private fun getReleaseFromProperties(properties: Properties): Either<MetaReleaseError, String> =
         properties.getProperty(RELEASE_KEY).toOption()
             .filter { it.isNotBlank() }
             .map { it.right() }
             .getOrElse {
-                MetaError.MetaFileError(IllegalStateException("Release property not found in $RELEASE_PROPERTIES"))
+                MetaReleaseError(IllegalStateException("Release property not found in $RELEASE_PROPERTIES"))
                     .left()
             }
 }
 
-sealed class MetaError {
-    data class MetaFileError(val cause: Throwable) : MetaError()
+class MetaReleaseError(e: Throwable) : Throwable(e) {
+    override val message: String
+        get() = super.message ?: "An error occurred while retrieving the release version."
 }

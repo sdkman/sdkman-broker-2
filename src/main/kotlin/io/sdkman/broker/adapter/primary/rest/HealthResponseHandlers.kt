@@ -6,6 +6,7 @@ import io.ktor.server.response.respond
 import io.sdkman.broker.application.service.DatabaseHealthStatus
 import io.sdkman.broker.application.service.HealthCheckError
 import io.sdkman.broker.application.service.HealthStatus
+import kotlinx.serialization.Serializable
 
 enum class DatabaseName(val displayName: String) {
     MONGODB("MongoDB"),
@@ -33,7 +34,8 @@ suspend fun ApplicationCall.handleDatabaseHealthStatus(databaseStatus: DatabaseH
     val overallHealthy = databaseStatus.mongodb == HealthStatus.UP && databaseStatus.postgres == HealthStatus.UP
     val statusCode = if (overallHealthy) HttpStatusCode.OK else HttpStatusCode.ServiceUnavailable
 
-    respond(statusCode, DetailedHealthResponse(mongoDbStatus, postgresStatus))
+    val reason = "Service is ${if (overallHealthy) "healthy" else "not healthy"}"
+    respond(statusCode, DetailedHealthResponse(mongoDbStatus, postgresStatus, reason))
 }
 
 suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
@@ -110,3 +112,6 @@ private fun createDatabaseErrorResponse(
             )
     }
 }
+
+@Serializable
+data class DetailedHealthResponse(val mongodb: String, val postgres: String, val reason: String)

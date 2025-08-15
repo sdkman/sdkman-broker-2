@@ -9,7 +9,7 @@ import io.sdkman.broker.support.beLeftAnd
 import io.sdkman.broker.support.shouldBeRight
 import java.io.ByteArrayInputStream
 
-class ReleaseServiceSpec : ShouldSpec({
+class MetaReleaseServiceSpec : ShouldSpec({
 
     should("successfully return release when properties file exists with valid release") {
         // given: a mocked classloader that returns a valid properties file
@@ -47,9 +47,9 @@ class ReleaseServiceSpec : ShouldSpec({
 
         // then: release file error is returned
         result should
-            beLeftAnd<MetaError, String> { error ->
-                error.shouldBeInstanceOf<MetaError.MetaFileError>()
-                error.cause.message?.contains("Release property not found") ?: false
+            beLeftAnd { error ->
+                error.shouldBeInstanceOf<MetaReleaseError>()
+                error.message.contains("Release property not found")
             }
     }
 
@@ -70,9 +70,9 @@ class ReleaseServiceSpec : ShouldSpec({
 
         // then: release file error is returned
         result should
-            beLeftAnd<MetaError, String> { error ->
-                error.shouldBeInstanceOf<MetaError.MetaFileError>()
-                error.cause.message?.contains("Release property not found") ?: false
+            beLeftAnd<MetaReleaseError, String> { error ->
+                error.shouldBeInstanceOf<MetaReleaseError>()
+                error.message.contains("Release property not found")
             }
     }
 
@@ -91,9 +91,9 @@ class ReleaseServiceSpec : ShouldSpec({
 
         // then: release file error is returned
         result should
-            beLeftAnd<MetaError, String> { error ->
-                error.shouldBeInstanceOf<MetaError.MetaFileError>()
-                error.cause.message?.contains("Could not load") ?: false
+            beLeftAnd { error ->
+                error.shouldBeInstanceOf<MetaReleaseError>()
+                error.message.contains("Could not load")
             }
     }
 })
