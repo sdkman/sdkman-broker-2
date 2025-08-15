@@ -16,10 +16,10 @@ import io.sdkman.broker.adapter.secondary.persistence.PostgresConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.application.service.CandidateDownloadService
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
-import io.sdkman.broker.application.service.HealthService
-import io.sdkman.broker.application.service.HealthServiceImpl
-import io.sdkman.broker.application.service.MetaService
-import io.sdkman.broker.application.service.MetaServiceImpl
+import io.sdkman.broker.application.service.MetaHealthService
+import io.sdkman.broker.application.service.MetaHealthServiceImpl
+import io.sdkman.broker.application.service.MetaReleaseService
+import io.sdkman.broker.application.service.MetaReleaseServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
@@ -48,8 +48,8 @@ object App {
         val auditRepository = PostgresAuditRepository(postgresDataSource)
 
         // Initialize services
-        val healthService = HealthServiceImpl(applicationRepository, postgresHealthRepository)
-        val releaseService = MetaServiceImpl()
+        val metaHealthService = MetaHealthServiceImpl(applicationRepository, postgresHealthRepository)
+        val metaReleaseService = MetaReleaseServiceImpl()
         val candidateDownloadService = CandidateDownloadServiceImpl(versionRepository, auditRepository)
         val sdkmanCliDownloadService = SdkmanCliDownloadServiceImpl()
         val sdkmanNativeDownloadService = SdkmanNativeDownloadServiceImpl()
@@ -57,8 +57,8 @@ object App {
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
             configureApp(
-                healthService,
-                releaseService,
+                metaHealthService,
+                metaReleaseService,
                 candidateDownloadService,
                 sdkmanCliDownloadService,
                 sdkmanNativeDownloadService
@@ -69,8 +69,8 @@ object App {
 
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.configureApp(
-    healthService: HealthService,
-    metaService: MetaService,
+    metaHealthService: MetaHealthService,
+    metaReleaseService: MetaReleaseService,
     candidateDownloadService: CandidateDownloadService,
     sdkmanCliDownloadService: SdkmanCliDownloadService,
     sdkmanNativeDownloadService: SdkmanNativeDownloadService
@@ -89,6 +89,6 @@ fun Application.configureApp(
     }
 
     // Configure routes
-    metaRoutes(healthService, metaService)
+    metaRoutes(metaHealthService, metaReleaseService)
     downloadRoutes(candidateDownloadService, sdkmanCliDownloadService, sdkmanNativeDownloadService)
 }

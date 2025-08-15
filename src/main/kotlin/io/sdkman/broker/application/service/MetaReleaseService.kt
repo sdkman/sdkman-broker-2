@@ -8,13 +8,13 @@ import arrow.core.right
 import arrow.core.toOption
 import java.util.Properties
 
-interface MetaService {
+interface MetaReleaseService {
     fun getReleaseVersion(): Either<MetaError, String>
 }
 
-class MetaServiceImpl(
-    private val classLoader: ClassLoader = MetaServiceImpl::class.java.classLoader
-) : MetaService {
+class MetaReleaseServiceImpl(
+    private val classLoader: ClassLoader = MetaReleaseServiceImpl::class.java.classLoader
+) : MetaReleaseService {
     companion object {
         private const val RELEASE_PROPERTIES = "release.properties"
         private const val RELEASE_KEY = "release"

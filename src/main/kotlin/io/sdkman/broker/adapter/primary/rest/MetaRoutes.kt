@@ -6,18 +6,18 @@ import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import io.sdkman.broker.application.service.HealthService
+import io.sdkman.broker.application.service.MetaHealthService
 import io.sdkman.broker.application.service.MetaError
-import io.sdkman.broker.application.service.MetaService
+import io.sdkman.broker.application.service.MetaReleaseService
 import kotlinx.serialization.Serializable
 
 fun Application.metaRoutes(
-    healthService: HealthService,
-    metaService: MetaService
+    metaHealthService: MetaHealthService,
+    metaReleaseService: MetaReleaseService
 ) {
     routing {
         get("/meta/health") {
-            healthService.checkHealth()
+            metaHealthService.checkHealth()
                 .fold(
                     { error -> call.handleHealthError(error) },
                     { databaseStatus -> call.handleDatabaseHealthStatus(databaseStatus) }
@@ -25,7 +25,7 @@ fun Application.metaRoutes(
         }
 
         get("/meta/release") {
-            metaService.getReleaseVersion()
+            metaReleaseService.getReleaseVersion()
                 .fold(
                     { error ->
                         call.respond(
@@ -40,9 +40,6 @@ fun Application.metaRoutes(
         }
     }
 }
-
-@Serializable
-data class HealthResponse(val status: String, val reason: String? = null)
 
 @Serializable
 data class DetailedHealthResponse(val mongodb: String, val postgres: String, val reason: String? = null)

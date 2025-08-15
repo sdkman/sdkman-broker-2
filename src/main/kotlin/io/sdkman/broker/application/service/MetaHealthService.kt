@@ -14,14 +14,14 @@ import io.sdkman.broker.domain.repository.DatabaseFailure
 import io.sdkman.broker.domain.repository.HealthRepository
 import io.sdkman.broker.domain.repository.convertToApplicationError
 
-interface HealthService {
+interface MetaHealthService {
     fun checkHealth(): Either<HealthCheckError, DatabaseHealthStatus>
 }
 
-class HealthServiceImpl(
+class MetaHealthServiceImpl(
     private val applicationRepository: ApplicationRepository,
     private val postgresHealthRepository: HealthRepository
-) : HealthService {
+) : MetaHealthService {
     override fun checkHealth(): Either<HealthCheckError, DatabaseHealthStatus> {
         val mongoHealthResult = checkMongoHealth()
         val postgresHealthResult = checkPostgresHealth()

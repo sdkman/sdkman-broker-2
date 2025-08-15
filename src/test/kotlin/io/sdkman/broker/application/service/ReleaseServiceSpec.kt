@@ -21,7 +21,7 @@ class ReleaseServiceSpec : ShouldSpec({
             mockClassLoader.getResourceAsStream("release.properties")
         } returns inputStream
 
-        val releaseService = MetaServiceImpl(mockClassLoader)
+        val releaseService = MetaReleaseServiceImpl(mockClassLoader)
 
         // when: getting the release
         val result = releaseService.getReleaseVersion()
@@ -40,7 +40,7 @@ class ReleaseServiceSpec : ShouldSpec({
             mockClassLoader.getResourceAsStream("release.properties")
         } returns inputStream
 
-        val releaseService = MetaServiceImpl(mockClassLoader)
+        val releaseService = MetaReleaseServiceImpl(mockClassLoader)
 
         // when: getting the release
         val result = releaseService.getReleaseVersion()
@@ -63,7 +63,7 @@ class ReleaseServiceSpec : ShouldSpec({
             mockClassLoader.getResourceAsStream("release.properties")
         } returns inputStream
 
-        val releaseService = MetaServiceImpl(mockClassLoader)
+        val releaseService = MetaReleaseServiceImpl(mockClassLoader)
 
         // when: getting the release
         val result = releaseService.getReleaseVersion()
@@ -84,7 +84,7 @@ class ReleaseServiceSpec : ShouldSpec({
             mockClassLoader.getResourceAsStream("release.properties")
         } returns null
 
-        val releaseService = MetaServiceImpl(mockClassLoader)
+        val releaseService = MetaReleaseServiceImpl(mockClassLoader)
 
         // when: getting the release
         val result = releaseService.getReleaseVersion()
