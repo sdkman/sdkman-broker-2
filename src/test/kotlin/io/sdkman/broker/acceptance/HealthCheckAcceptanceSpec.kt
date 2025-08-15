@@ -33,7 +33,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                     application {
                         configureAppForTesting(
                             TestDependencyInjection.healthService,
-                            TestDependencyInjection.releaseService,
+                            TestDependencyInjection.metaService,
                             TestDependencyInjection.versionService
                         )
                     }
@@ -58,7 +58,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                     application {
                         configureAppForTesting(
                             TestDependencyInjection.healthService,
-                            TestDependencyInjection.releaseService,
+                            TestDependencyInjection.metaService,
                             TestDependencyInjection.versionService
                         )
                     }
@@ -85,7 +85,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                     application {
                         configureAppForTesting(
                             TestDependencyInjection.healthService,
-                            TestDependencyInjection.releaseService,
+                            TestDependencyInjection.metaService,
                             TestDependencyInjection.versionService
                         )
                     }
@@ -109,7 +109,7 @@ class HealthCheckAcceptanceSpec : ShouldSpec() {
                     application {
                         configureAppForTesting(
                             TestDependencyInjection.healthServiceInvalidCredentials,
-                            TestDependencyInjection.releaseService,
+                            TestDependencyInjection.metaService,
                             TestDependencyInjection.versionService
                         )
                     }

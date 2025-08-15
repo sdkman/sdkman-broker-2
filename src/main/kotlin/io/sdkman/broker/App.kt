@@ -18,8 +18,8 @@ import io.sdkman.broker.application.service.CandidateDownloadService
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.HealthService
 import io.sdkman.broker.application.service.HealthServiceImpl
-import io.sdkman.broker.application.service.ReleaseService
-import io.sdkman.broker.application.service.ReleaseServiceImpl
+import io.sdkman.broker.application.service.MetaService
+import io.sdkman.broker.application.service.MetaServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
@@ -49,8 +49,8 @@ object App {
 
         // Initialize services
         val healthService = HealthServiceImpl(applicationRepository, postgresHealthRepository)
-        val releaseService = ReleaseServiceImpl()
-        val versionService = CandidateDownloadServiceImpl(versionRepository, auditRepository)
+        val releaseService = MetaServiceImpl()
+        val candidateDownloadService = CandidateDownloadServiceImpl(versionRepository, auditRepository)
         val sdkmanCliDownloadService = SdkmanCliDownloadServiceImpl()
         val sdkmanNativeDownloadService = SdkmanNativeDownloadServiceImpl()
 
@@ -59,7 +59,7 @@ object App {
             configureApp(
                 healthService,
                 releaseService,
-                versionService,
+                candidateDownloadService,
                 sdkmanCliDownloadService,
                 sdkmanNativeDownloadService
             )
@@ -70,7 +70,7 @@ object App {
 @OptIn(ExperimentalSerializationApi::class)
 fun Application.configureApp(
     healthService: HealthService,
-    releaseService: ReleaseService,
+    metaService: MetaService,
     candidateDownloadService: CandidateDownloadService,
     sdkmanCliDownloadService: SdkmanCliDownloadService,
     sdkmanNativeDownloadService: SdkmanNativeDownloadService
@@ -89,6 +89,6 @@ fun Application.configureApp(
     }
 
     // Configure routes
-    metaRoutes(healthService, releaseService)
+    metaRoutes(healthService, metaService)
     downloadRoutes(candidateDownloadService, sdkmanCliDownloadService, sdkmanNativeDownloadService)
 }
