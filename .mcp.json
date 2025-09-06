@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "gradle": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "/home/marco/mcp-servers/gradle-mcp-server/gradle-mcp-server-all.jar"
+      ],
+      "env": {}
+    },
+    "docker": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-docker@latest"
+      ]
+    }
+  }
+}
