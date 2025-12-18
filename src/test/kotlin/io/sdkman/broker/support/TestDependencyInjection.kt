@@ -1,5 +1,7 @@
 package io.sdkman.broker.support
 
+import arrow.core.Either
+import arrow.core.left
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
@@ -9,6 +11,9 @@ import io.sdkman.broker.application.service.MetaHealthServiceImpl
 import io.sdkman.broker.application.service.MetaReleaseServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
+import io.sdkman.broker.domain.model.Audit
+import io.sdkman.broker.domain.repository.AuditRepository
+import io.sdkman.broker.domain.repository.DatabaseFailure
 import javax.sql.DataSource
 
 // Dependency injection for tests
@@ -44,6 +49,13 @@ object TestDependencyInjection {
         PostgresAuditRepository(postgresDataSource)
     }
 
+    val failingAuditRepository by lazy {
+        object : AuditRepository {
+            override fun save(audit: Audit): Either<DatabaseFailure, Unit> =
+                DatabaseFailure.ConnectionFailure(RuntimeException()).left()
+        }
+    }
+
     val healthService by lazy {
         MetaHealthServiceImpl(applicationRepository, postgresHealthRepository)
     }
@@ -58,6 +70,10 @@ object TestDependencyInjection {
 
     val versionService by lazy {
         CandidateDownloadServiceImpl(versionRepository, auditRepository)
+    }
+
+    val versionServiceWithBrokenAuditRepo by lazy {
+        CandidateDownloadServiceImpl(versionRepository, failingAuditRepository)
     }
 
     val sdkmanCliDownloadService by lazy {

@@ -248,4 +248,39 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
             savedRecord.shouldBeNone()
         }
     }
+
+    should("NOT fail version download request if audit fails") {
+        setupVersion(
+            Version(
+                candidate = "kotlin",
+                version = "1.6.0",
+                platform = "UNIVERSAL",
+                url =
+                    "https://github.com/JetBrains/kotlin/releases/" +
+                        "download/v1.6.0/kotlin-compiler-1.6.0.zip",
+                distribution = None,
+                visible = true
+            )
+        )
+
+        testApplication {
+            application {
+                configureAppForTesting(
+                    TestDependencyInjection.healthService,
+                    TestDependencyInjection.metaService,
+                    TestDependencyInjection.versionServiceWithBrokenAuditRepo
+                )
+            }
+
+            val client = createClient { followRedirects = false }
+
+            val response =
+                client.get("/download/kotlin/1.6.0/linuxx64") {
+                    header("X-Real-IP", "10.0.0.1")
+                    header("User-Agent", "TestClient/1.0")
+                }
+
+            response.status shouldBe HttpStatusCode.Found
+        }
+    }
 })
