@@ -76,8 +76,8 @@ class CandidateDownloadServiceSpec : ShouldSpec({
             command shouldBe "install"
             version shouldBe "17.0.2"
             candidate shouldBe "java"
-            platform shouldBe "MAC_ARM64"
-            dist shouldBe "MAC_ARM64"
+            clientPlatform shouldBe "MAC_ARM64"
+            candidatePlatform shouldBe "MAC_ARM64"
             distribution shouldBe "tem".some()
             host shouldBe testAuditContext.host
             agent shouldBe testAuditContext.agent
@@ -120,8 +120,8 @@ class CandidateDownloadServiceSpec : ShouldSpec({
             command shouldBe "install"
             candidate shouldBe "groovy"
             version shouldBe "4.0.0"
-            platform shouldBe "LINUX_X64"
-            dist shouldBe "UNIVERSAL"
+            clientPlatform shouldBe "LINUX_X64"
+            candidatePlatform shouldBe "UNIVERSAL"
             distribution shouldBe none()
             host shouldBe testAuditContext.host
             agent shouldBe testAuditContext.agent

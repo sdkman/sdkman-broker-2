@@ -32,7 +32,7 @@ object PostgresTestSupport {
                 val baseCondition =
                     (AuditTable.candidate eq candidate) and
                         (AuditTable.version eq version) and
-                        (AuditTable.platform eq platform)
+                        (AuditTable.clientPlatform eq platform)
 
                 vendor.fold(
                     ifEmpty = { baseCondition },

@@ -19,11 +19,11 @@ object AuditTable : Table("audit") {
     val command: Column<String> = text("command")
     val candidate: Column<String> = text("candidate")
     val version: Column<String> = text("version")
-    val platform: Column<String> = text("platform")
+    val clientPlatform: Column<String> = text("client_platform")
+    val candidatePlatform: Column<String> = text("candidate_platform")
     val distribution: Column<String?> = text("distribution").nullable()
     val host: Column<String?> = text("host").nullable()
     val agent: Column<String?> = text("agent").nullable()
-    val dist: Column<String> = text("dist")
     val timestamp = timestamp("timestamp")
 
     override val primaryKey = PrimaryKey(id)
@@ -41,11 +41,11 @@ class PostgresAuditRepository(private val dataSource: DataSource) : AuditReposit
                     it[command] = audit.command
                     it[candidate] = audit.candidate
                     it[version] = audit.version
-                    it[platform] = audit.platform
+                    it[clientPlatform] = audit.clientPlatform
+                    it[candidatePlatform] = audit.candidatePlatform
                     it[distribution] = audit.distribution.getOrNull()
                     it[host] = audit.host.getOrNull()
                     it[agent] = audit.agent.getOrNull()
-                    it[dist] = audit.dist
                     it[timestamp] = audit.timestamp
                 }
                 Unit

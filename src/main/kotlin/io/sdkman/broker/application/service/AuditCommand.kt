@@ -23,17 +23,17 @@ data class AuditCommand(
                 versionEntity.distribution
                     .map { vendor -> versionEntity.version.removeSuffix("-$vendor") }
                     .getOrElse { versionEntity.version },
-            platform = clientPlatform.auditId,
-            dist = versionEntity.resolveTargetPlatform(clientPlatform).auditId,
+            clientPlatform = clientPlatform.auditId,
+            candidatePlatform = versionEntity.resolveCandidatePlatformFor(clientPlatform).auditId,
             distribution = versionEntity.distribution,
             host = auditContext.host,
             agent = auditContext.agent,
             timestamp = Clock.System.now()
         )
 
-    private fun Version.resolveTargetPlatform(sourcePlatform: Platform): Platform =
+    private fun Version.resolveCandidatePlatformFor(clientPlatform: Platform): Platform =
         when (this.platform) {
             Platform.Universal.persistentId -> Platform.Universal
-            else -> sourcePlatform
+            else -> clientPlatform
         }
 }
