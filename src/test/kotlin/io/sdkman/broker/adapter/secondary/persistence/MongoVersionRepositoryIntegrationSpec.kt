@@ -23,7 +23,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
                 version = "17.0.2-tem",
                 platform = "MAC_ARM64",
                 url = "https://example.com/java-17.0.2-arm64.tar.gz",
-                vendor = Some("tem"),
+                distribution = Some("tem"),
                 visible = true,
                 checksums = mapOf("SHA-256" to "abc123")
             )
@@ -41,7 +41,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
                         version = "17.0.2-tem",
                         platform = "MAC_ARM64",
                         url = "https://example.com/java-17.0.2-arm64.tar.gz",
-                        vendor = Some("tem"),
+                        distribution = Some("tem"),
                         visible = true,
                         checksums = mapOf("SHA-256" to "abc123")
                     )
@@ -69,7 +69,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
                 version = "11.0.2-tem",
                 platform = "LINUX_64",
                 url = "https://example.com/java-11.0.2.tar.gz",
-                vendor = None
+                distribution = None
             )
         )
 
@@ -90,7 +90,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
                 version = "17.0.2-tem",
                 platform = "WINDOWS_64",
                 url = "https://example.com/java-17.0.2-windows.zip",
-                vendor = None
+                distribution = None
             )
         )
 
@@ -111,7 +111,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
                 version = "4.0.0",
                 platform = "UNIVERSAL",
                 url = "https://example.com/groovy-4.0.0.zip",
-                vendor = None,
+                distribution = None,
                 visible = true
             )
         )
@@ -123,7 +123,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
         result shouldBeRightAnd { versionOption ->
             versionOption.fold(
                 { fail("version field should not be empty") },
-                { it.vendor.isNone() }
+                { it.distribution.isNone() }
             )
         }
     }
@@ -136,7 +136,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
                 version = "1.5.31",
                 platform = "UNIVERSAL",
                 url = "https://example.com/kotlin-1.5.31.zip",
-                vendor = None
+                distribution = None
             )
         )
 
@@ -160,7 +160,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
                 version = "7.0",
                 platform = "UNIVERSAL",
                 url = "https://example.com/gradle-7.0.zip",
-                vendor = None
+                distribution = None
             )
         )
 
@@ -184,7 +184,7 @@ class MongoVersionRepositoryIntegrationSpec : ShouldSpec({
                 version = "3.8.1",
                 platform = "UNIVERSAL",
                 url = "https://example.com/maven-3.8.1.tar.gz",
-                vendor = None,
+                distribution = None,
                 checksums =
                     mapOf(
                         "SHA-256" to "sha256value",

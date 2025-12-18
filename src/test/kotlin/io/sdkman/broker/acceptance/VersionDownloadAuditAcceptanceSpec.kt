@@ -36,7 +36,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 url =
                     "https://github.com/adoptium/temurin17-binaries/releases/" +
                         "download/jdk-17.0.2%2B8/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.2_8.tar.gz",
-                vendor = Some("tem"),
+                distribution = Some("tem"),
                 visible = true,
                 checksums = mapOf("SHA-256" to "abc123def456")
             )
@@ -75,7 +75,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 record[AuditTable.version] shouldBe "17.0.2"
                 record[AuditTable.platform] shouldBe "MAC_ARM64"
                 record[AuditTable.dist] shouldBe "MAC_ARM64"
-                record[AuditTable.vendor] shouldBe "tem"
+                record[AuditTable.distribution] shouldBe "tem"
                 record[AuditTable.host] shouldBe "203.0.113.195"
                 record[AuditTable.agent] shouldBe "curl/7.68.0"
                 record[AuditTable.timestamp] shouldNotBe null
@@ -93,7 +93,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 url =
                     "https://groovy.jfrog.io/artifactory/dist-release-local/" +
                         "groovy-zips/apache-groovy-binary-4.0.0.zip",
-                vendor = None,
+                distribution = None,
                 visible = true,
                 checksums = mapOf("SHA-256" to "def456ghi789", "MD5" to "ghi789jkl012")
             )
@@ -132,7 +132,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 record[AuditTable.version] shouldBe "4.0.0"
                 record[AuditTable.platform] shouldBe "LINUX_X64"
                 record[AuditTable.dist] shouldBe "UNIVERSAL"
-                record[AuditTable.vendor] shouldBe null
+                record[AuditTable.distribution] shouldBe null
                 record[AuditTable.host] shouldBe "192.168.1.100"
                 record[AuditTable.agent] shouldBe "SDKMAN/5.19.0"
                 record[AuditTable.timestamp] shouldNotBe null
@@ -150,7 +150,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                 url =
                     "https://github.com/JetBrains/kotlin/releases/" +
                         "download/v1.6.0/kotlin-compiler-1.6.0.zip",
-                vendor = None,
+                distribution = None,
                 visible = true
             )
         )
@@ -242,7 +242,7 @@ class VersionDownloadAuditAcceptanceSpec : ShouldSpec({
                     database = database,
                     candidate = "java",
                     version = "17.0.2-tem",
-                    platform = "invalidplatform"
+                    platform = "INVALID_PLATFORM"
                 )
 
             savedRecord.shouldBeNone()

@@ -1,7 +1,6 @@
 package io.sdkman.broker.adapter.secondary.persistence
 
 import arrow.core.Either
-import arrow.core.getOrElse
 import io.sdkman.broker.domain.model.Audit
 import io.sdkman.broker.domain.repository.AuditRepository
 import io.sdkman.broker.domain.repository.DatabaseFailure
@@ -21,7 +20,7 @@ object AuditTable : Table("audit") {
     val candidate: Column<String> = text("candidate")
     val version: Column<String> = text("version")
     val platform: Column<String> = text("platform")
-    val vendor: Column<String?> = text("vendor").nullable()
+    val distribution: Column<String?> = text("distribution").nullable()
     val host: Column<String?> = text("host").nullable()
     val agent: Column<String?> = text("agent").nullable()
     val dist: Column<String> = text("dist")
@@ -43,9 +42,9 @@ class PostgresAuditRepository(private val dataSource: DataSource) : AuditReposit
                     it[candidate] = audit.candidate
                     it[version] = audit.version
                     it[platform] = audit.platform
-                    it[vendor] = audit.vendor.getOrElse { null }
-                    it[host] = audit.host.getOrElse { null }
-                    it[agent] = audit.agent.getOrElse { null }
+                    it[distribution] = audit.distribution.getOrNull()
+                    it[host] = audit.host.getOrNull()
+                    it[agent] = audit.agent.getOrNull()
                     it[dist] = audit.dist
                     it[timestamp] = audit.timestamp
                 }

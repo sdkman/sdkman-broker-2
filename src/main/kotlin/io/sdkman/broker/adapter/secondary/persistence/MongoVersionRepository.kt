@@ -71,7 +71,7 @@ private fun Document.toVersion(): Version {
         version = this.getString(VERSION_FIELD),
         platform = this.getString(PLATFORM_FIELD),
         url = this.getString(URL_FIELD),
-        vendor = this.getString(VENDOR_FIELD).toOption(),
+        distribution = this.getString(VENDOR_FIELD).toOption(),
         visible = this.getBoolean(VISIBLE_FIELD).toOption().getOrElse { true },
         checksums = checksums
     )

@@ -7,7 +7,7 @@ CREATE TABLE audit (
     version TEXT NOT NULL,
     platform TEXT NOT NULL,
     dist TEXT NOT NULL,
-    vendor TEXT NULL,
+    distribution TEXT NULL,
     host TEXT NULL,
     agent TEXT NULL,
     timestamp TIMESTAMP NOT NULL

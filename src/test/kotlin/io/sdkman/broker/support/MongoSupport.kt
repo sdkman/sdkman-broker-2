@@ -12,7 +12,7 @@ object MongoSupport {
                 put("version", version.version)
                 put("platform", version.platform)
                 put("url", version.url)
-                version.vendor.map { put("vendor", it) }
+                version.distribution.map { put("vendor", it) }
                 put("visible", version.visible)
                 if (version.checksums.isNotEmpty()) {
                     put("checksums", Document(version.checksums))

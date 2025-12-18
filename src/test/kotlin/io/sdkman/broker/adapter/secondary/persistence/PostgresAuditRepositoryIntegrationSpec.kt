@@ -36,7 +36,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
                     candidate = "java",
                     version = "17.0.2-open",
                     platform = "linuxx64",
-                    vendor = Some("openjdk"),
+                    distribution = Some("openjdk"),
                     host = Some("test-host"),
                     agent = Some("test-agent"),
                     dist = "LINUX_X64",
@@ -55,7 +55,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
                 record[AuditTable.candidate] shouldBe audit.candidate
                 record[AuditTable.version] shouldBe audit.version
                 record[AuditTable.platform] shouldBe audit.platform
-                record[AuditTable.vendor] shouldBe audit.vendor.getOrNull()
+                record[AuditTable.distribution] shouldBe audit.distribution.getOrNull()
                 record[AuditTable.host] shouldBe audit.host.getOrNull()
                 record[AuditTable.agent] shouldBe audit.agent.getOrNull()
                 record[AuditTable.dist] shouldBe audit.dist
@@ -71,7 +71,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
                     candidate = "java",
                     version = "17.0.2-open",
                     platform = "linux64",
-                    vendor = None,
+                    distribution = None,
                     host = Some("test-host"),
                     agent = Some("test-agent"),
                     dist = "test-dist",
@@ -86,7 +86,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
             val savedRecord = PostgresTestSupport.readSavedAuditRecord(database, auditId)
 
             savedRecord shouldBeSomeAnd { record ->
-                record[AuditTable.vendor] shouldBe null
+                record[AuditTable.distribution] shouldBe null
             }
         }
 
@@ -99,7 +99,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
                     candidate = "java",
                     version = "17.0.2-open",
                     platform = "linux64",
-                    vendor = Some("openjdk"),
+                    distribution = Some("openjdk"),
                     host = None,
                     agent = Some("test-agent"),
                     dist = "test-dist",
@@ -126,7 +126,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
                     candidate = "java",
                     version = "17.0.2-open",
                     platform = "linux64",
-                    vendor = Some("openjdk"),
+                    distribution = Some("openjdk"),
                     host = Some("test-host"),
                     agent = None,
                     dist = "test-dist",
@@ -152,7 +152,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
                     candidate = "kotlin",
                     version = "1.9.22",
                     platform = "linux64",
-                    vendor = Some("jetbrains"),
+                    distribution = Some("jetbrains"),
                     host = Some("test-host"),
                     agent = Some("test-agent"),
                     dist = "test-dist",
@@ -192,7 +192,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
                     candidate = "java",
                     version = "17.0.2-open",
                     platform = "linux64",
-                    vendor = None,
+                    distribution = None,
                     host = Some("test-host"),
                     agent = Some("test-agent"),
                     dist = "test-dist",
@@ -219,7 +219,7 @@ class PostgresAuditRepositoryIntegrationSpec : ShouldSpec({
                     candidate = "java",
                     version = "17.0.2-open",
                     platform = "linux64",
-                    vendor = None,
+                    distribution = None,
                     host = Some("test-host"),
                     agent = Some("test-agent"),
                     dist = "test-dist",

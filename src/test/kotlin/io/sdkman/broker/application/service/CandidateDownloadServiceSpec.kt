@@ -46,7 +46,7 @@ class CandidateDownloadServiceSpec : ShouldSpec({
                 version = "17.0.2-tem",
                 platform = "MAC_ARM64",
                 url = "https://example.com/java-17.0.2-arm64.tar.gz",
-                vendor = Some("tem"),
+                distribution = Some("tem"),
                 checksums = mapOf("SHA-256" to "abc123")
             )
 
@@ -78,7 +78,7 @@ class CandidateDownloadServiceSpec : ShouldSpec({
             candidate shouldBe "java"
             platform shouldBe "MAC_ARM64"
             dist shouldBe "MAC_ARM64"
-            vendor shouldBe "tem".some()
+            distribution shouldBe "tem".some()
             host shouldBe testAuditContext.host
             agent shouldBe testAuditContext.agent
         }
@@ -122,7 +122,7 @@ class CandidateDownloadServiceSpec : ShouldSpec({
             version shouldBe "4.0.0"
             platform shouldBe "LINUX_X64"
             dist shouldBe "UNIVERSAL"
-            vendor shouldBe none()
+            distribution shouldBe none()
             host shouldBe testAuditContext.host
             agent shouldBe testAuditContext.agent
         }

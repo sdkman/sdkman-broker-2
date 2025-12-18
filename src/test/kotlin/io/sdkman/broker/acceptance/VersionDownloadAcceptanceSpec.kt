@@ -28,7 +28,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
                 url =
                     "https://github.com/adoptium/temurin17-binaries/releases/" +
                         "download/jdk-17.0.2%2B8/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.2_8.tar.gz",
-                vendor = Some("tem"),
+                distribution = Some("tem"),
                 visible = true,
                 checksums = mapOf("SHA-256" to "abc123def456")
             )
@@ -68,7 +68,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
                 url =
                     "https://groovy.jfrog.io/artifactory/dist-release-local/" +
                         "groovy-zips/apache-groovy-binary-4.0.0.zip",
-                vendor = None,
+                distribution = None,
                 visible = true,
                 checksums = mapOf("SHA-256" to "def456ghi789", "MD5" to "ghi789jkl012")
             )
@@ -142,7 +142,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
                 version = "17.0.2-tem",
                 platform = "MAC_ARM64",
                 url = "https://example.com/java-17.0.2.tar.gz",
-                vendor = Some("tem")
+                distribution = Some("tem")
             )
         )
 
@@ -171,7 +171,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
                 version = "17.0.2-tem",
                 platform = "MAC_ARM64",
                 url = "https://example.com/java-arm64.tar.gz",
-                vendor = Some("tem")
+                distribution = Some("tem")
             )
         )
 
@@ -200,7 +200,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
                 version = "1.5.31",
                 platform = "UNIVERSAL",
                 url = "https://github.com/JetBrains/kotlin/releases/download/v1.5.31/kotlin-compiler-1.5.31.zip",
-                vendor = None,
+                distribution = None,
                 checksums =
                     mapOf(
                         "SHA-256" to "sha256value",
@@ -243,7 +243,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
                 version = "7.0",
                 platform = "UNIVERSAL",
                 url = "https://services.gradle.org/distributions/gradle-7.0-bin.zip",
-                vendor = None
+                distribution = None
             )
         )
 
@@ -253,7 +253,7 @@ class VersionDownloadAcceptanceSpec : ShouldSpec({
                 version = "3.8.1",
                 platform = "UNIVERSAL",
                 url = "https://apache.org/dist/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz",
-                vendor = None
+                distribution = None
             )
         )
 

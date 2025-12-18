@@ -20,20 +20,20 @@ data class AuditCommand(
             command = "install",
             candidate = versionEntity.candidate,
             version =
-                versionEntity.vendor
+                versionEntity.distribution
                     .map { vendor -> versionEntity.version.removeSuffix("-$vendor") }
                     .getOrElse { versionEntity.version },
             platform = clientPlatform.auditId,
-            dist = versionEntity.resolveActualDistribution(clientPlatform),
-            vendor = versionEntity.vendor,
+            dist = versionEntity.resolveTargetPlatform(clientPlatform).auditId,
+            distribution = versionEntity.distribution,
             host = auditContext.host,
             agent = auditContext.agent,
             timestamp = Clock.System.now()
         )
 
-    private fun Version.resolveActualDistribution(sourcePlatform: Platform): String =
+    private fun Version.resolveTargetPlatform(sourcePlatform: Platform): Platform =
         when (this.platform) {
-            Platform.Universal.persistentId -> Platform.Universal.auditId
-            else -> sourcePlatform.auditId
+            Platform.Universal.persistentId -> Platform.Universal
+            else -> sourcePlatform
         }
 }

@@ -36,7 +36,7 @@ object PostgresTestSupport {
 
                 vendor.fold(
                     ifEmpty = { baseCondition },
-                    ifSome = { vendorValue -> baseCondition and (AuditTable.vendor eq vendorValue) }
+                    ifSome = { vendorValue -> baseCondition and (AuditTable.distribution eq vendorValue) }
                 )
             }.singleOrNull().toOption()
         }

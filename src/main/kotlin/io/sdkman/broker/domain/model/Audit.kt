@@ -11,7 +11,7 @@ data class Audit(
     val version: String,
     val platform: String,
     val dist: String,
-    val vendor: Option<String>,
+    val distribution: Option<String>,
     val host: Option<String>,
     val agent: Option<String>,
     val timestamp: Instant
