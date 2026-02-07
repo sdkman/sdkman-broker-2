@@ -13,6 +13,8 @@ sealed class Platform(val code: String, val persistentId: String, val auditId: S
 
     data object LinuxARM32SF : Platform("linuxarm32sf", "LINUX_ARM32SF", "LINUX_ARM32SF")
 
+    data object LinuxRISCV64 : Platform("linuxriscv64", "LINUX_RISCV64", "LINUX_RISCV64")
+
     data object DarwinX64 : Platform("darwinx64", "MAC_OSX", "MAC_X64")
 
     data object DarwinARM64 : Platform("darwinarm64", "MAC_ARM64", "MAC_ARM64")
@@ -31,6 +33,7 @@ sealed class Platform(val code: String, val persistentId: String, val auditId: S
                 "linuxx32" to LinuxX32,
                 "linuxarm32hf" to LinuxARM32HF,
                 "linuxarm32sf" to LinuxARM32SF,
+                "linuxriscv64" to LinuxRISCV64,
                 "darwinx64" to DarwinX64,
                 "darwinarm64" to DarwinARM64,
                 "windowsx64" to WindowsX64,
