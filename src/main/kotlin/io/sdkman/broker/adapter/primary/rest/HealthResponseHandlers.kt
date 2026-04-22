@@ -1,5 +1,8 @@
 package io.sdkman.broker.adapter.primary.rest
 
+import arrow.core.Option
+import arrow.core.getOrElse
+import arrow.core.toOption
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.response.respond
@@ -41,41 +44,41 @@ suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
     val response =
         when (error) {
             is HealthCheckError.DatabaseUnavailable -> {
-                createDatabaseErrorResponse(error.database, error.cause.message)
+                createDatabaseErrorResponse(error.database, error.cause.message.toOption())
             }
             is HealthCheckError.DatabaseError -> {
-                createDatabaseErrorResponse(error.database, error.cause.message)
+                createDatabaseErrorResponse(error.database, error.cause.message.toOption())
             }
             is HealthCheckError.ApplicationNotFound -> {
-                DetailedHealthResponse(
+                DetailedHealthErrorResponse(
                     DatabaseStatus.DOWN.status,
                     DatabaseStatus.UP.status,
                     "Application record not found"
                 )
             }
             is HealthCheckError.InvalidApplicationState -> {
-                DetailedHealthResponse(
+                DetailedHealthErrorResponse(
                     DatabaseStatus.DOWN.status,
                     DatabaseStatus.UP.status,
                     "Application in invalid state"
                 )
             }
             is HealthCheckError.MongoDatabaseUnavailable -> {
-                DetailedHealthResponse(
+                DetailedHealthErrorResponse(
                     DatabaseStatus.DOWN.status,
                     DatabaseStatus.UP.status,
                     "MongoDB unavailable"
                 )
             }
             is HealthCheckError.PostgresDatabaseUnavailable -> {
-                DetailedHealthResponse(
+                DetailedHealthErrorResponse(
                     DatabaseStatus.UP.status,
                     DatabaseStatus.DOWN.status,
                     "PostgreSQL unavailable"
                 )
             }
             is HealthCheckError.BothDatabasesUnavailable -> {
-                DetailedHealthResponse(
+                DetailedHealthErrorResponse(
                     DatabaseStatus.DOWN.status,
                     DatabaseStatus.DOWN.status,
                     "Both databases unavailable"
@@ -87,24 +90,24 @@ suspend fun ApplicationCall.handleHealthError(error: HealthCheckError) {
 
 private fun createDatabaseErrorResponse(
     database: String,
-    message: String?
-): DetailedHealthResponse {
-    val errorMessage = message ?: "Unknown error"
+    message: Option<String>
+): DetailedHealthErrorResponse {
+    val errorMessage = message.getOrElse { "Unknown error" }
     return when (database) {
         DatabaseName.MONGODB.displayName ->
-            DetailedHealthResponse(
+            DetailedHealthErrorResponse(
                 DatabaseStatus.DOWN.status,
                 DatabaseStatus.UP.status,
                 "${DatabaseName.MONGODB.displayName} error: $errorMessage"
             )
         DatabaseName.POSTGRESQL.displayName ->
-            DetailedHealthResponse(
+            DetailedHealthErrorResponse(
                 DatabaseStatus.UP.status,
                 DatabaseStatus.DOWN.status,
                 "${DatabaseName.POSTGRESQL.displayName} error: $errorMessage"
             )
         else ->
-            DetailedHealthResponse(
+            DetailedHealthErrorResponse(
                 DatabaseStatus.DOWN.status,
                 DatabaseStatus.DOWN.status,
                 "Database error: $errorMessage"
@@ -113,4 +116,7 @@ private fun createDatabaseErrorResponse(
 }
 
 @Serializable
-data class DetailedHealthResponse(val mongodb: String, val postgres: String, val reason: String? = null)
+data class DetailedHealthResponse(val mongodb: String, val postgres: String)
+
+@Serializable
+data class DetailedHealthErrorResponse(val mongodb: String, val postgres: String, val reason: String)
