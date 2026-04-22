@@ -4,8 +4,8 @@ plugins {
     application
     id("pl.allegro.tech.build.axion-release") version "1.18.18"
     id("com.google.cloud.tools.jib") version "3.4.1"
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
-    id("io.gitlab.arturbosch.detekt") version "1.23.4"
+    id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
 }
 
 group = "io.sdkman"
@@ -46,6 +46,7 @@ tasks.processResources {
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 // Define versions for dependencies to ensure compatibility
@@ -92,6 +93,9 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.9")
     testImplementation("org.flywaydb:flyway-core:11.10.2")
     testImplementation("org.flywaydb:flyway-database-postgresql:11.10.2")
+
+    detektPlugins("com.github.marc0der:detekt-rules:1.0.1")
+    compileOnly("com.github.marc0der:detekt-rules:1.0.1")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -135,38 +139,15 @@ jib {
     }
 }
 
-// Configure ktlint
 ktlint {
-    version.set("1.0.1")
-    verbose.set(true)
-    android.set(false)
-    outputToConsole.set(true)
-    ignoreFailures.set(false)
-    filter {
-        exclude("**/generated/**")
-        include("**/kotlin/**")
-    }
+    version.set("1.5.0")
 }
 
-// Configure Detekt
 detekt {
-    config.setFrom(files("$projectDir/config/detekt/detekt.yml"))
     buildUponDefaultConfig = true
-    allRules = false
-    autoCorrect = true
-    baseline = file("$projectDir/config/detekt/baseline.xml")
+    config.setFrom(files("$projectDir/detekt.yml"))
 }
 
-tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-    reports {
-        html.required.set(true)
-        xml.required.set(true)
-        txt.required.set(true)
-        sarif.required.set(true)
-    }
-}
-
-tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
-    jvmTarget = "21"
-    baseline.set(file("$projectDir/config/detekt/baseline.xml"))
+tasks.named("check") {
+    dependsOn("ktlintCheck")
 }
