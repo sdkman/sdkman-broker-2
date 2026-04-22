@@ -33,7 +33,8 @@ class PostgresHealthRepository(private val dataSource: DataSource) : HealthRepos
                 statement.executeQuery().use { resultSet ->
                     when {
                         resultSet.isHealthCheckSuccessful() -> Unit
-                        else -> throw RuntimeException("PostgreSQL health check query did not return expected result")
+                        else ->
+                        throw IllegalStateException("PostgreSQL health check query did not return expected result")
                     }
                 }
             }

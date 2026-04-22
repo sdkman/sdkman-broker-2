@@ -23,7 +23,7 @@ class MongoConnectivity(private val config: AppConfig) {
         return result.fold(
             { exception ->
                 logger.error("Failed to connect to MongoDB: ${exception.message}", exception)
-                throw RuntimeException("Failed to connect to MongoDB", exception)
+                throw IllegalStateException("Failed to connect to MongoDB", exception)
             },
             { database -> database }
         )
