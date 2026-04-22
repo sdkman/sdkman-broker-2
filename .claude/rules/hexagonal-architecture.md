@@ -114,9 +114,9 @@ class CandidateService {
 
 ## Related Rules
 
-- rules/ddd-rules.md - Domain modeling complements hexagonal structure
-- rules/kotlin-rules.md - Language-specific implementation patterns
-- rules/kotest-rules.md - Testing approaches for isolated domain logic
+- rules/domain-driven-design.md - Domain modeling complements hexagonal structure
+- rules/kotlin.md - Language-specific implementation patterns
+- rules/kotest.md - Testing approaches for isolated domain logic
 
 ## References
 
