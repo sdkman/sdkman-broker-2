@@ -6,7 +6,6 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
 import io.sdkman.broker.config.AppConfig
 import org.junit.jupiter.api.Tag
 
@@ -22,6 +21,7 @@ class MongoConnectivitySpec :
             every { config.mongodbDatabase } returns "sdkman"
             every { config.mongodbUsername } returns None
             every { config.mongodbPassword } returns None
+            every { config.mongodbAuthMechanism } returns None
 
             val connectivity = MongoConnectivity(config)
 
@@ -40,6 +40,7 @@ class MongoConnectivitySpec :
             every { config.mongodbDatabase } returns "sdkman"
             every { config.mongodbUsername } returns None
             every { config.mongodbPassword } returns None
+            every { config.mongodbAuthMechanism } returns None
 
             val connectivity = MongoConnectivity(config)
 
@@ -58,6 +59,7 @@ class MongoConnectivitySpec :
             every { config.mongodbDatabase } returns "sdkman"
             every { config.mongodbUsername } returns Some("broker")
             every { config.mongodbPassword } returns Some("password123")
+            every { config.mongodbAuthMechanism } returns None
 
             val connectivity = MongoConnectivity(config)
 
@@ -68,7 +70,7 @@ class MongoConnectivitySpec :
             connectionString shouldBe "mongodb://broker:password123@localhost:27017/sdkman"
         }
 
-        should("add auth mechanism for non-localhost production environments") {
+        should("append auth mechanism when configured alongside credentials") {
             // given
             val config = mockk<AppConfig>()
             every { config.mongodbHost } returns "mongo.sdkman.io"
@@ -76,10 +78,9 @@ class MongoConnectivitySpec :
             every { config.mongodbDatabase } returns "sdkman"
             every { config.mongodbUsername } returns Some("broker")
             every { config.mongodbPassword } returns Some("password123")
+            every { config.mongodbAuthMechanism } returns Some("SCRAM-SHA-1")
 
-            // Create a spy of MongoConnectivity to override the isProductionEnvironment method
-            val connectivity = spyk(MongoConnectivity(config))
-            every { connectivity.isProductionEnvironment(any()) } returns true
+            val connectivity = MongoConnectivity(config)
 
             // when
             val connectionString = connectivity.buildConnectionString()

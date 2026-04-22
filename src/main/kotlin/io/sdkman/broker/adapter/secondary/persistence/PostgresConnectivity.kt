@@ -1,8 +1,6 @@
 package io.sdkman.broker.adapter.secondary.persistence
 
 import arrow.core.Either
-import arrow.core.Option
-import arrow.core.getOrElse
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.sdkman.broker.config.AppConfig
@@ -32,23 +30,8 @@ class PostgresConnectivity(
     }
 
     fun buildConnectionString(): String {
-        val host = config.postgresHost
-        val port = config.postgresPort
-        val database = config.postgresDatabase
-        val simpleConnectionString = "jdbc:postgresql://$host:$port/$database"
-
-        if (!isProductionEnvironment(host)) {
-            return simpleConnectionString
-        }
-
-        val credentialConnectionString: Option<String> =
-            config.postgresUsername.flatMap { username ->
-                config.postgresPassword.map { password ->
-                    "jdbc:postgresql://$host:$port/$database?user=$username&password=$password&sslmode=require"
-                }
-            }
-
-        return credentialConnectionString.getOrElse { simpleConnectionString }
+        val base = "jdbc:postgresql://${config.postgresHost}:${config.postgresPort}/${config.postgresDatabase}"
+        return if (config.postgresSslMode == SSL_MODE_DISABLE) base else "$base?sslmode=${config.postgresSslMode}"
     }
 
     private fun createDataSource(connectionString: String): DataSource =
@@ -65,5 +48,7 @@ class PostgresConnectivity(
             HikariDataSource(this)
         }
 
-    fun isProductionEnvironment(host: String): Boolean = host != "localhost" && host != "127.0.0.1"
+    companion object {
+        private const val SSL_MODE_DISABLE = "disable"
+    }
 }
