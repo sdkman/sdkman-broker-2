@@ -1,10 +1,9 @@
 package io.sdkman.broker.support
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import io.kotest.core.listeners.TestListener
 import io.kotest.core.spec.Spec
 import org.flywaydb.core.Flyway
+import org.postgresql.ds.PGSimpleDataSource
 import org.testcontainers.containers.PostgreSQLContainer
 import javax.sql.DataSource
 
@@ -84,12 +83,9 @@ object PostgresTestListener : TestListener {
         username: String,
         password: String
     ): DataSource =
-        HikariDataSource(
-            HikariConfig().apply {
-                this.jdbcUrl = jdbcUrl
-                this.username = username
-                this.password = password
-                driverClassName = "org.postgresql.Driver"
-            }
-        )
+        PGSimpleDataSource().apply {
+            setURL(jdbcUrl)
+            this.user = username
+            this.password = password
+        }
 }
