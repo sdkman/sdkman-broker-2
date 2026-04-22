@@ -1,12 +1,11 @@
 package io.sdkman.broker.support
 
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import io.kotest.core.listeners.TestListener
 import io.kotest.core.spec.Spec
 import org.flywaydb.core.Flyway
 import org.testcontainers.containers.PostgreSQLContainer
-import java.io.PrintWriter
-import java.sql.DriverManager
-import java.util.logging.Logger
 import javax.sql.DataSource
 
 object PostgresTestListener : TestListener {
@@ -83,28 +82,13 @@ object PostgresTestListener : TestListener {
         jdbcUrl: String,
         username: String,
         password: String
-    ): DataSource {
-        return object : DataSource {
-            override fun getConnection() = DriverManager.getConnection(jdbcUrl, username, password)
-
-            override fun getConnection(
-                username: String?,
-                password: String?
-            ) = DriverManager.getConnection(jdbcUrl, username, password)
-
-            override fun getLogWriter() = throw UnsupportedOperationException("Can't get LogWriter")
-
-            override fun setLogWriter(out: PrintWriter?) = Unit
-
-            override fun getLoginTimeout() = 0
-
-            override fun setLoginTimeout(seconds: Int) = Unit
-
-            override fun getParentLogger() = Logger.getLogger("")
-
-            override fun <T : Any?> unwrap(iface: Class<T>?) = throw UnsupportedOperationException("Can't unwrap")
-
-            override fun isWrapperFor(iface: Class<*>?) = false
-        }
-    }
+    ): DataSource =
+        HikariDataSource(
+            HikariConfig().apply {
+                this.jdbcUrl = jdbcUrl
+                this.username = username
+                this.password = password
+                driverClassName = "org.postgresql.Driver"
+            }
+        )
 }
