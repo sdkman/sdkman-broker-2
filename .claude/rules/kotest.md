@@ -113,9 +113,9 @@ class DownloadServiceTest { // Wrong framework and naming
 
 ## Related Rules
 
-- rules/hexagonal-architecture-rules.md - Defines the architectural boundaries that testing layers should respect
-- rules/kotlin-rules.md - General Kotlin coding standards that apply to test code
-- rules/ddd-rules.md - Domain modeling principles that inform unit test structure
+- rules/hexagonal-architecture.md - Defines the architectural boundaries that testing layers should respect
+- rules/kotlin.md - General Kotlin coding standards that apply to test code
+- rules/domain-driven-design.md - Domain modeling principles that inform unit test structure
 
 ## References
 

@@ -140,9 +140,9 @@ for (item in items) {
 
 ## Related Rules
 
-- rules/ddd-rules.md - Domain modeling aligns with functional types and smart constructors
-- rules/hexagonal-architecture-rules.md - Boundary conversions from nullable to Option types
-- rules/kotest-rules.md - Testing patterns for functional code with Arrow types
+- rules/domain-driven-design.md - Domain modeling aligns with functional types and smart constructors
+- rules/hexagonal-architecture.md - Boundary conversions from nullable to Option types
+- rules/kotest.md - Testing patterns for functional code with Arrow types
 
 ## References
 
