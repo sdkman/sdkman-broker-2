@@ -24,7 +24,7 @@ class MongoApplicationRepositoryIntegrationSpec : ShouldSpec({
 
         // then
         Application.of("OK").fold(
-            { error -> throw RuntimeException("Failed to create test application: $error") },
+            { error -> throw IllegalStateException("Failed to create test application: $error") },
             { expectedApp -> result shouldBeRight Some(expectedApp) }
         )
     }

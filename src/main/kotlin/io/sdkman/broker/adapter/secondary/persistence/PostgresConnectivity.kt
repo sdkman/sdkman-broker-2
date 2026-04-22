@@ -23,7 +23,7 @@ class PostgresConnectivity(private val config: AppConfig) {
         return result.fold(
             { exception ->
                 logger.error("Failed to connect to PostgreSQL: ${exception.message}", exception)
-                throw RuntimeException("Failed to connect to PostgreSQL", exception)
+                throw IllegalStateException("Failed to connect to PostgreSQL", exception)
             },
             { dataSource -> dataSource }
         )
