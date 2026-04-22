@@ -9,21 +9,27 @@ import io.kotest.matchers.shouldNot
 // Custom matchers for Arrow Option types
 // Provides expressive, readable assertions for functional tests
 
-// Matcher for Option.isSome() with optional value validation
-fun <T> beSome(expectedValue: T? = null): Matcher<Option<T>> {
-    return object : Matcher<Option<T>> {
-        override fun test(value: Option<T>): MatcherResult {
-            val isSome = value.isSome()
-            val valueMatches = expectedValue?.let { value.getOrNull() == it } ?: true
-
-            return MatcherResult(
-                isSome && valueMatches,
-                { "Expected Option to be Some${expectedValue?.let { " with value $it" } ?: ""}, but was $value" },
-                { "Expected Option not to be Some${expectedValue?.let { " with value $it" } ?: ""}, but was $value" }
+// Matcher for Option.isSome() without value validation
+fun <T> beSome(): Matcher<Option<T>> =
+    object : Matcher<Option<T>> {
+        override fun test(value: Option<T>): MatcherResult =
+            MatcherResult(
+                value.isSome(),
+                { "Expected Option to be Some, but was $value" },
+                { "Expected Option not to be Some, but was $value" }
             )
-        }
     }
-}
+
+// Matcher for Option.isSome() with value validation
+fun <T> beSome(expectedValue: T): Matcher<Option<T>> =
+    object : Matcher<Option<T>> {
+        override fun test(value: Option<T>): MatcherResult =
+            MatcherResult(
+                value.isSome() && value.getOrNull() == expectedValue,
+                { "Expected Option to be Some with value $expectedValue, but was $value" },
+                { "Expected Option not to be Some with value $expectedValue, but was $value" }
+            )
+    }
 
 // Matcher for Option.isNone()
 fun <T> beNone(): Matcher<Option<T>> {
