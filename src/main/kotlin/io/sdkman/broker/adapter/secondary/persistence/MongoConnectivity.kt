@@ -34,12 +34,12 @@ class MongoConnectivity(
     fun buildConnectionString(): String {
         val host = config.mongodbHost
         val port = config.mongodbPort
+        val authSuffix = config.mongodbAuthMechanism.map { "?authMechanism=$it" }.getOrElse { "" }
 
         val credentials =
             config.mongodbUsername.flatMap { username ->
                 config.mongodbPassword.map { password ->
-                    val authMechanism = if (isProductionEnvironment(host)) "?authMechanism=SCRAM-SHA-1" else ""
-                    "mongodb://$username:$password@$host:$port/${config.mongodbDatabase}$authMechanism"
+                    "mongodb://$username:$password@$host:$port/${config.mongodbDatabase}$authSuffix"
                 }
             }
 
@@ -47,6 +47,4 @@ class MongoConnectivity(
             "mongodb://$host:$port/${config.mongodbDatabase}"
         }
     }
-
-    fun isProductionEnvironment(host: String): Boolean = host != "localhost" && host != "127.0.0.1"
 }

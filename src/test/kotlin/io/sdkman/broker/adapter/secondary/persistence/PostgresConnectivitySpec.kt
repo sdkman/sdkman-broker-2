@@ -11,7 +11,7 @@ import io.sdkman.broker.config.AppConfig
 class PostgresConnectivitySpec :
     ShouldSpec({
 
-        should("build basic connection string for localhost without credentials") {
+        should("build basic connection string when ssl mode is disabled") {
             // given
             val mockConfig = mockk<AppConfig>()
             every { mockConfig.postgresHost } returns "localhost"
@@ -19,6 +19,7 @@ class PostgresConnectivitySpec :
             every { mockConfig.postgresDatabase } returns "sdkman"
             every { mockConfig.postgresUsername } returns none()
             every { mockConfig.postgresPassword } returns none()
+            every { mockConfig.postgresSslMode } returns "disable"
 
             val connectivity = PostgresConnectivity(mockConfig)
 
@@ -29,7 +30,7 @@ class PostgresConnectivitySpec :
             result shouldBe "jdbc:postgresql://localhost:5432/sdkman"
         }
 
-        should("not include credentials in URL for localhost connections") {
+        should("omit ssl parameter regardless of credentials when ssl mode is disabled") {
             // given
             val mockConfig = mockk<AppConfig>()
             every { mockConfig.postgresHost } returns "localhost"
@@ -37,6 +38,7 @@ class PostgresConnectivitySpec :
             every { mockConfig.postgresDatabase } returns "sdkman"
             every { mockConfig.postgresUsername } returns "broker".some()
             every { mockConfig.postgresPassword } returns "password123".some()
+            every { mockConfig.postgresSslMode } returns "disable"
 
             val connectivity = PostgresConnectivity(mockConfig)
 
@@ -47,7 +49,7 @@ class PostgresConnectivitySpec :
             result shouldBe "jdbc:postgresql://localhost:5432/sdkman"
         }
 
-        should("build connection string with credentials for production host") {
+        should("append sslmode query parameter when ssl mode is set") {
             // given
             val mockConfig = mockk<AppConfig>()
             every { mockConfig.postgresHost } returns "postgres.sdkman.io"
@@ -55,6 +57,7 @@ class PostgresConnectivitySpec :
             every { mockConfig.postgresDatabase } returns "sdkman"
             every { mockConfig.postgresUsername } returns "broker".some()
             every { mockConfig.postgresPassword } returns "password123".some()
+            every { mockConfig.postgresSslMode } returns "require"
 
             val connectivity = PostgresConnectivity(mockConfig)
 
@@ -62,7 +65,6 @@ class PostgresConnectivitySpec :
             val result = connectivity.buildConnectionString()
 
             // then
-            result shouldBe
-                "jdbc:postgresql://postgres.sdkman.io:5432/sdkman?user=broker&password=password123&sslmode=require"
+            result shouldBe "jdbc:postgresql://postgres.sdkman.io:5432/sdkman?sslmode=require"
         }
     })

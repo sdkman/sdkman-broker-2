@@ -24,11 +24,13 @@ class PostgresConnectivityIntegrationSpec :
                     override val mongodbDatabase: String = "sdkman"
                     override val mongodbUsername: Option<String> = None
                     override val mongodbPassword: Option<String> = None
+                    override val mongodbAuthMechanism: Option<String> = None
                     override val postgresHost: String = PostgresTestListener.host
                     override val postgresPort: String = PostgresTestListener.port.toString()
                     override val postgresDatabase: String = PostgresTestListener.databaseName
                     override val postgresUsername: Option<String> = PostgresTestListener.username.some()
                     override val postgresPassword: Option<String> = PostgresTestListener.password.some()
+                    override val postgresSslMode: String = "disable"
                     override val serverPort: Int = 8080
                     override val serverHost: String = "127.0.0.1"
                 }

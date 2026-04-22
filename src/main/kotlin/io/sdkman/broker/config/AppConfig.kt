@@ -10,11 +10,13 @@ interface AppConfig {
     val mongodbDatabase: String
     val mongodbUsername: Option<String>
     val mongodbPassword: Option<String>
+    val mongodbAuthMechanism: Option<String>
     val postgresHost: String
     val postgresPort: String
     val postgresDatabase: String
     val postgresUsername: Option<String>
     val postgresPassword: Option<String>
+    val postgresSslMode: String
     val serverPort: Int
     val serverHost: String
 }
@@ -28,6 +30,7 @@ class DefaultAppConfig : AppConfig {
     override val mongodbPort: String = config.getStringOrDefault("mongodb.port", "27017")
     override val mongodbUsername: Option<String> = config.getOptionString("mongodb.username")
     override val mongodbPassword: Option<String> = config.getOptionString("mongodb.password")
+    override val mongodbAuthMechanism: Option<String> = config.getOptionString("mongodb.authmechanism")
 
     // Postgres settings
     override val postgresDatabase: String = config.getStringOrDefault("postgres.database", "sdkman")
@@ -35,6 +38,7 @@ class DefaultAppConfig : AppConfig {
     override val postgresPort: String = config.getStringOrDefault("postgres.port", "5432")
     override val postgresUsername: Option<String> = config.getOptionString("postgres.username")
     override val postgresPassword: Option<String> = config.getOptionString("postgres.password")
+    override val postgresSslMode: String = config.getStringOrDefault("postgres.sslmode", "disable")
 
     // Server settings
     override val serverPort: Int = config.getIntOrDefault("server.port", 8080)
