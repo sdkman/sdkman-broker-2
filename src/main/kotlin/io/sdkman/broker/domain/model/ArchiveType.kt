@@ -1,6 +1,8 @@
 package io.sdkman.broker.domain.model
 
-sealed class ArchiveType(val value: String) {
+sealed class ArchiveType(
+    val value: String
+) {
     data object Zip : ArchiveType("zip")
 
     data object TarGz : ArchiveType("tar.gz")

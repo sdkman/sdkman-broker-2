@@ -10,43 +10,44 @@ import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRight
 
-class MongoApplicationRepositoryIntegrationSpec : ShouldSpec({
-    listener(MongoTestListener)
+class MongoApplicationRepositoryIntegrationSpec :
+    ShouldSpec({
+        listener(MongoTestListener)
 
-    val repository = MongoApplicationRepository(MongoTestListener.database)
+        val repository = MongoApplicationRepository(MongoTestListener.database)
 
-    should("return application when record exists with valid alive status") {
-        // given
-        MongoSupport.setupValidAppRecord()
+        should("return application when record exists with valid alive status") {
+            // given
+            MongoSupport.setupValidAppRecord()
 
-        // when
-        val result = repository.findApplication()
+            // when
+            val result = repository.findApplication()
 
-        // then
-        Application.of("OK").fold(
-            { error -> throw IllegalStateException("Failed to create test application: $error") },
-            { expectedApp -> result shouldBeRight Some(expectedApp) }
-        )
-    }
+            // then
+            Application.of("OK").fold(
+                { error -> throw IllegalStateException("Failed to create test application: $error") },
+                { expectedApp -> result shouldBeRight Some(expectedApp) }
+            )
+        }
 
-    should("return None when application record does not exist") {
-        // given: empty database (MongoTestListener.resetDatabase() is called automatically)
+        should("return None when application record does not exist") {
+            // given: empty database (MongoTestListener.resetDatabase() is called automatically)
 
-        // when
-        val result = repository.findApplication()
+            // when
+            val result = repository.findApplication()
 
-        // then
-        result shouldBeRight None
-    }
+            // then
+            result shouldBeRight None
+        }
 
-    should("return an error when application record has invalid alive status") {
-        // given
-        MongoSupport.setupInvalidAppRecord()
+        should("return an error when application record has invalid alive status") {
+            // given
+            MongoSupport.setupInvalidAppRecord()
 
-        // when
-        val result = repository.findApplication()
+            // when
+            val result = repository.findApplication()
 
-        // then
-        result shouldBeLeftAnd { it is RepositoryError.DatabaseError }
-    }
-})
+            // then
+            result shouldBeLeftAnd { it is RepositoryError.DatabaseError }
+        }
+    })

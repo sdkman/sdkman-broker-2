@@ -10,16 +10,18 @@ import java.sql.Connection
 import java.sql.ResultSet
 import javax.sql.DataSource
 
-class PostgresHealthRepository(private val dataSource: DataSource) : HealthRepository {
+class PostgresHealthRepository(
+    private val dataSource: DataSource
+) : HealthRepository {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     override fun checkConnectivity(): Either<DatabaseFailure, HealthCheckSuccess> =
-        Either.catch {
-            dataSource.connection.use { connection ->
-                executeHealthCheck(connection).getOrElse { throw it }
-            }
-        }
-            .map { HealthCheckSuccess }
+        Either
+            .catch {
+                dataSource.connection.use { connection ->
+                    executeHealthCheck(connection).getOrElse { throw it }
+                }
+            }.map { HealthCheckSuccess }
             .mapLeft { exception ->
                 logger.error("PostgreSQL health check failed: {}", exception.message, exception)
                 exception.toDatabaseFailure()
@@ -28,15 +30,18 @@ class PostgresHealthRepository(private val dataSource: DataSource) : HealthRepos
     private fun ResultSet.isHealthCheckSuccessful(): Boolean = this.next() && this.getInt(1) == 1
 
     private fun executeHealthCheck(connection: Connection): Either<RuntimeException, Unit> =
-        Either.catch {
-            connection.prepareStatement("SELECT 1").use { statement ->
-                statement.executeQuery().use { resultSet ->
-                    when {
-                        resultSet.isHealthCheckSuccessful() -> Unit
-                        else ->
-                        throw IllegalStateException("PostgreSQL health check query did not return expected result")
+        Either
+            .catch {
+                connection.prepareStatement("SELECT 1").use { statement ->
+                    statement.executeQuery().use { resultSet ->
+                        when {
+                            resultSet.isHealthCheckSuccessful() -> Unit
+                            else ->
+                                throw IllegalStateException(
+                                    "PostgreSQL health check query did not return expected result"
+                                )
+                        }
                     }
                 }
-            }
-        }.mapLeft { RuntimeException(it) }
+            }.mapLeft { RuntimeException(it) }
 }

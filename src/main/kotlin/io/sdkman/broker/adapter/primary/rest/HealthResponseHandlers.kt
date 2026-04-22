@@ -11,12 +11,16 @@ import io.sdkman.broker.application.service.HealthCheckError
 import io.sdkman.broker.application.service.HealthStatus
 import kotlinx.serialization.Serializable
 
-enum class DatabaseName(val displayName: String) {
+enum class DatabaseName(
+    val displayName: String
+) {
     MONGODB("MongoDB"),
     POSTGRESQL("PostgreSQL")
 }
 
-enum class DatabaseStatus(val status: String) {
+enum class DatabaseStatus(
+    val status: String
+) {
     UP("UP"),
     DOWN("DOWN")
 }
@@ -116,7 +120,14 @@ private fun createDatabaseErrorResponse(
 }
 
 @Serializable
-data class DetailedHealthResponse(val mongodb: String, val postgres: String)
+data class DetailedHealthResponse(
+    val mongodb: String,
+    val postgres: String
+)
 
 @Serializable
-data class DetailedHealthErrorResponse(val mongodb: String, val postgres: String, val reason: String)
+data class DetailedHealthErrorResponse(
+    val mongodb: String,
+    val postgres: String,
+    val reason: String
+)

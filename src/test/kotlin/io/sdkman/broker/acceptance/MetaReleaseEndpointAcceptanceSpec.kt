@@ -15,60 +15,61 @@ import io.sdkman.broker.support.configureAppForTesting
 import org.junit.jupiter.api.Tag
 
 @Tag("acceptance")
-class MetaReleaseEndpointAcceptanceSpec : ShouldSpec({
+class MetaReleaseEndpointAcceptanceSpec :
+    ShouldSpec({
 
-    should("return 200 OK with release when release.properties file is present") {
-        // given: a running application and the release.properties file is present
-        testApplication {
-            // Using the test properties file in src/test/resources
-            application {
-                configureAppForTesting(
-                    TestDependencyInjection.healthService,
-                    TestDependencyInjection.metaService,
-                    TestDependencyInjection.versionService
-                )
-            }
-
-            // when: a GET request is made for "/meta/release"
-            val response = client.get("/meta/release")
-            val responseText = response.body<String>()
-
-            // then: the service response status is 200
-            response.status shouldBe HttpStatusCode.OK
-
-            // Verify the response contains the expected release
-            responseText.contains("1.0.0-test") shouldBe true
-        }
-    }
-
-    should("return 500 Internal Server Error when release.properties file is not present") {
-        // given: a running application but the release.properties file will not be found
-        testApplication {
-            // Using a service that can't find the file
-            val mockService =
-                object : MetaReleaseService {
-                    override fun getReleaseVersion(): Either<MetaReleaseError, String> =
-                        MetaReleaseError(
-                            IllegalStateException("Could not load release.properties")
-                        ).left()
+        should("return 200 OK with release when release.properties file is present") {
+            // given: a running application and the release.properties file is present
+            testApplication {
+                // Using the test properties file in src/test/resources
+                application {
+                    configureAppForTesting(
+                        TestDependencyInjection.healthService,
+                        TestDependencyInjection.metaService,
+                        TestDependencyInjection.versionService
+                    )
                 }
 
-            application {
-                configureAppForTesting(
-                    TestDependencyInjection.healthService,
-                    mockService,
-                    TestDependencyInjection.versionService
-                )
+                // when: a GET request is made for "/meta/release"
+                val response = client.get("/meta/release")
+                val responseText = response.body<String>()
+
+                // then: the service response status is 200
+                response.status shouldBe HttpStatusCode.OK
+
+                // Verify the response contains the expected release
+                responseText.contains("1.0.0-test") shouldBe true
             }
-
-            // when: a GET request is made for "/meta/release"
-            val response = client.get("/meta/release")
-
-            // then: the service response status is 500
-            response.status shouldBe HttpStatusCode.InternalServerError
-
-            // Verify the response contains the expected error message
-            response.body<String>().contains("Could not load release.properties") shouldBe true
         }
-    }
-})
+
+        should("return 500 Internal Server Error when release.properties file is not present") {
+            // given: a running application but the release.properties file will not be found
+            testApplication {
+                // Using a service that can't find the file
+                val mockService =
+                    object : MetaReleaseService {
+                        override fun getReleaseVersion(): Either<MetaReleaseError, String> =
+                            MetaReleaseError(
+                                IllegalStateException("Could not load release.properties")
+                            ).left()
+                    }
+
+                application {
+                    configureAppForTesting(
+                        TestDependencyInjection.healthService,
+                        mockService,
+                        TestDependencyInjection.versionService
+                    )
+                }
+
+                // when: a GET request is made for "/meta/release"
+                val response = client.get("/meta/release")
+
+                // then: the service response status is 500
+                response.status shouldBe HttpStatusCode.InternalServerError
+
+                // Verify the response contains the expected error message
+                response.body<String>().contains("Could not load release.properties") shouldBe true
+            }
+        }
+    })

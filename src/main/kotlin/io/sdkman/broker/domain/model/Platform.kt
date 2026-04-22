@@ -2,7 +2,11 @@ package io.sdkman.broker.domain.model
 
 import arrow.core.Option
 
-sealed class Platform(val code: String, val persistentId: String, val auditId: String) {
+sealed class Platform(
+    val code: String,
+    val persistentId: String,
+    val auditId: String
+) {
     data object LinuxX64 : Platform("linuxx64", "LINUX_64", "LINUX_X64")
 
     data object LinuxARM64 : Platform("linuxarm64", "LINUX_ARM64", "LINUX_ARM64")

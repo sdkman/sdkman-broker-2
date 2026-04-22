@@ -11,37 +11,38 @@ import io.sdkman.broker.support.PostgresTestListener
 import org.junit.jupiter.api.Tag
 
 @Tag("integration")
-class PostgresConnectivityIntegrationSpec : ShouldSpec({
-    listener(PostgresTestListener)
+class PostgresConnectivityIntegrationSpec :
+    ShouldSpec({
+        listener(PostgresTestListener)
 
-    should("successfully connect to PostgreSQL and get a data source") {
-        // given
-        val config =
-            object : AppConfig {
-                override val mongodbHost: String = "localhost"
-                override val mongodbPort: String = "27017"
-                override val mongodbDatabase: String = "sdkman"
-                override val mongodbUsername: Option<String> = None
-                override val mongodbPassword: Option<String> = None
-                override val postgresHost: String = PostgresTestListener.host
-                override val postgresPort: String = PostgresTestListener.port.toString()
-                override val postgresDatabase: String = PostgresTestListener.databaseName
-                override val postgresUsername: Option<String> = PostgresTestListener.username.some()
-                override val postgresPassword: Option<String> = PostgresTestListener.password.some()
-                override val serverPort: Int = 8080
-                override val serverHost: String = "127.0.0.1"
+        should("successfully connect to PostgreSQL and get a data source") {
+            // given
+            val config =
+                object : AppConfig {
+                    override val mongodbHost: String = "localhost"
+                    override val mongodbPort: String = "27017"
+                    override val mongodbDatabase: String = "sdkman"
+                    override val mongodbUsername: Option<String> = None
+                    override val mongodbPassword: Option<String> = None
+                    override val postgresHost: String = PostgresTestListener.host
+                    override val postgresPort: String = PostgresTestListener.port.toString()
+                    override val postgresDatabase: String = PostgresTestListener.databaseName
+                    override val postgresUsername: Option<String> = PostgresTestListener.username.some()
+                    override val postgresPassword: Option<String> = PostgresTestListener.password.some()
+                    override val serverPort: Int = 8080
+                    override val serverHost: String = "127.0.0.1"
+                }
+            val connectivity = PostgresConnectivity(config)
+
+            // when
+            val dataSource = connectivity.dataSource()
+
+            // then
+            dataSource shouldNotBe null
+
+            // Verify we can interact with the database
+            dataSource.connection.use { connection ->
+                connection.isValid(5) shouldBe true
             }
-        val connectivity = PostgresConnectivity(config)
-
-        // when
-        val dataSource = connectivity.dataSource()
-
-        // then
-        dataSource shouldNotBe null
-
-        // Verify we can interact with the database
-        dataSource.connection.use { connection ->
-            connection.isValid(5) shouldBe true
         }
-    }
-})
+    })

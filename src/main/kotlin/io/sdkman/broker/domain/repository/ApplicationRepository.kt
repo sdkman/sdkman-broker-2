@@ -10,9 +10,13 @@ interface ApplicationRepository {
 }
 
 sealed class RepositoryError {
-    data class ConnectionError(val cause: Throwable) : RepositoryError()
+    data class ConnectionError(
+        val cause: Throwable
+    ) : RepositoryError()
 
-    data class DatabaseError(val cause: Throwable) : RepositoryError()
+    data class DatabaseError(
+        val cause: Throwable
+    ) : RepositoryError()
 }
 
 fun RepositoryError.toApplicationError(): ApplicationError =

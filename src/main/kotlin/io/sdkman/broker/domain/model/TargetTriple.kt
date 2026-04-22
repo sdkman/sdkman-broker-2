@@ -2,7 +2,9 @@ package io.sdkman.broker.domain.model
 
 import arrow.core.Option
 
-enum class TargetTriple(val triple: String) {
+enum class TargetTriple(
+    val triple: String
+) {
     LINUX_X64("x86_64-unknown-linux-gnu"),
     LINUX_ARM64("aarch64-unknown-linux-gnu"),
     LINUX_X32("i686-unknown-linux-gnu"),

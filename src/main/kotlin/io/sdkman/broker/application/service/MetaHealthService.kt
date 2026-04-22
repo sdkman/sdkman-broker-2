@@ -56,7 +56,8 @@ class MetaHealthServiceImpl(
     }
 
     private fun checkMongoHealth(): Either<HealthCheckError, Unit> =
-        applicationRepository.findApplication()
+        applicationRepository
+            .findApplication()
             .convertToApplicationError()
             .mapLeft { domainError ->
                 when (domainError) {
@@ -73,8 +74,7 @@ class MetaHealthServiceImpl(
                     is ApplicationError.ApplicationNotFound -> HealthCheckError.ApplicationNotFound
                     is ApplicationError.InvalidAliveStatus -> HealthCheckError.InvalidApplicationState(domainError)
                 }
-            }
-            .flatMap { applicationOption ->
+            }.flatMap { applicationOption ->
                 applicationOption.fold(
                     { HealthCheckError.ApplicationNotFound.left() },
                     { Unit.right() }
@@ -82,7 +82,8 @@ class MetaHealthServiceImpl(
             }
 
     private fun checkPostgresHealth(): Either<HealthCheckError, Unit> =
-        postgresHealthRepository.checkConnectivity()
+        postgresHealthRepository
+            .checkConnectivity()
             .mapLeft { databaseFailure ->
                 when (databaseFailure) {
                     is DatabaseFailure.ConnectionFailure ->
@@ -90,8 +91,7 @@ class MetaHealthServiceImpl(
                     is DatabaseFailure.QueryExecutionFailure ->
                         HealthCheckError.DatabaseError("PostgreSQL", databaseFailure.exception)
                 }
-            }
-            .map { Unit }
+            }.map { Unit }
 }
 
 enum class HealthStatus {
@@ -105,17 +105,29 @@ data class DatabaseHealthStatus(
 )
 
 sealed class HealthCheckError {
-    data class DatabaseUnavailable(val database: String, val cause: Throwable) : HealthCheckError()
+    data class DatabaseUnavailable(
+        val database: String,
+        val cause: Throwable
+    ) : HealthCheckError()
 
-    data class DatabaseError(val database: String, val cause: Throwable) : HealthCheckError()
+    data class DatabaseError(
+        val database: String,
+        val cause: Throwable
+    ) : HealthCheckError()
 
     data object ApplicationNotFound : HealthCheckError()
 
-    data class InvalidApplicationState(val error: ApplicationError) : HealthCheckError()
+    data class InvalidApplicationState(
+        val error: ApplicationError
+    ) : HealthCheckError()
 
-    data class MongoDatabaseUnavailable(val mongoError: Option<HealthCheckError>) : HealthCheckError()
+    data class MongoDatabaseUnavailable(
+        val mongoError: Option<HealthCheckError>
+    ) : HealthCheckError()
 
-    data class PostgresDatabaseUnavailable(val postgresError: Option<HealthCheckError>) : HealthCheckError()
+    data class PostgresDatabaseUnavailable(
+        val postgresError: Option<HealthCheckError>
+    ) : HealthCheckError()
 
     data class BothDatabasesUnavailable(
         val mongoError: Option<HealthCheckError>,

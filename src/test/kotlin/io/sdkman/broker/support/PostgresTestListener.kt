@@ -39,7 +39,8 @@ object PostgresTestListener : TestListener {
 
     private fun runMigrations() {
         val flyway =
-            Flyway.configure()
+            Flyway
+                .configure()
                 .dataSource(jdbcUrl(), username, password)
                 .locations("classpath:db/migration")
                 .baselineOnMigrate(true)

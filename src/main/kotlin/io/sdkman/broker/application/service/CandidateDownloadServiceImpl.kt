@@ -30,8 +30,10 @@ class CandidateDownloadServiceImpl(
     ): Either<VersionError, DownloadInfo> =
         either<VersionError, DownloadInfo> {
             val platform =
-                Platform.fromCode(platformCode)
-                    .toEither { VersionError.InvalidPlatform(platformCode) }.bind()
+                Platform
+                    .fromCode(platformCode)
+                    .toEither { VersionError.InvalidPlatform(platformCode) }
+                    .bind()
             val versionEntity = findVersionWithFallback(candidate, version, platform.persistentId).bind()
             val checksumHeaders =
                 versionEntity.checksums.mapKeys { (algorithm, _) ->
@@ -64,11 +66,14 @@ class CandidateDownloadServiceImpl(
         version: String,
         platformId: String
     ): Either<VersionError, Version> =
-        versionRepository.findByQuery(candidate, version, platformId)
+        versionRepository
+            .findByQuery(candidate, version, platformId)
             .flatMap { platformSpecificOption ->
                 platformSpecificOption.fold(
-                    { // Try UNIVERSAL fallback
-                        versionRepository.findByQuery(candidate, version, Platform.Universal.persistentId)
+                    {
+                        // Try UNIVERSAL fallback
+                        versionRepository
+                            .findByQuery(candidate, version, Platform.Universal.persistentId)
                             .flatMap { universalOption ->
                                 universalOption.fold(
                                     { VersionError.VersionNotFound(candidate, version, platformId).left() },
@@ -81,7 +86,8 @@ class CandidateDownloadServiceImpl(
             }
 
     private fun createAuditEntry(auditCommand: AuditCommand): Either<Unit, Unit> =
-        auditRepository.save(auditCommand.toAudit())
+        auditRepository
+            .save(auditCommand.toAudit())
             .mapLeft { failure ->
                 logger.error(
                     "Failed to save audit entry for download: {}",

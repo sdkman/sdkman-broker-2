@@ -4,47 +4,48 @@ import arrow.core.Option
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 
-class AppConfigSpec : ShouldSpec({
+class AppConfigSpec :
+    ShouldSpec({
 
-    should("read database name from configuration") {
-        // given
-        val config = DefaultAppConfig()
+        should("read database name from configuration") {
+            // given
+            val config = DefaultAppConfig()
 
-        // when/then
-        config.mongodbDatabase shouldBe "sdkman"
-    }
+            // when/then
+            config.mongodbDatabase shouldBe "sdkman"
+        }
 
-    should("read MongoDB host from configuration") {
-        // given
-        val config = DefaultAppConfig()
+        should("read MongoDB host from configuration") {
+            // given
+            val config = DefaultAppConfig()
 
-        // when/then
-        config.mongodbHost shouldBe "127.0.0.1"
-    }
+            // when/then
+            config.mongodbHost shouldBe "127.0.0.1"
+        }
 
-    should("read MongoDB port from configuration") {
-        // given
-        val config = DefaultAppConfig()
+        should("read MongoDB port from configuration") {
+            // given
+            val config = DefaultAppConfig()
 
-        // when/then
-        config.mongodbPort shouldBe "27017"
-    }
+            // when/then
+            config.mongodbPort shouldBe "27017"
+        }
 
-    should("handle null values for credentials") {
-        // given
-        val config = DefaultAppConfig()
+        should("handle null values for credentials") {
+            // given
+            val config = DefaultAppConfig()
 
-        // when/then
-        config.mongodbUsername shouldBe Option.fromNullable(null)
-        config.mongodbPassword shouldBe Option.fromNullable(null)
-    }
+            // when/then
+            config.mongodbUsername shouldBe Option.fromNullable(null)
+            config.mongodbPassword shouldBe Option.fromNullable(null)
+        }
 
-    should("read server settings from configuration") {
-        // given
-        val config = DefaultAppConfig()
+        should("read server settings from configuration") {
+            // given
+            val config = DefaultAppConfig()
 
-        // when/then
-        config.serverPort shouldBe 8080
-        config.serverHost shouldBe "0.0.0.0"
-    }
-})
+            // when/then
+            config.serverPort shouldBe 8080
+            config.serverHost shouldBe "0.0.0.0"
+        }
+    })

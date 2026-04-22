@@ -41,7 +41,8 @@ class SdkmanCliDownloadServiceImpl : SdkmanCliDownloadService {
         if (platformCode.isBlank()) {
             VersionError.InvalidPlatform("[empty/blank]").left()
         } else {
-            Platform.fromCode(platformCode)
+            Platform
+                .fromCode(platformCode)
                 .toEither { VersionError.InvalidPlatform(platformCode) }
         }
 

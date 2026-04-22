@@ -32,7 +32,8 @@ fun Application.downloadRoutes(
                     agent = Option.fromNullable(call.request.header("User-Agent"))
                 )
 
-            candidateDownloadService.downloadVersion(candidate, version, platform, auditContext)
+            candidateDownloadService
+                .downloadVersion(candidate, version, platform, auditContext)
                 .fold(
                     { error -> call.handleVersionError(error) },
                     { downloadInfo ->
@@ -51,7 +52,8 @@ fun Application.downloadRoutes(
             val version = call.parameters["version"] ?: return@get call.respondBadRequest()
             val platform = call.parameters["platform"] ?: return@get call.respondBadRequest()
 
-            sdkmanCliDownloadService.downloadSdkmanCli(command, version, platform)
+            sdkmanCliDownloadService
+                .downloadSdkmanCli(command, version, platform)
                 .fold(
                     { error -> call.handleVersionError(error) },
                     { downloadInfo ->
@@ -66,7 +68,8 @@ fun Application.downloadRoutes(
             val version = call.parameters["version"] ?: return@get call.respondBadRequest()
             val platform = call.parameters["platform"] ?: return@get call.respondBadRequest()
 
-            sdkmanNativeDownloadService.downloadNativeCli(command, version, platform)
+            sdkmanNativeDownloadService
+                .downloadNativeCli(command, version, platform)
                 .fold(
                     { error -> call.handleVersionError(error) },
                     { downloadInfo ->

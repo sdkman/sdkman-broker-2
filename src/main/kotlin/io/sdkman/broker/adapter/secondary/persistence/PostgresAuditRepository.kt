@@ -29,29 +29,31 @@ object AuditTable : Table("audit") {
     override val primaryKey = PrimaryKey(id)
 }
 
-class PostgresAuditRepository(private val dataSource: DataSource) : AuditRepository {
+class PostgresAuditRepository(
+    private val dataSource: DataSource
+) : AuditRepository {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val database: Database by lazy { Database.connect(dataSource) }
 
     override fun save(audit: Audit): Either<DatabaseFailure, Unit> =
-        Either.catch {
-            transaction(database) {
-                AuditTable.insert {
-                    audit.id.map { auditId -> it[id] = auditId }
-                    it[command] = audit.command
-                    it[candidate] = audit.candidate
-                    it[version] = audit.version
-                    it[clientPlatform] = audit.clientPlatform
-                    it[candidatePlatform] = audit.candidatePlatform
-                    it[distribution] = audit.distribution.getOrNull()
-                    it[host] = audit.host.getOrNull()
-                    it[agent] = audit.agent.getOrNull()
-                    it[timestamp] = audit.timestamp
+        Either
+            .catch {
+                transaction(database) {
+                    AuditTable.insert {
+                        audit.id.map { auditId -> it[id] = auditId }
+                        it[command] = audit.command
+                        it[candidate] = audit.candidate
+                        it[version] = audit.version
+                        it[clientPlatform] = audit.clientPlatform
+                        it[candidatePlatform] = audit.candidatePlatform
+                        it[distribution] = audit.distribution.getOrNull()
+                        it[host] = audit.host.getOrNull()
+                        it[agent] = audit.agent.getOrNull()
+                        it[timestamp] = audit.timestamp
+                    }
+                    Unit
                 }
-                Unit
-            }
-        }
-            .mapLeft { exception ->
+            }.mapLeft { exception ->
                 logger.error("Failed to save audit record: {}", exception.message, exception)
                 exception.toDatabaseFailure()
             }
