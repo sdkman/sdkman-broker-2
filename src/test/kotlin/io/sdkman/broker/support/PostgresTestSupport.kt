@@ -17,7 +17,11 @@ object PostgresTestSupport {
         id: UUID
     ): Option<ResultRow> =
         transaction(database) {
-            AuditTable.selectAll().where { AuditTable.id eq id }.singleOrNull().toOption()
+            AuditTable
+                .selectAll()
+                .where { AuditTable.id eq id }
+                .singleOrNull()
+                .toOption()
         }
 
     fun readSavedAuditRecordByVersion(
@@ -28,16 +32,19 @@ object PostgresTestSupport {
         vendor: Option<String> = None
     ): Option<ResultRow> =
         transaction(database) {
-            AuditTable.selectAll().where {
-                val baseCondition =
-                    (AuditTable.candidate eq candidate) and
-                        (AuditTable.version eq version) and
-                        (AuditTable.clientPlatform eq platform)
+            AuditTable
+                .selectAll()
+                .where {
+                    val baseCondition =
+                        (AuditTable.candidate eq candidate) and
+                            (AuditTable.version eq version) and
+                            (AuditTable.clientPlatform eq platform)
 
-                vendor.fold(
-                    ifEmpty = { baseCondition },
-                    ifSome = { vendorValue -> baseCondition and (AuditTable.distribution eq vendorValue) }
-                )
-            }.singleOrNull().toOption()
+                    vendor.fold(
+                        ifEmpty = { baseCondition },
+                        ifSome = { vendorValue -> baseCondition and (AuditTable.distribution eq vendorValue) }
+                    )
+                }.singleOrNull()
+                .toOption()
         }
 }

@@ -16,7 +16,8 @@ fun Application.metaRoutes(
 ) {
     routing {
         get("/meta/health") {
-            metaHealthService.checkHealth()
+            metaHealthService
+                .checkHealth()
                 .fold(
                     { error -> call.handleHealthError(error) },
                     { databaseStatus -> call.handleDatabaseHealthStatus(databaseStatus) }
@@ -24,7 +25,8 @@ fun Application.metaRoutes(
         }
 
         get("/meta/release") {
-            metaReleaseService.getReleaseVersion()
+            metaReleaseService
+                .getReleaseVersion()
                 .fold(
                     { error ->
                         call.respond(
@@ -41,7 +43,11 @@ fun Application.metaRoutes(
 }
 
 @Serializable
-data class ReleaseResponse(val release: String)
+data class ReleaseResponse(
+    val release: String
+)
 
 @Serializable
-data class ReleaseErrorResponse(val error: String)
+data class ReleaseErrorResponse(
+    val error: String
+)

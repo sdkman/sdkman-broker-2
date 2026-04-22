@@ -25,20 +25,25 @@ class MetaReleaseServiceImpl(
             .flatMap { properties -> getReleaseFromProperties(properties) }
 
     private fun loadPropertiesFile(): Either<MetaReleaseError, Properties> =
-        Either.catch {
-            val properties = Properties()
-            classLoader.getResourceAsStream(RELEASE_PROPERTIES).toOption()
-                .fold(
-                    { throw IllegalStateException("Could not load $RELEASE_PROPERTIES") },
-                    { stream ->
-                        stream.use { properties.load(it) }
-                        properties
-                    }
-                )
-        }.mapLeft { MetaReleaseError(it) }
+        Either
+            .catch {
+                val properties = Properties()
+                classLoader
+                    .getResourceAsStream(RELEASE_PROPERTIES)
+                    .toOption()
+                    .fold(
+                        { throw IllegalStateException("Could not load $RELEASE_PROPERTIES") },
+                        { stream ->
+                            stream.use { properties.load(it) }
+                            properties
+                        }
+                    )
+            }.mapLeft { MetaReleaseError(it) }
 
     private fun getReleaseFromProperties(properties: Properties): Either<MetaReleaseError, String> =
-        properties.getProperty(RELEASE_KEY).toOption()
+        properties
+            .getProperty(RELEASE_KEY)
+            .toOption()
             .filter { it.isNotBlank() }
             .map { it.right() }
             .getOrElse {
@@ -47,7 +52,9 @@ class MetaReleaseServiceImpl(
             }
 }
 
-class MetaReleaseError(e: Throwable) : Throwable(e) {
+class MetaReleaseError(
+    e: Throwable
+) : Throwable(e) {
     override val message: String
         get() = super.message ?: "An error occurred while retrieving the release version."
 }

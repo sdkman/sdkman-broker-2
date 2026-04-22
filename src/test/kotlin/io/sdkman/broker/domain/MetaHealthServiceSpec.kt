@@ -22,142 +22,144 @@ import io.sdkman.broker.domain.repository.RepositoryError
 import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRight
 
-class MetaHealthServiceSpec : ShouldSpec({
-    val applicationOK =
-        Application.of("OK")
-            .getOrElse { throw IllegalStateException("Failed to create test application: $it") }
+class MetaHealthServiceSpec :
+    ShouldSpec({
+        val applicationOK =
+            Application
+                .of("OK")
+                .getOrElse { throw IllegalStateException("Failed to create test application: $it") }
 
-    context("HealthServiceImpl with dual database checks") {
+        context("HealthServiceImpl with dual database checks") {
 
-        should("return DatabaseHealthStatus with both UP when both databases are healthy") {
-            // given
-            val mockApplicationRepo = mockk<ApplicationRepository>()
-            val mockPostgresHealthRepo = mockk<HealthRepository>()
+            should("return DatabaseHealthStatus with both UP when both databases are healthy") {
+                // given
+                val mockApplicationRepo = mockk<ApplicationRepository>()
+                val mockPostgresHealthRepo = mockk<HealthRepository>()
 
-            every { mockApplicationRepo.findApplication() } returns Some(applicationOK).right()
-            every { mockPostgresHealthRepo.checkConnectivity() } returns HealthCheckSuccess.right()
+                every { mockApplicationRepo.findApplication() } returns Some(applicationOK).right()
+                every { mockPostgresHealthRepo.checkConnectivity() } returns HealthCheckSuccess.right()
 
-            val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
+                val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
 
-            // when
-            val result = service.checkHealth()
+                // when
+                val result = service.checkHealth()
 
-            // then
-            result shouldBeRight DatabaseHealthStatus(HealthStatus.UP, HealthStatus.UP)
+                // then
+                result shouldBeRight DatabaseHealthStatus(HealthStatus.UP, HealthStatus.UP)
+            }
+
+            should("return MongoDatabaseUnavailable error when MongoDB is down but PostgreSQL is up") {
+                // given
+                val mockApplicationRepo = mockk<ApplicationRepository>()
+                val mockPostgresHealthRepo = mockk<HealthRepository>()
+
+                every { mockApplicationRepo.findApplication() } returns None.right()
+                every { mockPostgresHealthRepo.checkConnectivity() } returns HealthCheckSuccess.right()
+
+                val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
+
+                // when
+                val result = service.checkHealth()
+
+                // then
+                result shouldBeLeftAnd { it is HealthCheckError.MongoDatabaseUnavailable }
+            }
+
+            should("return PostgresDatabaseUnavailable error when PostgreSQL is down but MongoDB is up") {
+                // given
+                val mockApplicationRepo = mockk<ApplicationRepository>()
+                val mockPostgresHealthRepo = mockk<HealthRepository>()
+
+                every { mockApplicationRepo.findApplication() } returns Some(applicationOK).right()
+                every {
+                    mockPostgresHealthRepo.checkConnectivity()
+                } returns DatabaseFailure.ConnectionFailure(RuntimeException("Connection failed")).left()
+
+                val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
+
+                // when
+                val result = service.checkHealth()
+
+                // then
+                result shouldBeLeftAnd { it is HealthCheckError.PostgresDatabaseUnavailable }
+            }
+
+            should("return BothDatabasesUnavailable error when both databases are down") {
+                // given
+                val mockApplicationRepo = mockk<ApplicationRepository>()
+                val mockPostgresHealthRepo = mockk<HealthRepository>()
+
+                val dbError = RepositoryError.DatabaseError(RuntimeException("MongoDB error"))
+                every { mockApplicationRepo.findApplication() } returns Either.Left(dbError)
+                every {
+                    mockPostgresHealthRepo.checkConnectivity()
+                } returns DatabaseFailure.QueryExecutionFailure(RuntimeException("PostgreSQL error")).left()
+
+                val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
+
+                // when
+                val result = service.checkHealth()
+
+                // then
+                result shouldBeLeftAnd { it is HealthCheckError.BothDatabasesUnavailable }
+            }
+
+            should("return MongoDatabaseUnavailable when MongoDB has connection error") {
+                // given
+                val mockApplicationRepo = mockk<ApplicationRepository>()
+                val mockPostgresHealthRepo = mockk<HealthRepository>()
+
+                val connectionError = RepositoryError.ConnectionError(RuntimeException("Connection timeout"))
+                every { mockApplicationRepo.findApplication() } returns Either.Left(connectionError)
+                every { mockPostgresHealthRepo.checkConnectivity() } returns HealthCheckSuccess.right()
+
+                val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
+
+                // when
+                val result = service.checkHealth()
+
+                // then
+                result shouldBeLeftAnd { it is HealthCheckError.MongoDatabaseUnavailable }
+            }
+
+            should("return PostgresDatabaseUnavailable when PostgreSQL has query failure") {
+                // given
+                val mockApplicationRepo = mockk<ApplicationRepository>()
+                val mockPostgresHealthRepo = mockk<HealthRepository>()
+
+                every { mockApplicationRepo.findApplication() } returns Some(applicationOK).right()
+                every {
+                    mockPostgresHealthRepo.checkConnectivity()
+                } returns DatabaseFailure.QueryExecutionFailure(RuntimeException("Query failed")).left()
+
+                val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
+
+                // when
+                val result = service.checkHealth()
+
+                // then
+                result shouldBeLeftAnd { it is HealthCheckError.PostgresDatabaseUnavailable }
+            }
+
+            should("handle scenario where both databases have different error types") {
+                // given
+                val mockApplicationRepo = mockk<ApplicationRepository>()
+                val mockPostgresHealthRepo = mockk<HealthRepository>()
+
+                // MongoDB has a general database error, PostgreSQL has connection failure
+                val dbError = RepositoryError.DatabaseError(RuntimeException("MongoDB query error"))
+                every { mockApplicationRepo.findApplication() } returns Either.Left(dbError)
+                every {
+                    mockPostgresHealthRepo.checkConnectivity()
+                } returns DatabaseFailure.ConnectionFailure(RuntimeException("PostgreSQL connection error")).left()
+
+                val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
+
+                // when
+                val result = service.checkHealth()
+
+                // then
+                result shouldBeLeftAnd { it is HealthCheckError.BothDatabasesUnavailable }
+            }
         }
-
-        should("return MongoDatabaseUnavailable error when MongoDB is down but PostgreSQL is up") {
-            // given
-            val mockApplicationRepo = mockk<ApplicationRepository>()
-            val mockPostgresHealthRepo = mockk<HealthRepository>()
-
-            every { mockApplicationRepo.findApplication() } returns None.right()
-            every { mockPostgresHealthRepo.checkConnectivity() } returns HealthCheckSuccess.right()
-
-            val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
-
-            // when
-            val result = service.checkHealth()
-
-            // then
-            result shouldBeLeftAnd { it is HealthCheckError.MongoDatabaseUnavailable }
-        }
-
-        should("return PostgresDatabaseUnavailable error when PostgreSQL is down but MongoDB is up") {
-            // given
-            val mockApplicationRepo = mockk<ApplicationRepository>()
-            val mockPostgresHealthRepo = mockk<HealthRepository>()
-
-            every { mockApplicationRepo.findApplication() } returns Some(applicationOK).right()
-            every {
-                mockPostgresHealthRepo.checkConnectivity()
-            } returns DatabaseFailure.ConnectionFailure(RuntimeException("Connection failed")).left()
-
-            val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
-
-            // when
-            val result = service.checkHealth()
-
-            // then
-            result shouldBeLeftAnd { it is HealthCheckError.PostgresDatabaseUnavailable }
-        }
-
-        should("return BothDatabasesUnavailable error when both databases are down") {
-            // given
-            val mockApplicationRepo = mockk<ApplicationRepository>()
-            val mockPostgresHealthRepo = mockk<HealthRepository>()
-
-            val dbError = RepositoryError.DatabaseError(RuntimeException("MongoDB error"))
-            every { mockApplicationRepo.findApplication() } returns Either.Left(dbError)
-            every {
-                mockPostgresHealthRepo.checkConnectivity()
-            } returns DatabaseFailure.QueryExecutionFailure(RuntimeException("PostgreSQL error")).left()
-
-            val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
-
-            // when
-            val result = service.checkHealth()
-
-            // then
-            result shouldBeLeftAnd { it is HealthCheckError.BothDatabasesUnavailable }
-        }
-
-        should("return MongoDatabaseUnavailable when MongoDB has connection error") {
-            // given
-            val mockApplicationRepo = mockk<ApplicationRepository>()
-            val mockPostgresHealthRepo = mockk<HealthRepository>()
-
-            val connectionError = RepositoryError.ConnectionError(RuntimeException("Connection timeout"))
-            every { mockApplicationRepo.findApplication() } returns Either.Left(connectionError)
-            every { mockPostgresHealthRepo.checkConnectivity() } returns HealthCheckSuccess.right()
-
-            val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
-
-            // when
-            val result = service.checkHealth()
-
-            // then
-            result shouldBeLeftAnd { it is HealthCheckError.MongoDatabaseUnavailable }
-        }
-
-        should("return PostgresDatabaseUnavailable when PostgreSQL has query failure") {
-            // given
-            val mockApplicationRepo = mockk<ApplicationRepository>()
-            val mockPostgresHealthRepo = mockk<HealthRepository>()
-
-            every { mockApplicationRepo.findApplication() } returns Some(applicationOK).right()
-            every {
-                mockPostgresHealthRepo.checkConnectivity()
-            } returns DatabaseFailure.QueryExecutionFailure(RuntimeException("Query failed")).left()
-
-            val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
-
-            // when
-            val result = service.checkHealth()
-
-            // then
-            result shouldBeLeftAnd { it is HealthCheckError.PostgresDatabaseUnavailable }
-        }
-
-        should("handle scenario where both databases have different error types") {
-            // given
-            val mockApplicationRepo = mockk<ApplicationRepository>()
-            val mockPostgresHealthRepo = mockk<HealthRepository>()
-
-            // MongoDB has a general database error, PostgreSQL has connection failure
-            val dbError = RepositoryError.DatabaseError(RuntimeException("MongoDB query error"))
-            every { mockApplicationRepo.findApplication() } returns Either.Left(dbError)
-            every {
-                mockPostgresHealthRepo.checkConnectivity()
-            } returns DatabaseFailure.ConnectionFailure(RuntimeException("PostgreSQL connection error")).left()
-
-            val service = MetaHealthServiceImpl(mockApplicationRepo, mockPostgresHealthRepo)
-
-            // when
-            val result = service.checkHealth()
-
-            // then
-            result shouldBeLeftAnd { it is HealthCheckError.BothDatabasesUnavailable }
-        }
-    }
-})
+    })

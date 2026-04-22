@@ -13,138 +13,139 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import javax.sql.DataSource
 
-class PostgresHealthRepositorySpec : ShouldSpec({
+class PostgresHealthRepositorySpec :
+    ShouldSpec({
 
-    context("PostgresHealthRepository") {
+        context("PostgresHealthRepository") {
 
-        context("checkConnectivity") {
+            context("checkConnectivity") {
 
-            should("return success when database connection and query are successful") {
-                val dataSource = mockk<DataSource>()
-                val connection = mockk<Connection>()
-                val preparedStatement = mockk<PreparedStatement>()
-                val resultSet = mockk<ResultSet>()
+                should("return success when database connection and query are successful") {
+                    val dataSource = mockk<DataSource>()
+                    val connection = mockk<Connection>()
+                    val preparedStatement = mockk<PreparedStatement>()
+                    val resultSet = mockk<ResultSet>()
 
-                every { dataSource.connection } returns connection
-                every { connection.prepareStatement("SELECT 1") } returns preparedStatement
-                every { preparedStatement.executeQuery() } returns resultSet
-                every { resultSet.next() } returns true
-                every { resultSet.getInt(1) } returns 1
-                every { connection.close() } returns Unit
-                every { preparedStatement.close() } returns Unit
-                every { resultSet.close() } returns Unit
+                    every { dataSource.connection } returns connection
+                    every { connection.prepareStatement("SELECT 1") } returns preparedStatement
+                    every { preparedStatement.executeQuery() } returns resultSet
+                    every { resultSet.next() } returns true
+                    every { resultSet.getInt(1) } returns 1
+                    every { connection.close() } returns Unit
+                    every { preparedStatement.close() } returns Unit
+                    every { resultSet.close() } returns Unit
 
-                val repository = PostgresHealthRepository(dataSource)
-                val result = repository.checkConnectivity()
+                    val repository = PostgresHealthRepository(dataSource)
+                    val result = repository.checkConnectivity()
 
-                result.shouldBeRightAnd { true }
+                    result.shouldBeRightAnd { true }
 
-                verify {
-                    dataSource.connection
-                    connection.prepareStatement("SELECT 1")
-                    preparedStatement.executeQuery()
-                    resultSet.next()
-                    resultSet.getInt(1)
-                }
-            }
-
-            should("return ConnectionFailure when connection cannot be established") {
-                val dataSource = mockk<DataSource>()
-                val connectionException = SQLException("Connection timeout")
-
-                every { dataSource.connection } throws connectionException
-
-                val repository = PostgresHealthRepository(dataSource)
-                val result = repository.checkConnectivity()
-
-                result.shouldBeLeftAnd { error: DatabaseFailure ->
-                    error is DatabaseFailure.ConnectionFailure
+                    verify {
+                        dataSource.connection
+                        connection.prepareStatement("SELECT 1")
+                        preparedStatement.executeQuery()
+                        resultSet.next()
+                        resultSet.getInt(1)
+                    }
                 }
 
-                verify { dataSource.connection }
-            }
+                should("return ConnectionFailure when connection cannot be established") {
+                    val dataSource = mockk<DataSource>()
+                    val connectionException = SQLException("Connection timeout")
 
-            should("return ConnectionFailure for connection-related SQL exceptions") {
-                val dataSource = mockk<DataSource>()
-                val connection = mockk<Connection>()
-                val connectionException = SQLException("Connection refused")
+                    every { dataSource.connection } throws connectionException
 
-                every { dataSource.connection } returns connection
-                every { connection.prepareStatement("SELECT 1") } throws connectionException
-                every { connection.close() } returns Unit
+                    val repository = PostgresHealthRepository(dataSource)
+                    val result = repository.checkConnectivity()
 
-                val repository = PostgresHealthRepository(dataSource)
-                val result = repository.checkConnectivity()
+                    result.shouldBeLeftAnd { error: DatabaseFailure ->
+                        error is DatabaseFailure.ConnectionFailure
+                    }
 
-                result.shouldBeLeftAnd { error: DatabaseFailure ->
-                    error is DatabaseFailure.ConnectionFailure
+                    verify { dataSource.connection }
                 }
-            }
 
-            should("return QueryFailure when SQL query fails") {
-                val dataSource = mockk<DataSource>()
-                val connection = mockk<Connection>()
-                val preparedStatement = mockk<PreparedStatement>()
-                val queryException = SQLException("Invalid SQL syntax")
+                should("return ConnectionFailure for connection-related SQL exceptions") {
+                    val dataSource = mockk<DataSource>()
+                    val connection = mockk<Connection>()
+                    val connectionException = SQLException("Connection refused")
 
-                every { dataSource.connection } returns connection
-                every { connection.prepareStatement("SELECT 1") } returns preparedStatement
-                every { preparedStatement.executeQuery() } throws queryException
-                every { connection.close() } returns Unit
-                every { preparedStatement.close() } returns Unit
+                    every { dataSource.connection } returns connection
+                    every { connection.prepareStatement("SELECT 1") } throws connectionException
+                    every { connection.close() } returns Unit
 
-                val repository = PostgresHealthRepository(dataSource)
-                val result = repository.checkConnectivity()
+                    val repository = PostgresHealthRepository(dataSource)
+                    val result = repository.checkConnectivity()
 
-                result.shouldBeLeftAnd { error: DatabaseFailure ->
-                    error is DatabaseFailure.QueryExecutionFailure
+                    result.shouldBeLeftAnd { error: DatabaseFailure ->
+                        error is DatabaseFailure.ConnectionFailure
+                    }
                 }
-            }
 
-            should("return QueryFailure when result set has no results") {
-                val dataSource = mockk<DataSource>()
-                val connection = mockk<Connection>()
-                val preparedStatement = mockk<PreparedStatement>()
-                val resultSet = mockk<ResultSet>()
+                should("return QueryFailure when SQL query fails") {
+                    val dataSource = mockk<DataSource>()
+                    val connection = mockk<Connection>()
+                    val preparedStatement = mockk<PreparedStatement>()
+                    val queryException = SQLException("Invalid SQL syntax")
 
-                every { dataSource.connection } returns connection
-                every { connection.prepareStatement("SELECT 1") } returns preparedStatement
-                every { preparedStatement.executeQuery() } returns resultSet
-                every { resultSet.next() } returns false
-                every { connection.close() } returns Unit
-                every { preparedStatement.close() } returns Unit
-                every { resultSet.close() } returns Unit
+                    every { dataSource.connection } returns connection
+                    every { connection.prepareStatement("SELECT 1") } returns preparedStatement
+                    every { preparedStatement.executeQuery() } throws queryException
+                    every { connection.close() } returns Unit
+                    every { preparedStatement.close() } returns Unit
 
-                val repository = PostgresHealthRepository(dataSource)
-                val result = repository.checkConnectivity()
+                    val repository = PostgresHealthRepository(dataSource)
+                    val result = repository.checkConnectivity()
 
-                result.shouldBeLeftAnd { error: DatabaseFailure ->
-                    error is DatabaseFailure.QueryExecutionFailure
+                    result.shouldBeLeftAnd { error: DatabaseFailure ->
+                        error is DatabaseFailure.QueryExecutionFailure
+                    }
                 }
-            }
 
-            should("return QueryFailure when result set returns unexpected value") {
-                val dataSource = mockk<DataSource>()
-                val connection = mockk<Connection>()
-                val preparedStatement = mockk<PreparedStatement>()
-                val resultSet = mockk<ResultSet>()
+                should("return QueryFailure when result set has no results") {
+                    val dataSource = mockk<DataSource>()
+                    val connection = mockk<Connection>()
+                    val preparedStatement = mockk<PreparedStatement>()
+                    val resultSet = mockk<ResultSet>()
 
-                every { dataSource.connection } returns connection
-                every { connection.prepareStatement("SELECT 1") } returns preparedStatement
-                every { preparedStatement.executeQuery() } returns resultSet
-                every { resultSet.next() } returns true
-                every { resultSet.getInt(1) } returns 0
-                every { connection.close() } returns Unit
-                every { preparedStatement.close() } returns Unit
-                every { resultSet.close() } returns Unit
+                    every { dataSource.connection } returns connection
+                    every { connection.prepareStatement("SELECT 1") } returns preparedStatement
+                    every { preparedStatement.executeQuery() } returns resultSet
+                    every { resultSet.next() } returns false
+                    every { connection.close() } returns Unit
+                    every { preparedStatement.close() } returns Unit
+                    every { resultSet.close() } returns Unit
 
-                val repository = PostgresHealthRepository(dataSource)
-                val result = repository.checkConnectivity()
+                    val repository = PostgresHealthRepository(dataSource)
+                    val result = repository.checkConnectivity()
 
-                result.shouldBeLeftAnd { error: DatabaseFailure ->
-                    error is DatabaseFailure.QueryExecutionFailure
+                    result.shouldBeLeftAnd { error: DatabaseFailure ->
+                        error is DatabaseFailure.QueryExecutionFailure
+                    }
+                }
+
+                should("return QueryFailure when result set returns unexpected value") {
+                    val dataSource = mockk<DataSource>()
+                    val connection = mockk<Connection>()
+                    val preparedStatement = mockk<PreparedStatement>()
+                    val resultSet = mockk<ResultSet>()
+
+                    every { dataSource.connection } returns connection
+                    every { connection.prepareStatement("SELECT 1") } returns preparedStatement
+                    every { preparedStatement.executeQuery() } returns resultSet
+                    every { resultSet.next() } returns true
+                    every { resultSet.getInt(1) } returns 0
+                    every { connection.close() } returns Unit
+                    every { preparedStatement.close() } returns Unit
+                    every { resultSet.close() } returns Unit
+
+                    val repository = PostgresHealthRepository(dataSource)
+                    val result = repository.checkConnectivity()
+
+                    result.shouldBeLeftAnd { error: DatabaseFailure ->
+                        error is DatabaseFailure.QueryExecutionFailure
+                    }
                 }
             }
         }
-    }
-})
+    })

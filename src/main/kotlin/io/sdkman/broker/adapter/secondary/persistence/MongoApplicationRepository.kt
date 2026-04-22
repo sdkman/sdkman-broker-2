@@ -13,7 +13,9 @@ import io.sdkman.broker.domain.repository.ApplicationRepository
 import io.sdkman.broker.domain.repository.RepositoryError
 import org.bson.Document
 
-class MongoApplicationRepository(private val database: MongoDatabase) : ApplicationRepository {
+class MongoApplicationRepository(
+    private val database: MongoDatabase
+) : ApplicationRepository {
     companion object {
         private const val COLLECTION_NAME = "application"
         private const val ALIVE_FIELD = "alive"
@@ -29,29 +31,32 @@ class MongoApplicationRepository(private val database: MongoDatabase) : Applicat
             }
 
     private fun findDocument(): Either<RepositoryError, Option<Document>> =
-        Either.catch {
-            Option.fromNullable(
-                database.getCollection(COLLECTION_NAME)
-                    .find()
-                    .first()
-            )
-        }.mapLeft { error ->
-            when (error) {
-                is MongoException -> RepositoryError.ConnectionError(error)
-                else -> RepositoryError.DatabaseError(error)
+        Either
+            .catch {
+                Option.fromNullable(
+                    database
+                        .getCollection(COLLECTION_NAME)
+                        .find()
+                        .first()
+                )
+            }.mapLeft { error ->
+                when (error) {
+                    is MongoException -> RepositoryError.ConnectionError(error)
+                    else -> RepositoryError.DatabaseError(error)
+                }
             }
-        }
 
     private fun processDocument(document: Document): Either<RepositoryError, Option<Application>> =
-        Either.catch { document.getString(ALIVE_FIELD) }
+        Either
+            .catch { document.getString(ALIVE_FIELD) }
             .mapLeft { error -> RepositoryError.DatabaseError(error) }
             .flatMap { aliveStatus ->
-                Application.of(aliveStatus)
+                Application
+                    .of(aliveStatus)
                     .mapLeft { error ->
                         val errorMsg = "Invalid application record: $error"
                         val exception = IllegalStateException(errorMsg)
                         RepositoryError.DatabaseError(exception)
-                    }
-                    .map { app -> Some(app) }
+                    }.map { app -> Some(app) }
             }
 }

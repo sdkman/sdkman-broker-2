@@ -9,7 +9,9 @@ import com.mongodb.client.MongoDatabase
 import io.sdkman.broker.config.AppConfig
 import org.slf4j.LoggerFactory
 
-class MongoConnectivity(private val config: AppConfig) {
+class MongoConnectivity(
+    private val config: AppConfig
+) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun database(): MongoDatabase {

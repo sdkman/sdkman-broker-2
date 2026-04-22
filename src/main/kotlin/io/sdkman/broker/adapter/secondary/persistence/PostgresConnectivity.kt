@@ -9,7 +9,9 @@ import io.sdkman.broker.config.AppConfig
 import org.slf4j.LoggerFactory
 import javax.sql.DataSource
 
-class PostgresConnectivity(private val config: AppConfig) {
+class PostgresConnectivity(
+    private val config: AppConfig
+) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun dataSource(): DataSource {

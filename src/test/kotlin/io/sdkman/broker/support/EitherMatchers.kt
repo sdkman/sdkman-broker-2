@@ -9,8 +9,8 @@ import io.sdkman.broker.domain.repository.DatabaseFailure
 
 fun <L, R> beRight(expected: R): Matcher<Either<L, R>> =
     object : Matcher<Either<L, R>> {
-        override fun test(value: Either<L, R>): MatcherResult {
-            return when (value) {
+        override fun test(value: Either<L, R>): MatcherResult =
+            when (value) {
                 is Either.Right ->
                     MatcherResult(
                         value.value == expected,
@@ -24,13 +24,12 @@ fun <L, R> beRight(expected: R): Matcher<Either<L, R>> =
                         { "Expected Either to not be Right($expected)" }
                     )
             }
-        }
     }
 
 fun <L, R> beRightAnd(predicate: (R) -> Boolean): Matcher<Either<L, R>> =
     object : Matcher<Either<L, R>> {
-        override fun test(value: Either<L, R>): MatcherResult {
-            return when (value) {
+        override fun test(value: Either<L, R>): MatcherResult =
+            when (value) {
                 is Either.Right ->
                     MatcherResult(
                         predicate(value.value),
@@ -44,13 +43,12 @@ fun <L, R> beRightAnd(predicate: (R) -> Boolean): Matcher<Either<L, R>> =
                         { "Expected Either to not be Right" }
                     )
             }
-        }
     }
 
 fun <L, R> beLeft(expected: L): Matcher<Either<L, R>> =
     object : Matcher<Either<L, R>> {
-        override fun test(value: Either<L, R>): MatcherResult {
-            return when (value) {
+        override fun test(value: Either<L, R>): MatcherResult =
+            when (value) {
                 is Either.Left ->
                     MatcherResult(
                         value.value == expected,
@@ -64,13 +62,12 @@ fun <L, R> beLeft(expected: L): Matcher<Either<L, R>> =
                         { "Expected Either to not be Left($expected)" }
                     )
             }
-        }
     }
 
 fun <L, R> beLeftAnd(predicate: (L) -> Boolean): Matcher<Either<L, R>> =
     object : Matcher<Either<L, R>> {
-        override fun test(value: Either<L, R>): MatcherResult {
-            return when (value) {
+        override fun test(value: Either<L, R>): MatcherResult =
+            when (value) {
                 is Either.Left ->
                     MatcherResult(
                         predicate(value.value),
@@ -84,7 +81,6 @@ fun <L, R> beLeftAnd(predicate: (L) -> Boolean): Matcher<Either<L, R>> =
                         { "Expected Either to not be Left" }
                     )
             }
-        }
     }
 
 infix fun <L, R> Either<L, R>.shouldBeRight(expected: R) = this should beRight(expected)

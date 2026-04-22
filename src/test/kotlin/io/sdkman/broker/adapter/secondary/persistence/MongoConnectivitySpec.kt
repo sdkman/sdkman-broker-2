@@ -11,79 +11,81 @@ import io.sdkman.broker.config.AppConfig
 import org.junit.jupiter.api.Tag
 
 @Tag("unit")
-class MongoConnectivitySpec : ShouldSpec({
+class MongoConnectivitySpec :
+    ShouldSpec({
 
-    should("generate basic connection string for localhost with no credentials") {
-        // given
-        val config = mockk<AppConfig>()
-        every { config.mongodbHost } returns "localhost"
-        every { config.mongodbPort } returns "27017"
-        every { config.mongodbDatabase } returns "sdkman"
-        every { config.mongodbUsername } returns None
-        every { config.mongodbPassword } returns None
+        should("generate basic connection string for localhost with no credentials") {
+            // given
+            val config = mockk<AppConfig>()
+            every { config.mongodbHost } returns "localhost"
+            every { config.mongodbPort } returns "27017"
+            every { config.mongodbDatabase } returns "sdkman"
+            every { config.mongodbUsername } returns None
+            every { config.mongodbPassword } returns None
 
-        val connectivity = MongoConnectivity(config)
+            val connectivity = MongoConnectivity(config)
 
-        // when
-        val connectionString = connectivity.buildConnectionString()
+            // when
+            val connectionString = connectivity.buildConnectionString()
 
-        // then
-        connectionString shouldBe "mongodb://localhost:27017/sdkman"
-    }
+            // then
+            connectionString shouldBe "mongodb://localhost:27017/sdkman"
+        }
 
-    should("use custom host and port when provided") {
-        // given
-        val config = mockk<AppConfig>()
-        every { config.mongodbHost } returns "mongo.example.com"
-        every { config.mongodbPort } returns "12345"
-        every { config.mongodbDatabase } returns "sdkman"
-        every { config.mongodbUsername } returns None
-        every { config.mongodbPassword } returns None
+        should("use custom host and port when provided") {
+            // given
+            val config = mockk<AppConfig>()
+            every { config.mongodbHost } returns "mongo.example.com"
+            every { config.mongodbPort } returns "12345"
+            every { config.mongodbDatabase } returns "sdkman"
+            every { config.mongodbUsername } returns None
+            every { config.mongodbPassword } returns None
 
-        val connectivity = MongoConnectivity(config)
+            val connectivity = MongoConnectivity(config)
 
-        // when
-        val connectionString = connectivity.buildConnectionString()
+            // when
+            val connectionString = connectivity.buildConnectionString()
 
-        // then
-        connectionString shouldBe "mongodb://mongo.example.com:12345/sdkman"
-    }
+            // then
+            connectionString shouldBe "mongodb://mongo.example.com:12345/sdkman"
+        }
 
-    should("include credentials when username and password are provided") {
-        // given
-        val config = mockk<AppConfig>()
-        every { config.mongodbHost } returns "localhost"
-        every { config.mongodbPort } returns "27017"
-        every { config.mongodbDatabase } returns "sdkman"
-        every { config.mongodbUsername } returns Some("broker")
-        every { config.mongodbPassword } returns Some("password123")
+        should("include credentials when username and password are provided") {
+            // given
+            val config = mockk<AppConfig>()
+            every { config.mongodbHost } returns "localhost"
+            every { config.mongodbPort } returns "27017"
+            every { config.mongodbDatabase } returns "sdkman"
+            every { config.mongodbUsername } returns Some("broker")
+            every { config.mongodbPassword } returns Some("password123")
 
-        val connectivity = MongoConnectivity(config)
+            val connectivity = MongoConnectivity(config)
 
-        // when
-        val connectionString = connectivity.buildConnectionString()
+            // when
+            val connectionString = connectivity.buildConnectionString()
 
-        // then
-        connectionString shouldBe "mongodb://broker:password123@localhost:27017/sdkman"
-    }
+            // then
+            connectionString shouldBe "mongodb://broker:password123@localhost:27017/sdkman"
+        }
 
-    should("add auth mechanism for non-localhost production environments") {
-        // given
-        val config = mockk<AppConfig>()
-        every { config.mongodbHost } returns "mongo.sdkman.io"
-        every { config.mongodbPort } returns "16434"
-        every { config.mongodbDatabase } returns "sdkman"
-        every { config.mongodbUsername } returns Some("broker")
-        every { config.mongodbPassword } returns Some("password123")
+        should("add auth mechanism for non-localhost production environments") {
+            // given
+            val config = mockk<AppConfig>()
+            every { config.mongodbHost } returns "mongo.sdkman.io"
+            every { config.mongodbPort } returns "16434"
+            every { config.mongodbDatabase } returns "sdkman"
+            every { config.mongodbUsername } returns Some("broker")
+            every { config.mongodbPassword } returns Some("password123")
 
-        // Create a spy of MongoConnectivity to override the isProductionEnvironment method
-        val connectivity = spyk(MongoConnectivity(config))
-        every { connectivity.isProductionEnvironment(any()) } returns true
+            // Create a spy of MongoConnectivity to override the isProductionEnvironment method
+            val connectivity = spyk(MongoConnectivity(config))
+            every { connectivity.isProductionEnvironment(any()) } returns true
 
-        // when
-        val connectionString = connectivity.buildConnectionString()
+            // when
+            val connectionString = connectivity.buildConnectionString()
 
-        // then
-        connectionString shouldBe "mongodb://broker:password123@mongo.sdkman.io:16434/sdkman?authMechanism=SCRAM-SHA-1"
-    }
-})
+            // then
+            connectionString shouldBe
+                "mongodb://broker:password123@mongo.sdkman.io:16434/sdkman?authMechanism=SCRAM-SHA-1"
+        }
+    })

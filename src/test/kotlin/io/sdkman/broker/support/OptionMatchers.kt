@@ -32,17 +32,15 @@ fun <T> beSome(expectedValue: T): Matcher<Option<T>> =
     }
 
 // Matcher for Option.isNone()
-fun <T> beNone(): Matcher<Option<T>> {
-    return object : Matcher<Option<T>> {
-        override fun test(value: Option<T>): MatcherResult {
-            return MatcherResult(
+fun <T> beNone(): Matcher<Option<T>> =
+    object : Matcher<Option<T>> {
+        override fun test(value: Option<T>): MatcherResult =
+            MatcherResult(
                 value.isNone(),
                 { "Expected Option to be None, but was $value" },
                 { "Expected Option not to be None, but was None" }
             )
-        }
     }
-}
 
 // Extension functions for more readable syntax
 infix fun <T> Option<T>.shouldBeSome(expected: T) = this should beSome(expected)

@@ -2,7 +2,9 @@ package io.sdkman.broker.domain.model
 
 import arrow.core.Option
 
-enum class Command(val value: String) {
+enum class Command(
+    val value: String
+) {
     INSTALL("install"),
     SELFUPDATE("selfupdate");
 

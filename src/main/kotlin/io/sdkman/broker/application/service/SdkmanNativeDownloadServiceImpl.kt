@@ -29,7 +29,8 @@ class SdkmanNativeDownloadServiceImpl : SdkmanNativeDownloadService {
         if (command.isBlank()) {
             VersionError.InvalidCommand("[empty/blank]").left()
         } else {
-            Command.fromValue(command)
+            Command
+                .fromValue(command)
                 .toEither { VersionError.InvalidCommand(command) }
         }
 
@@ -44,7 +45,8 @@ class SdkmanNativeDownloadServiceImpl : SdkmanNativeDownloadService {
         if (platformCode.isBlank()) {
             VersionError.InvalidPlatform("[empty/blank]").left()
         } else {
-            Platform.fromCode(platformCode)
+            Platform
+                .fromCode(platformCode)
                 .toEither { VersionError.InvalidPlatform(platformCode) }
         }
 
@@ -52,7 +54,8 @@ class SdkmanNativeDownloadServiceImpl : SdkmanNativeDownloadService {
         when (platform) {
             Platform.Exotic -> VersionError.InvalidPlatform(platform.code).left()
             else ->
-                TargetTriple.fromPlatform(platform)
+                TargetTriple
+                    .fromPlatform(platform)
                     .toEither { VersionError.InvalidPlatform(platform.code) }
         }
 
