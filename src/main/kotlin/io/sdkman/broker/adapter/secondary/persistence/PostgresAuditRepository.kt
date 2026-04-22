@@ -21,9 +21,9 @@ object AuditTable : Table("audit") {
     val version: Column<String> = text("version")
     val clientPlatform: Column<String> = text("client_platform")
     val candidatePlatform: Column<String> = text("candidate_platform")
-    val distribution: Column<String?> = text("distribution").nullable()
-    val host: Column<String?> = text("host").nullable()
-    val agent: Column<String?> = text("agent").nullable()
+    val distribution = text("distribution").nullable()
+    val host = text("host").nullable()
+    val agent = text("agent").nullable()
     val timestamp = timestamp("timestamp")
 
     override val primaryKey = PrimaryKey(id)
