@@ -93,6 +93,41 @@ Response:
 - 200 OK: `{"status":"UP"}` when healthy
 - 503 Service Unavailable: `{"status":"DOWN","reason":"..."}` when unhealthy
 
+## Production Configuration
+
+The service is configured via environment variables. Values default to sensible local-development settings; production deployments must set the following:
+
+### Required
+
+| Variable            | Purpose                                                                 |
+| ------------------- | ----------------------------------------------------------------------- |
+| `MONGODB_HOST`      | MongoDB host.                                                           |
+| `MONGODB_PORT`      | MongoDB port.                                                           |
+| `MONGODB_DATABASE`  | MongoDB database name.                                                  |
+| `MONGODB_USERNAME`  | MongoDB user.                                                           |
+| `MONGODB_PASSWORD`  | MongoDB password.                                                       |
+| `POSTGRES_HOST`     | PostgreSQL host.                                                        |
+| `POSTGRES_PORT`     | PostgreSQL port.                                                        |
+| `POSTGRES_DATABASE` | PostgreSQL database name.                                               |
+| `POSTGRES_USERNAME` | PostgreSQL user.                                                        |
+| `POSTGRES_PASSWORD` | PostgreSQL password.                                                    |
+
+### Secure Connections
+
+In production, both database connections must be hardened:
+
+| Variable                | Value          | Purpose                                                                 |
+| ----------------------- | -------------- | ----------------------------------------------------------------------- |
+| `POSTGRES_SSLMODE`      | `require`      | Forces TLS on the PostgreSQL connection. Defaults to `disable` locally. |
+| `MONGODB_AUTHMECHANISM` | `SCRAM-SHA-1`  | Enables SCRAM-SHA-1 auth on the MongoDB connection. Unset locally.      |
+
+### Server
+
+| Variable | Purpose                                            |
+| -------- | -------------------------------------------------- |
+| `PORT`   | HTTP port to bind. Defaults to `8080`.             |
+| `HOST`   | Bind address. Defaults to `0.0.0.0` in production. |
+
 ## Deployment
 
 This project uses GitHub Actions for CI/CD:
