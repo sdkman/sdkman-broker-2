@@ -40,7 +40,7 @@ lookup query (see below); no additional index is required.
 | `candidate`       | TEXT      | no    | Candidate identifier (`java`, `groovy`, …). Lower-case.                                                 |
 | `version`         | TEXT      | no    | Suffix-stripped version (e.g. `17.0.2`, never `17.0.2-tem`).                                            |
 | `distribution`    | TEXT      | yes   | Full distribution enum name (`TEMURIN`, `CORRETTO`, …). `NULL` for non-Java rows. Never `'NA'`/`'NONE'`.|
-| `platform`        | TEXT      | no    | Normalised platform identifier (`LINUX_64`, `MAC_ARM64`, …, `UNIVERSAL`).                               |
+| `platform`        | TEXT      | no    | Normalised platform identifier in the new-style convention (`LINUX_X64`, `MAC_X64`, `MAC_ARM64`, …, `UNIVERSAL`) — shared with the audit table. The legacy Mongo `versions.platform` shape (`LINUX_64`, `MAC_OSX`, …) is not used here. |
 | `visible`         | BOOLEAN   | no    | No database-level default; `sdkman-state` sets the value on insert. The Broker reads it for parity.     |
 | `url`             | TEXT      | no    | Binary download URL emitted verbatim in the `Location` header.                                          |
 | `md5_sum`         | TEXT      | yes   | MD5 checksum hex string.                                                                                |
