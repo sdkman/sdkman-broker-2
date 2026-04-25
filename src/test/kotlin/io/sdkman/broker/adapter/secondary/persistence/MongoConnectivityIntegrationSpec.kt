@@ -5,6 +5,7 @@ import arrow.core.Option
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.sdkman.broker.config.AppConfig
+import io.sdkman.broker.config.PersistenceBackend
 import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.shouldBeSome
 import org.junit.jupiter.api.Tag
@@ -30,6 +31,7 @@ class MongoConnectivityIntegrationSpec :
                     override val postgresUsername: Option<String> = None
                     override val postgresPassword: Option<String> = None
                     override val postgresSslMode: String = "disable"
+                    override val persistenceBackend: PersistenceBackend = PersistenceBackend.Mongo
                     override val serverPort: Int = 8080
                     override val serverHost: String = "127.0.0.1"
                 }
