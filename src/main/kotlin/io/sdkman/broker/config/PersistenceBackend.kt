@@ -18,11 +18,19 @@ sealed class PersistenceBackend(
     data object Postgres : PersistenceBackend("postgres")
 
     companion object {
-        private val backends: Map<String, PersistenceBackend> =
+        // Built lazily — eager initialisation triggers a sealed-class
+        // circular-init gotcha when the first reference to this type is
+        // `PersistenceBackend.Mongo` (or `Postgres`) rather than a companion
+        // method. The eager `mapOf(Mongo.value to Mongo, …)` reads
+        // `Mongo.INSTANCE` while the parent class's static init is still
+        // running, yielding `NullPointerException` from inside the
+        // companion's `<clinit>`.
+        private val backends: Map<String, PersistenceBackend> by lazy {
             mapOf(
                 Mongo.value to Mongo,
                 Postgres.value to Postgres
             )
+        }
 
         fun fromValue(value: String): PersistenceBackend =
             Option.fromNullable(backends[value.lowercase()]).getOrElse {
