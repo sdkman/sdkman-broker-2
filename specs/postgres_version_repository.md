@@ -125,7 +125,7 @@ Optional request headers consumed for audit:
 9. **Archive type is inferred from the URL.** The `X-Sdkman-ArchiveType`
    header value is determined by the extension of the `Location` URL, not by
    any database field. `.zip` → `zip`, `.tar.gz`/`.tgz` → `tar.gz`,
-   `.tar.bz2`/`.bz2` → `tar.bz2`, `.xz` → `xz`. Unknown extensions default to
+   `.tar.bz2` → `tar.bz2`, `.xz` → `xz`. Unknown extensions default to
    `zip`.
 10. **Audit is best-effort.** An audit write failure is logged but never
     prevents the `302` response to the client. A 4xx or 5xx response never
