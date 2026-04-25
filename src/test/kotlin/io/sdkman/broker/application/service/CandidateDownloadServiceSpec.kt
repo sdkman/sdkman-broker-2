@@ -40,23 +40,23 @@ class CandidateDownloadServiceSpec :
             clearMocks(mockVersionRepository, mockAuditRepository)
         }
 
-        should("return download response and record audit for specific platform match") {
-            // given: exact platform match exists
+        should("strip Java short-code suffix and forward stripped version + distribution to repository") {
+            // given: Java request carries `-tem` suffix; canonical shape is what the repo returns
             val platformSpecificVersion =
                 Version(
                     candidate = "java",
-                    version = "17.0.2-tem",
+                    version = "17.0.2",
                     platform = "MAC_ARM64",
                     url = "https://example.com/java-17.0.2-arm64.tar.gz",
-                    distribution = Some("tem"),
+                    distribution = Some("TEMURIN"),
                     checksums = mapOf("SHA-256" to "abc123")
                 )
 
             every {
                 mockVersionRepository.findByQuery(
                     "java",
-                    "17.0.2-tem",
-                    None,
+                    "17.0.2",
+                    Some("TEMURIN"),
                     Platform.DarwinARM64
                 )
             } returns Some(platformSpecificVersion).right()
@@ -72,7 +72,7 @@ class CandidateDownloadServiceSpec :
                     response.archiveType == "tar.gz"
             }
 
-            // and: audit entry persisted
+            // and: audit entry persisted with canonical version and full distribution enum
             val auditSlot = slot<Audit>()
             verify { mockAuditRepository.save(capture(auditSlot)) }
             auditSlot.captured.apply {
@@ -81,10 +81,87 @@ class CandidateDownloadServiceSpec :
                 candidate shouldBe "java"
                 clientPlatform shouldBe "MAC_ARM64"
                 candidatePlatform shouldBe "MAC_ARM64"
-                distribution shouldBe "tem".some()
+                distribution shouldBe "TEMURIN".some()
                 host shouldBe testAuditContext.host
                 agent shouldBe testAuditContext.agent
             }
+        }
+
+        should("forward verbatim version and no distribution for Java with unknown short-code suffix") {
+            // given: suffix `bogus` is not a recognised Java short code
+            every {
+                mockVersionRepository.findByQuery("java", "17.0.2-bogus", None, Platform.LinuxX64)
+            } returns None.right()
+            every {
+                mockVersionRepository.findByQuery("java", "17.0.2-bogus", None, Platform.Universal)
+            } returns None.right()
+
+            // when: downloading version with unknown suffix
+            val result = underTest.downloadVersion("java", "17.0.2-bogus", "linuxx64", testAuditContext)
+
+            // then: VersionNotFound error preserves the original request token
+            result shouldBeLeft VersionError.VersionNotFound("java", "17.0.2-bogus", "LINUX_64")
+
+            // and: no audit row written for a 404
+            verify(exactly = 0) { mockAuditRepository.save(any()) }
+        }
+
+        should("preserve Java distribution when falling back to UNIVERSAL platform") {
+            // given: no exact platform match but UNIVERSAL row exists for the same distribution
+            val universalJavaVersion =
+                Version(
+                    candidate = "java",
+                    version = "21.0.1",
+                    platform = "UNIVERSAL",
+                    url = "https://example.com/java-21.0.1.tar.gz",
+                    distribution = Some("TEMURIN")
+                )
+            every {
+                mockVersionRepository.findByQuery("java", "21.0.1", Some("TEMURIN"), Platform.LinuxX64)
+            } returns None.right()
+            every {
+                mockVersionRepository.findByQuery("java", "21.0.1", Some("TEMURIN"), Platform.Universal)
+            } returns Some(universalJavaVersion).right()
+            every { mockAuditRepository.save(any()) } returns Unit.right()
+
+            // when: client requests Linux build
+            val result = underTest.downloadVersion("java", "21.0.1-tem", "linuxx64", testAuditContext)
+
+            // then: UNIVERSAL fallback succeeds
+            result shouldBeRightAnd { response ->
+                response.redirectUrl == "https://example.com/java-21.0.1.tar.gz"
+            }
+
+            // and: audit row records UNIVERSAL candidate platform but preserves distribution
+            val auditSlot = slot<Audit>()
+            verify { mockAuditRepository.save(capture(auditSlot)) }
+            auditSlot.captured.apply {
+                version shouldBe "21.0.1"
+                candidate shouldBe "java"
+                clientPlatform shouldBe "LINUX_X64"
+                candidatePlatform shouldBe "UNIVERSAL"
+                distribution shouldBe "TEMURIN".some()
+            }
+        }
+
+        should("not fall back to a UNIVERSAL row of a different Java distribution") {
+            // given: no exact match and no UNIVERSAL match for ZULU; a TEMURIN UNIVERSAL row may exist but
+            // is invisible to a ZULU lookup because the repository filters on distribution.
+            every {
+                mockVersionRepository.findByQuery("java", "21.0.1", Some("ZULU"), Platform.LinuxX64)
+            } returns None.right()
+            every {
+                mockVersionRepository.findByQuery("java", "21.0.1", Some("ZULU"), Platform.Universal)
+            } returns None.right()
+
+            // when: client requests Linux build for ZULU
+            val result = underTest.downloadVersion("java", "21.0.1-zulu", "linuxx64", testAuditContext)
+
+            // then: VersionNotFound — distributions do not leak across the UNIVERSAL fallback
+            result shouldBeLeft VersionError.VersionNotFound("java", "21.0.1-zulu", "LINUX_64")
+
+            // and: no audit row written for a 404
+            verify(exactly = 0) { mockAuditRepository.save(any()) }
         }
 
         should("return download response and record audit for UNIVERSAL fallback when platform match not found") {
@@ -165,18 +242,18 @@ class CandidateDownloadServiceSpec :
         }
 
         should("return VersionNotFound error and record no audit when platform not found and no UNIVERSAL fallback") {
-            // given: no exact match and no UNIVERSAL fallback
+            // given: no exact match and no UNIVERSAL fallback (calls use the stripped Java contract)
             every {
-                mockVersionRepository.findByQuery("java", "17.0.2-tem", None, Platform.LinuxX64)
+                mockVersionRepository.findByQuery("java", "17.0.2", Some("TEMURIN"), Platform.LinuxX64)
             } returns None.right()
             every {
-                mockVersionRepository.findByQuery("java", "17.0.2-tem", None, Platform.Universal)
+                mockVersionRepository.findByQuery("java", "17.0.2", Some("TEMURIN"), Platform.Universal)
             } returns None.right()
 
             // when: downloading version for unsupported platform
             val result = underTest.downloadVersion("java", "17.0.2-tem", "linuxx64", testAuditContext)
 
-            // then: VersionNotFound error
+            // then: VersionNotFound error preserves the original request token
             result shouldBeLeft VersionError.VersionNotFound("java", "17.0.2-tem", "LINUX_64")
 
             // and: record no audit
@@ -184,10 +261,10 @@ class CandidateDownloadServiceSpec :
         }
 
         should("return DatabaseError and record no audit when repository fails") {
-            // given: repository error
+            // given: repository error on the stripped Java lookup
             val dbError = RuntimeException("Database connection failed")
             every {
-                mockVersionRepository.findByQuery("java", "17.0.2-tem", None, Platform.DarwinARM64)
+                mockVersionRepository.findByQuery("java", "17.0.2", Some("TEMURIN"), Platform.DarwinARM64)
             } returns VersionError.DatabaseError(dbError).left()
 
             // when: downloading version

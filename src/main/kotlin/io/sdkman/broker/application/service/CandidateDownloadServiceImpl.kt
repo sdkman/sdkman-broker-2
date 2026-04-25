@@ -9,6 +9,7 @@ import arrow.core.right
 import io.sdkman.broker.adapter.primary.rest.AuditContext
 import io.sdkman.broker.domain.model.ArchiveType
 import io.sdkman.broker.domain.model.DownloadInfo
+import io.sdkman.broker.domain.model.JavaDistribution
 import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.domain.model.VersionError
@@ -16,6 +17,8 @@ import io.sdkman.broker.domain.repository.AuditRepository
 import io.sdkman.broker.domain.repository.VersionRepository
 import io.sdkman.broker.domain.service.CandidateDownloadService
 import org.slf4j.LoggerFactory
+
+private const val JAVA_CANDIDATE = "java"
 
 class CandidateDownloadServiceImpl(
     private val versionRepository: VersionRepository,
@@ -35,7 +38,8 @@ class CandidateDownloadServiceImpl(
                     .fromCode(platformCode)
                     .toEither { VersionError.InvalidPlatform(platformCode) }
                     .bind()
-            val versionEntity = findVersionWithFallback(candidate, version, platform).bind()
+            val resolved = resolveVersionToken(candidate, version)
+            val versionEntity = findVersionWithFallback(candidate, version, resolved, platform).bind()
             val checksumHeaders =
                 versionEntity.checksums.mapKeys { (algorithm, _) ->
                     "X-Sdkman-Checksum-${algorithm.uppercase()}"
@@ -62,22 +66,36 @@ class CandidateDownloadServiceImpl(
             return downloadInfo.right()
         }
 
+    private fun resolveVersionToken(
+        candidate: String,
+        version: String
+    ): JavaDistribution.Resolution =
+        if (candidate == JAVA_CANDIDATE) {
+            JavaDistribution.resolve(version)
+        } else {
+            JavaDistribution.Resolution(version, None)
+        }
+
     private fun findVersionWithFallback(
         candidate: String,
-        version: String,
+        requestedVersion: String,
+        resolved: JavaDistribution.Resolution,
         platform: Platform
     ): Either<VersionError, Version> =
         versionRepository
-            .findByQuery(candidate, version, None, platform)
+            .findByQuery(candidate, resolved.version, resolved.distribution, platform)
             .flatMap { platformSpecificOption ->
                 platformSpecificOption.fold(
                     {
-                        // Try UNIVERSAL fallback
                         versionRepository
-                            .findByQuery(candidate, version, None, Platform.Universal)
+                            .findByQuery(candidate, resolved.version, resolved.distribution, Platform.Universal)
                             .flatMap { universalOption ->
                                 universalOption.fold(
-                                    { VersionError.VersionNotFound(candidate, version, platform.persistentId).left() },
+                                    {
+                                        VersionError
+                                            .VersionNotFound(candidate, requestedVersion, platform.persistentId)
+                                            .left()
+                                    },
                                     { it.right() }
                                 )
                             }
