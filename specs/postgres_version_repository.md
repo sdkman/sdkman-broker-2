@@ -182,7 +182,12 @@ Feature: Candidate Download — Postgres-backed Version Resolution
       And the "X-Sdkman-Checksum-MD5" header is "ghi789"
       And an audit row is written with candidate_platform "UNIVERSAL", client_platform "LINUX_X64", distribution null
 
-  Scenario: Java UNIVERSAL fallback preserves distribution
+  # Note: production data does not contain UNIVERSAL Java rows — Java versions
+  # are always platform-specific. The two scenarios below are defensive: they
+  # pin the Broker's behaviour if such a row were ever to appear (e.g. through
+  # an upstream data error), so the fallback rules remain unambiguous.
+
+  Scenario: Java UNIVERSAL fallback preserves distribution (defensive)
     Given a version record exists with
       | candidate    | java      |
       | version      | 21.0.1    |
@@ -192,7 +197,7 @@ Feature: Candidate Download — Postgres-backed Version Resolution
     Then the response status is 302
       And an audit row is written with distribution "TEMURIN", candidate_platform "UNIVERSAL"
 
-  Scenario: Java UNIVERSAL fallback does not leak across distributions
+  Scenario: Java UNIVERSAL fallback does not leak across distributions (defensive)
     Given a version record exists with
       | candidate    | java      |
       | version      | 21.0.1    |
