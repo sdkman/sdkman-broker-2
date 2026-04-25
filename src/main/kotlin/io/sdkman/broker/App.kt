@@ -14,6 +14,7 @@ import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
+import io.sdkman.broker.adapter.secondary.persistence.PostgresVersionRepository
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.MetaHealthService
 import io.sdkman.broker.application.service.MetaHealthServiceImpl
@@ -22,6 +23,8 @@ import io.sdkman.broker.application.service.MetaReleaseServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
+import io.sdkman.broker.config.PersistenceBackend
+import io.sdkman.broker.domain.repository.VersionRepository
 import io.sdkman.broker.domain.service.CandidateDownloadService
 import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 import io.sdkman.broker.domain.service.SdkmanNativeDownloadService
@@ -43,7 +46,11 @@ object App {
 
         // Initialize repositories
         val applicationRepository = MongoApplicationRepository(database)
-        val versionRepository = MongoVersionRepository(database)
+        val versionRepository: VersionRepository =
+            when (config.persistenceBackend) {
+                PersistenceBackend.Mongo -> MongoVersionRepository(database)
+                PersistenceBackend.Postgres -> PostgresVersionRepository(postgresDataSource)
+            }
         val postgresHealthRepository = PostgresHealthRepository(postgresDataSource)
         val auditRepository = PostgresAuditRepository(postgresDataSource)
 
