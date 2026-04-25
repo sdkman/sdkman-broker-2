@@ -6,6 +6,7 @@ import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
+import io.sdkman.broker.adapter.secondary.persistence.PostgresVersionRepository
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.MetaHealthServiceImpl
 import io.sdkman.broker.application.service.MetaReleaseServiceImpl
@@ -35,6 +36,10 @@ object TestDependencyInjection {
 
     val versionRepository by lazy {
         MongoVersionRepository(database)
+    }
+
+    val postgresVersionRepository by lazy {
+        PostgresVersionRepository(postgresDataSource)
     }
 
     val postgresHealthRepository by lazy {
@@ -74,6 +79,14 @@ object TestDependencyInjection {
 
     val versionServiceWithBrokenAuditRepo by lazy {
         CandidateDownloadServiceImpl(versionRepository, failingAuditRepository)
+    }
+
+    val versionServicePostgres by lazy {
+        CandidateDownloadServiceImpl(postgresVersionRepository, auditRepository)
+    }
+
+    val versionServicePostgresWithBrokenAuditRepo by lazy {
+        CandidateDownloadServiceImpl(postgresVersionRepository, failingAuditRepository)
     }
 
     val sdkmanCliDownloadService by lazy {
