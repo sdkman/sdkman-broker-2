@@ -14,7 +14,8 @@ SDKMAN Broker is a Kotlin-based Ktor application that brokers SDKMAN candidate a
 
 Run after every implementation to get immediate feedback:
 
-- **Full chain:** `./gradlew check` (compile → detekt → ktlintCheck → test)
+- **Clean build** `./gradlew clean`
+- **Full check:** `./gradlew clean check` (clean -> compile → detekt → ktlintCheck → test)
 - **Tests only:** `./gradlew test`
 - **Lint only:** `./gradlew ktlintCheck`
 - **Lint auto-fix:** `./gradlew ktlintFormat`
@@ -45,7 +46,7 @@ docker run --restart=always \
 
 * Use atomic Git commits with small incremental changes. **NO BULK COMMITS PLEASE!**
 * Use Conventional Commits for well structured commit messages: https://www.conventionalcommits.org/en/v1.0.0/
-* Always delegate Git commits to the `/commit` skill if available on the system. This ensures Conventional Commit format.
+* Only commit green builds
 
 ## Rules
 
