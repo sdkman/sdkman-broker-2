@@ -124,9 +124,13 @@ Optional request headers consumed for audit:
     prevents the `302` response to the client. A 4xx or 5xx response never
     produces an audit row.
 11. **Audit uses canonical values.** The `version` field is the
-    suffix-stripped version (e.g. `17.0.2`) and the `distribution` field is
-    the full distribution enum name (e.g. `TEMURIN`), matching the
-    normalised storage in the new `versions` table.
+    suffix-stripped version (e.g. `17.0.2`), the `distribution` field is
+    the full distribution enum name (e.g. `TEMURIN`), and the
+    `client_platform`/`candidate_platform` fields use the new-style
+    platform identifiers (`LINUX_X64`, `MAC_X64`, …) — matching the
+    normalised storage in the new Postgres `versions` table. Historical
+    audit rows written under the Mongo backend may carry the legacy
+    `LINUX_64`/`MAC_OSX` style; this spec governs new writes only.
 12. **Backend selection is invisible to the client.** The same URL, headers,
     and status codes are produced whether the request is served by the
     MongoDB or Postgres backend. Any discrepancy between backends is a bug.
