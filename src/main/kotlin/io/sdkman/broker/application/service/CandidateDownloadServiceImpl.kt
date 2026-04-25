@@ -1,6 +1,7 @@
 package io.sdkman.broker.application.service
 
 import arrow.core.Either
+import arrow.core.None
 import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.raise.either
@@ -34,7 +35,7 @@ class CandidateDownloadServiceImpl(
                     .fromCode(platformCode)
                     .toEither { VersionError.InvalidPlatform(platformCode) }
                     .bind()
-            val versionEntity = findVersionWithFallback(candidate, version, platform.persistentId).bind()
+            val versionEntity = findVersionWithFallback(candidate, version, platform).bind()
             val checksumHeaders =
                 versionEntity.checksums.mapKeys { (algorithm, _) ->
                     "X-Sdkman-Checksum-${algorithm.uppercase()}"
@@ -64,19 +65,19 @@ class CandidateDownloadServiceImpl(
     private fun findVersionWithFallback(
         candidate: String,
         version: String,
-        platformId: String
+        platform: Platform
     ): Either<VersionError, Version> =
         versionRepository
-            .findByQuery(candidate, version, platformId)
+            .findByQuery(candidate, version, None, platform)
             .flatMap { platformSpecificOption ->
                 platformSpecificOption.fold(
                     {
                         // Try UNIVERSAL fallback
                         versionRepository
-                            .findByQuery(candidate, version, Platform.Universal.persistentId)
+                            .findByQuery(candidate, version, None, Platform.Universal)
                             .flatMap { universalOption ->
                                 universalOption.fold(
-                                    { VersionError.VersionNotFound(candidate, version, platformId).left() },
+                                    { VersionError.VersionNotFound(candidate, version, platform.persistentId).left() },
                                     { it.right() }
                                 )
                             }

@@ -1,11 +1,12 @@
 package io.sdkman.broker.adapter.secondary.persistence
 
 import arrow.core.Either
+import arrow.core.None
 import arrow.core.Option
+import arrow.core.Some
 import arrow.core.firstOrNone
 import arrow.core.getOrElse
 import arrow.core.toOption
-import com.mongodb.MongoException
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository.Companion.CANDIDATE_FIELD
@@ -14,6 +15,8 @@ import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository.Com
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository.Companion.VENDOR_FIELD
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository.Companion.VERSION_FIELD
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository.Companion.VISIBLE_FIELD
+import io.sdkman.broker.domain.model.JavaDistribution
+import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.domain.model.VersionError
 import io.sdkman.broker.domain.repository.VersionRepository
@@ -36,28 +39,46 @@ class MongoVersionRepository(
     override fun findByQuery(
         candidate: String,
         version: String,
-        platform: String
+        distribution: Option<String>,
+        platform: Platform
     ): Either<VersionError, Option<Version>> =
         Either
             .catch {
-                val filter =
-                    Filters.and(
-                        Filters.eq(CANDIDATE_FIELD, candidate),
-                        Filters.eq(VERSION_FIELD, version),
-                        Filters.eq(PLATFORM_FIELD, platform)
-                    )
+                distribution.fold(
+                    ifEmpty = { findVerbatim(candidate, version, platform.persistentId) },
+                    ifSome = { enumName -> findByDistribution(candidate, version, enumName, platform.persistentId) }
+                )
+            }.mapLeft { error -> VersionError.DatabaseError(error) }
 
-                database
-                    .getCollection(COLLECTION_NAME)
-                    .find(filter)
-                    .firstOrNone()
-                    .map { it.toVersion() }
-            }.mapLeft { error ->
-                when (error) {
-                    is MongoException -> VersionError.DatabaseError(error)
-                    else -> VersionError.DatabaseError(error)
-                }
+    private fun findVerbatim(
+        candidate: String,
+        version: String,
+        platformId: String
+    ): Option<Version> =
+        database
+            .getCollection(COLLECTION_NAME)
+            .find(
+                Filters.and(
+                    Filters.eq(CANDIDATE_FIELD, candidate),
+                    Filters.eq(VERSION_FIELD, version),
+                    Filters.eq(PLATFORM_FIELD, platformId)
+                )
+            ).firstOrNone()
+            .map { it.toVersion() }
+
+    private fun findByDistribution(
+        candidate: String,
+        strippedVersion: String,
+        distributionEnumName: String,
+        platformId: String
+    ): Option<Version> =
+        JavaDistribution.shortCodeFor(distributionEnumName).fold(
+            ifEmpty = { None },
+            ifSome = { shortCode ->
+                findVerbatim(candidate, "$strippedVersion-$shortCode", platformId)
+                    .map { it.copy(version = strippedVersion, distribution = Some(distributionEnumName)) }
             }
+        )
 }
 
 private fun Document.toVersion(): Version {

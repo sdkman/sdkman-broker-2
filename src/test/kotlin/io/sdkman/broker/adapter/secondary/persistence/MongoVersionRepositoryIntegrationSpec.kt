@@ -5,6 +5,7 @@ import arrow.core.Some
 import io.kotest.assertions.fail
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.support.MongoSupport.setupVersion
 import io.sdkman.broker.support.MongoTestListener
@@ -16,7 +17,7 @@ class MongoVersionRepositoryIntegrationSpec :
 
         val repository = MongoVersionRepository(MongoTestListener.database)
 
-        should("find version by exact candidate, version, and platform match") {
+        should("find version by exact candidate, version, and platform match (verbatim form)") {
             // given: version record in database
             setupVersion(
                 Version(
@@ -30,10 +31,10 @@ class MongoVersionRepositoryIntegrationSpec :
                 )
             )
 
-            // when: searching for exact match
-            val result = repository.findByQuery("java", "17.0.2-tem", "MAC_ARM64")
+            // when: searching with verbatim version, no distribution
+            val result = repository.findByQuery("java", "17.0.2-tem", None, Platform.DarwinARM64)
 
-            // then: version is found
+            // then: version is found, returned shape mirrors the on-disk row
             result shouldBeRightAnd { versionOption ->
                 versionOption ==
                     Some(
@@ -50,11 +51,64 @@ class MongoVersionRepositoryIntegrationSpec :
             }
         }
 
+        should("find Java version via canonical (stripped, full enum) form and return canonical shape") {
+            // given: legacy on-disk shape (suffixed version, short-code vendor)
+            setupVersion(
+                Version(
+                    candidate = "java",
+                    version = "17.0.2-tem",
+                    platform = "MAC_ARM64",
+                    url = "https://example.com/java-17.0.2-arm64.tar.gz",
+                    distribution = Some("tem"),
+                    visible = true,
+                    checksums = mapOf("SHA-256" to "abc123")
+                )
+            )
+
+            // when: caller queries with canonical (stripped, full enum) form
+            val result = repository.findByQuery("java", "17.0.2", Some("TEMURIN"), Platform.DarwinARM64)
+
+            // then: row is found and returned in canonical shape, hiding short-code from callers
+            result shouldBeRightAnd { versionOption ->
+                versionOption ==
+                    Some(
+                        Version(
+                            candidate = "java",
+                            version = "17.0.2",
+                            platform = "MAC_ARM64",
+                            url = "https://example.com/java-17.0.2-arm64.tar.gz",
+                            distribution = Some("TEMURIN"),
+                            visible = true,
+                            checksums = mapOf("SHA-256" to "abc123")
+                        )
+                    )
+            }
+        }
+
+        should("return None when distribution enum name is not in the short-code map") {
+            // given: a Java row that would otherwise match
+            setupVersion(
+                Version(
+                    candidate = "java",
+                    version = "17.0.2-tem",
+                    platform = "MAC_ARM64",
+                    url = "https://example.com/java-17.0.2-arm64.tar.gz",
+                    distribution = Some("tem")
+                )
+            )
+
+            // when: caller passes an unknown distribution enum name
+            val result = repository.findByQuery("java", "17.0.2", Some("UNKNOWN_DISTRIBUTION"), Platform.DarwinARM64)
+
+            // then: no Mongo lookup key can be constructed; return None
+            result shouldBeRightAnd { versionOption -> versionOption.isNone() }
+        }
+
         should("return None when no matching version found") {
             // given: empty database
 
             // when: searching for non-existent version
-            val result = repository.findByQuery("nonexistent", "1.0.0", "LINUX_64")
+            val result = repository.findByQuery("nonexistent", "1.0.0", None, Platform.LinuxX64)
 
             // then: None is returned
             result shouldBeRightAnd { versionOption ->
@@ -75,7 +129,7 @@ class MongoVersionRepositoryIntegrationSpec :
             )
 
             // when: searching for different version
-            val result = repository.findByQuery("java", "17.0.2-tem", "LINUX_64")
+            val result = repository.findByQuery("java", "17.0.2-tem", None, Platform.LinuxX64)
 
             // then: None is returned
             result shouldBeRightAnd { versionOption ->
@@ -96,7 +150,7 @@ class MongoVersionRepositoryIntegrationSpec :
             )
 
             // when: searching for different platform
-            val result = repository.findByQuery("java", "17.0.2-tem", "LINUX_64")
+            val result = repository.findByQuery("java", "17.0.2-tem", None, Platform.LinuxX64)
 
             // then: None is returned
             result shouldBeRightAnd { versionOption ->
@@ -118,7 +172,7 @@ class MongoVersionRepositoryIntegrationSpec :
             )
 
             // when: retrieving version
-            val result = repository.findByQuery("groovy", "4.0.0", "UNIVERSAL")
+            val result = repository.findByQuery("groovy", "4.0.0", None, Platform.Universal)
 
             // then: vendor is None
             result shouldBeRightAnd { versionOption ->
@@ -142,7 +196,7 @@ class MongoVersionRepositoryIntegrationSpec :
             )
 
             // when: retrieving version
-            val result = repository.findByQuery("kotlin", "1.5.31", "UNIVERSAL")
+            val result = repository.findByQuery("kotlin", "1.5.31", None, Platform.Universal)
 
             // then: visible defaults to true
             result shouldBeRightAnd { versionOption ->
@@ -166,7 +220,7 @@ class MongoVersionRepositoryIntegrationSpec :
             )
 
             // when: retrieving version
-            val result = repository.findByQuery("gradle", "7.0", "UNIVERSAL")
+            val result = repository.findByQuery("gradle", "7.0", None, Platform.Universal)
 
             // then: checksums is empty map
             result shouldBeRightAnd { versionOption ->
@@ -196,7 +250,7 @@ class MongoVersionRepositoryIntegrationSpec :
             )
 
             // when: retrieving version
-            val result = repository.findByQuery("maven", "3.8.1", "UNIVERSAL")
+            val result = repository.findByQuery("maven", "3.8.1", None, Platform.Universal)
 
             // then: all checksums are present
             result shouldBeRightAnd { versionOption ->
