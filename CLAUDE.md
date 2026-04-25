@@ -6,14 +6,9 @@ Operational guardrails for the sdkman-broker service. Keep this concise and oper
 
 SDKMAN Broker is a Kotlin-based Ktor application that brokers SDKMAN candidate artifact downloads, resolving platform-specific binaries and redirecting clients to the correct URL.
 
-## MCP Integration
-
-This project uses the Gradle MCP server for enhanced Gradle operations. Always use the gradle-mcp when available for building, testing, dependency management, and task execution.
-
 ## Build & Run
 
-- **Run service:** `./gradlew run` (starts Ktor on port 8080)
-- **Run with Docker:** See README.md for MongoDB and PostgreSQL setup
+- **Run service:** `./gradlew run` (starts Ktor on port 8080; requires MongoDB and PostgreSQL — see Database Setup below)
 
 ## Validation
 
@@ -26,9 +21,11 @@ Run after every implementation to get immediate feedback:
 - **Static analysis:** `./gradlew detekt` (config in `detekt.yml`)
 - **Build Docker image:** `./gradlew jib` (or `jibDockerBuild` for local)
 
-## Database Setup
+Tests spin up MongoDB and PostgreSQL via Testcontainers — no manual database setup is required to run the test suite.
 
-The application requires MongoDB and PostgreSQL. For development:
+## Database Setup (Dev Server Only)
+
+The dev server (`./gradlew run`) connects to MongoDB and PostgreSQL on localhost. Start them in Docker:
 
 ```bash
 docker run -d --restart=always -p=27017:27017 --name mongo mongo:3.2
@@ -57,6 +54,6 @@ Project rules are defined in `.claude/rules/` — study these before making chan
 ## Key Conventions
 
 - Kotlin with Ktor, Exposed ORM, Arrow for functional types
-- Kotest for assertions, JUnit Platform as test runner
-- MongoDB (legacy) and PostgreSQL (current) for state
+- Kotest for assertions, JUnit Platform as test runner, Testcontainers for integration databases
+- MongoDB (legacy, default) and PostgreSQL (migration target) for state
 - kotlinx-serialization for JSON
