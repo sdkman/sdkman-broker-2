@@ -18,30 +18,30 @@ corresponding Kotlin enum/lookup, and in the relevant tests — in that order.
 | `amzn`     | `CORRETTO`             |
 | `zulu`     | `ZULU`                 |
 | `librca`   | `LIBERICA`             |
-| `librcanik`| `LIBERICA_NIK`         |
 | `nik`      | `LIBERICA_NIK`         |
 | `oracle`   | `ORACLE`               |
-| `open`     | `OPEN`                 |
-| `graal`    | `GRAALVM_CE`           |
-| `graalce`  | `GRAALVM_CE`           |
-| `grl`      | `GRAALVM`              |
+| `open`     | `OPENJDK`              |
+| `graal`    | `GRAALVM`              |
+| `graalce`  | `GRAALCE`              |
 | `mandrel`  | `MANDREL`              |
 | `ms`       | `MICROSOFT`            |
 | `sapmchn`  | `SAP_MACHINE`          |
 | `sem`      | `SEMERU`               |
-| `sem-ce`   | `SEMERU_CE`            |
-| `tem-ce`   | `TEMURIN_CE`           |
 | `kona`     | `KONA`                 |
-| `bsphr`    | `BISHENG`              |
-| `dragon`   | `DRAGONWELL`           |
+| `bisheng`  | `BISHENG`              |
 | `jbr`      | `JETBRAINS`            |
-| `trv`      | `TRAVA`                |
 
 > **Source of truth.** The list above is a snapshot of the short-codes
 > currently in use by `sdkman-state` against the legacy MongoDB `versions`
 > collection. Keep it in lock-step with the upstream registry; the test
 > Postgres seed data must use these same short-code → enum pairings to be
 > representative of production.
+
+> **Intentional omissions.** The live shortcodes `albba` (Dragonwell),
+> `gln` (Gluon), and `trava` (Trava) are deliberately excluded. Their
+> distributions are not part of `sdkman-state`'s enum and will not be
+> migrated to Postgres; requests for these short codes will `404` after
+> the cutover.
 
 ## Resolution rules
 
