@@ -1,7 +1,6 @@
 package io.sdkman.broker.application.service
 
 import arrow.core.Some
-import arrow.core.getOrElse
 import io.sdkman.broker.adapter.primary.rest.AuditContext
 import io.sdkman.broker.domain.model.Audit
 import io.sdkman.broker.domain.model.Platform
@@ -19,10 +18,7 @@ data class AuditCommand(
             id = Some(UUID.randomUUID()),
             command = "install",
             candidate = versionEntity.candidate,
-            version =
-                versionEntity.distribution
-                    .map { vendor -> versionEntity.version.removeSuffix("-$vendor") }
-                    .getOrElse { versionEntity.version },
+            version = versionEntity.version,
             clientPlatform = clientPlatform.auditId,
             candidatePlatform = versionEntity.resolveCandidatePlatformFor(clientPlatform).auditId,
             distribution = versionEntity.distribution,
