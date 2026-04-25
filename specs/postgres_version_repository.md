@@ -26,7 +26,7 @@ Business Rules, not the API contract — the audit log is internal storage).
 The only observable difference is the data source. After cutover the Broker
 reads version records from the Postgres `versions` table owned by
 `sdkman-state` instead of the MongoDB `versions` collection. A single
-feature toggle (`VENDORS_REPOSITORY`, values `mongo` | `postgres`, default
+feature toggle (`PERSISTENCE_BACKEND`, values `mongo` | `postgres`, default
 `mongo`) selects the backend at startup so deployments can cut over and roll
 back without code changes.
 
@@ -137,7 +137,7 @@ Optional request headers consumed for audit:
 Feature: Candidate Download — Postgres-backed Version Resolution
 
   Background:
-    Given the Broker is configured with VENDORS_REPOSITORY=postgres
+    Given the Broker is configured with PERSISTENCE_BACKEND=postgres
 
   Scenario: Java platform-specific download with distribution suffix
     Given a version record exists with
@@ -237,7 +237,7 @@ Feature: Candidate Download — Postgres-backed Version Resolution
 
 - [ ] `GET /download/{candidate}/{version}/{platform}` produces identical
       responses (status, headers, body, audit row) under
-      `VENDORS_REPOSITORY=postgres` as under `VENDORS_REPOSITORY=mongo` for every
+      `PERSISTENCE_BACKEND=postgres` as under `PERSISTENCE_BACKEND=mongo` for every
       scenario in Examples.
 - [ ] Java requests with a recognised distribution short-code suffix resolve
       to the matching Postgres row with separate `version` and `distribution`
@@ -250,7 +250,7 @@ Feature: Candidate Download — Postgres-backed Version Resolution
       `sha_256_sum`, `sha_512_sum` columns on the record.
 - [ ] Audit rows record the suffix-stripped `version` and the full
       distribution enum name (e.g. `TEMURIN`, never the short code `tem`).
-- [ ] `VENDORS_REPOSITORY` defaults to `mongo`; invalid values fail the
+- [ ] `PERSISTENCE_BACKEND` defaults to `mongo`; invalid values fail the
       application at startup with a descriptive error.
 - [ ] Acceptance specs exist for the Postgres-backed path mirroring the
       existing Mongo-backed specs, and both run green in CI.
