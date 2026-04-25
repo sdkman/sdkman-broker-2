@@ -30,6 +30,11 @@ feature toggle (`PERSISTENCE_BACKEND`, values `mongo` | `postgres`, default
 `mongo`) selects the backend at startup so deployments can cut over and roll
 back without code changes.
 
+Distribution string splitting should happen in the service layer and should
+*not leak into the repository layer*. For example, `17.0.0-tem` should never reach
+the respository layer, but instead it should receive version `17.0.0` and
+distribution `TEMURIN` as separate params along with other like candidate and platform.
+
 ## API Contract
 
 The HTTP contract below is unchanged by this migration. It is restated here
