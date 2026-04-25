@@ -2,7 +2,12 @@ package io.sdkman.broker.support
 
 import io.kotest.core.listeners.TestListener
 import io.kotest.core.spec.Spec
+import io.sdkman.broker.adapter.secondary.persistence.AuditTable
+import io.sdkman.broker.adapter.secondary.persistence.VersionsTable
 import org.flywaydb.core.Flyway
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.deleteAll
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.postgresql.ds.PGSimpleDataSource
 import org.testcontainers.containers.PostgreSQLContainer
 import javax.sql.DataSource
@@ -34,6 +39,20 @@ object PostgresTestListener : TestListener {
 
         // Run migrations once per container lifecycle
         runMigrations()
+
+        // Truncate broker-owned tables at spec start so each spec is isolated
+        // from rows another spec wrote earlier in the same JVM. The shared
+        // testcontainer never resets between specs, so without this hook the
+        // Postgres `audit` table accumulates across specs — which surfaces as
+        // duplicate-row failures in any spec that asserts via `singleOrNull`.
+        truncateBrokerTables()
+    }
+
+    private fun truncateBrokerTables() {
+        transaction(Database.connect(dataSource)) {
+            AuditTable.deleteAll()
+            VersionsTable.deleteAll()
+        }
     }
 
     private fun runMigrations() {
