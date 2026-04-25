@@ -17,13 +17,14 @@ interface AppConfig {
     val postgresUsername: Option<String>
     val postgresPassword: Option<String>
     val postgresSslMode: String
+    val persistenceBackend: PersistenceBackend
     val serverPort: Int
     val serverHost: String
 }
 
-class DefaultAppConfig : AppConfig {
+class DefaultAppConfig(
     private val config: Config = ConfigFactory.load()
-
+) : AppConfig {
     // MongoDB settings
     override val mongodbDatabase: String = config.getStringOrDefault("mongodb.database", "sdkman")
     override val mongodbHost: String = config.getStringOrDefault("mongodb.host", "127.0.0.1")
@@ -39,6 +40,10 @@ class DefaultAppConfig : AppConfig {
     override val postgresUsername: Option<String> = config.getOptionString("postgres.username")
     override val postgresPassword: Option<String> = config.getOptionString("postgres.password")
     override val postgresSslMode: String = config.getStringOrDefault("postgres.sslmode", "disable")
+
+    // Persistence backend selector — fails fast at construction on invalid values.
+    override val persistenceBackend: PersistenceBackend =
+        PersistenceBackend.fromValue(config.getStringOrDefault("persistence.backend", "mongo"))
 
     // Server settings
     override val serverPort: Int = config.getIntOrDefault("server.port", 8080)
