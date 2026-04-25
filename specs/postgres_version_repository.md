@@ -97,7 +97,10 @@ Optional request headers consumed for audit:
 4. **Exact platform match wins.** The Broker first looks for a record whose
    `platform` equals the normalised identifier for the requested `{platform}`
    code and, for Java, whose `distribution` equals the distribution that the
-   parsed short code resolves to.
+   parsed short code resolves to. *Example:* `GET /download/java/17.0.2-tem/linuxx64`
+   maps URL `linuxx64` → `LINUX_X64` and suffix `tem` → `TEMURIN`, then queries
+   for `candidate='java'`, `version='17.0.2'`, `distribution='TEMURIN'`,
+   `platform='LINUX_X64'`.
 5. **UNIVERSAL fallback.** If the exact platform match misses, the Broker
    retries the lookup with `platform = UNIVERSAL` for the same candidate,
    version, and distribution. If the UNIVERSAL row exists it is served; the
@@ -106,7 +109,11 @@ Optional request headers consumed for audit:
 6. **UNIVERSAL fallback preserves distribution.** A Java request that falls
    back to UNIVERSAL still requires a UNIVERSAL row for the same
    distribution. It does not match a UNIVERSAL row belonging to a different
-   distribution, nor a UNIVERSAL row with no distribution.
+   distribution, nor a UNIVERSAL row with no distribution. *Example:*
+   `GET /download/java/21.0.1-tem/linuxx64` falls back to a lookup for
+   `(candidate='java', version='21.0.1', distribution='TEMURIN', platform='UNIVERSAL')`.
+   It will *not* match a row with `distribution='ZULU'` (different distribution),
+   nor a row with `distribution=NULL` (no distribution) — both yield `404`.
 7. **Unknown platform is a client error.** A `{platform}` that does not map
    to a known platform code returns `400` and does not perform any lookup or
    audit side-effect.
