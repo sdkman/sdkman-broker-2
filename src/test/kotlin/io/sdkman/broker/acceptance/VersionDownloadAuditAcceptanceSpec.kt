@@ -76,7 +76,7 @@ class VersionDownloadAuditAcceptanceSpec :
                     record[AuditTable.version] shouldBe "17.0.2"
                     record[AuditTable.clientPlatform] shouldBe "MAC_ARM64"
                     record[AuditTable.candidatePlatform] shouldBe "MAC_ARM64"
-                    record[AuditTable.distribution] shouldBe "tem"
+                    record[AuditTable.distribution] shouldBe "TEMURIN"
                     record[AuditTable.host] shouldBe "203.0.113.195"
                     record[AuditTable.agent] shouldBe "curl/7.68.0"
                     record[AuditTable.timestamp] shouldNotBe null

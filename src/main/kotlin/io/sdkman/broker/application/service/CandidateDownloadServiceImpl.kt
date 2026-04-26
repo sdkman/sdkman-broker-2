@@ -2,6 +2,7 @@ package io.sdkman.broker.application.service
 
 import arrow.core.Either
 import arrow.core.None
+import arrow.core.Option
 import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.raise.either
@@ -9,6 +10,7 @@ import arrow.core.right
 import io.sdkman.broker.adapter.primary.rest.AuditContext
 import io.sdkman.broker.domain.model.ArchiveType
 import io.sdkman.broker.domain.model.DownloadInfo
+import io.sdkman.broker.domain.model.JavaDistribution
 import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.domain.model.VersionError
@@ -35,20 +37,25 @@ class CandidateDownloadServiceImpl(
                     .fromCode(platformCode)
                     .toEither { VersionError.InvalidPlatform(platformCode) }
                     .bind()
-            val versionEntity = findVersionWithFallback(candidate, version, platform).bind()
+            val (parsedVersion, distribution) = parseVersionToken(candidate, version)
+            val versionEntity =
+                findVersionWithFallback(candidate, parsedVersion, distribution, platform).bind()
             val checksumHeaders =
                 versionEntity.checksums.mapKeys { (algorithm, _) ->
                     "X-Sdkman-Checksum-${algorithm.uppercase()}"
                 }
             createAuditEntry(
                 AuditCommand(
+                    candidate = candidate,
+                    version = parsedVersion,
+                    distribution = distribution,
                     versionEntity = versionEntity,
                     clientPlatform = platform,
                     auditContext = auditContext
                 )
             )
             logger.info(
-                "Downloading $candidate version $version; " +
+                "Downloading $candidate version $parsedVersion; " +
                     "requested: ${platform.persistentId}; " +
                     "distributed: ${versionEntity.platform}"
             )
@@ -62,18 +69,29 @@ class CandidateDownloadServiceImpl(
             return downloadInfo.right()
         }
 
+    private fun parseVersionToken(
+        candidate: String,
+        version: String
+    ): Pair<String, Option<JavaDistribution>> =
+        if (candidate == JAVA_CANDIDATE) {
+            JavaDistribution.parseVersionToken(version)
+        } else {
+            version to None
+        }
+
     private fun findVersionWithFallback(
         candidate: String,
         version: String,
+        distribution: Option<JavaDistribution>,
         platform: Platform
     ): Either<VersionError, Version> =
         versionRepository
-            .findByQuery(candidate, version, None, platform)
+            .findByQuery(candidate, version, distribution, platform)
             .flatMap { platformSpecificOption ->
                 platformSpecificOption.fold(
                     {
                         versionRepository
-                            .findByQuery(candidate, version, None, Platform.Universal)
+                            .findByQuery(candidate, version, distribution, Platform.Universal)
                             .flatMap { universalOption ->
                                 universalOption.fold(
                                     {
@@ -99,4 +117,8 @@ class CandidateDownloadServiceImpl(
                     failure.exception
                 )
             }
+
+    companion object {
+        private const val JAVA_CANDIDATE = "java"
+    }
 }
