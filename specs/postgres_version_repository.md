@@ -256,23 +256,23 @@ Feature: Candidate Download — Postgres-backed Version Resolution
 
 ## Acceptance Criteria
 
-- [ ] `GET /download/{candidate}/{version}/{platform}` produces identical
+- [x] `GET /download/{candidate}/{version}/{platform}` produces identical
       responses (status, headers, body, audit row) under
       `PERSISTENCE_BACKEND=postgres` as under `PERSISTENCE_BACKEND=mongo` for every
       scenario in Examples.
-- [ ] Java requests with a recognised distribution short-code suffix resolve
+- [x] Java requests with a recognised distribution short-code suffix resolve
       to the matching Postgres row with separate `version` and `distribution`
       values.
-- [ ] Non-Java requests resolve against Postgres rows where `distribution IS
+- [x] Non-Java requests resolve against Postgres rows where `distribution IS
       NULL`, with no suffix stripping.
-- [ ] UNIVERSAL fallback behaves per Business Rules 5 and 6, including the
+- [x] UNIVERSAL fallback behaves per Business Rules 5 and 6, including the
       distribution-preservation rule for Java.
-- [ ] `X-Sdkman-Checksum-*` headers are emitted only for non-null `md5_sum`,
+- [x] `X-Sdkman-Checksum-*` headers are emitted only for non-null `md5_sum`,
       `sha_256_sum`, `sha_512_sum` columns on the record.
-- [ ] Audit rows record the suffix-stripped `version` and the full
+- [x] Audit rows record the suffix-stripped `version` and the full
       distribution enum name (e.g. `TEMURIN`, never the short code `tem`).
-- [ ] `PERSISTENCE_BACKEND` defaults to `mongo`; invalid values fail the
+- [x] `PERSISTENCE_BACKEND` defaults to `mongo`; invalid values fail the
       application at startup with a descriptive error.
-- [ ] Acceptance specs exist for the Postgres-backed path mirroring the
+- [x] Acceptance specs exist for the Postgres-backed path mirroring the
       existing Mongo-backed specs, and both run green in CI.
-- [ ] All quality gates pass (build, lint, tests).
+- [x] All quality gates pass (build, lint, tests).
