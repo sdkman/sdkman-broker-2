@@ -85,6 +85,10 @@ object TestDependencyInjection {
         CandidateDownloadServiceImpl(versionRepository, failingAuditRepository)
     }
 
+    val versionServicePostgresWithBrokenAuditRepo by lazy {
+        CandidateDownloadServiceImpl(postgresVersionRepository, failingAuditRepository)
+    }
+
     val sdkmanCliDownloadService by lazy {
         SdkmanCliDownloadServiceImpl()
     }
