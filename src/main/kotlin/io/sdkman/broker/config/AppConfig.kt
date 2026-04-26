@@ -1,6 +1,7 @@
 package io.sdkman.broker.config
 
 import arrow.core.Option
+import arrow.core.getOrElse
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 
@@ -19,6 +20,7 @@ interface AppConfig {
     val postgresSslMode: String
     val serverPort: Int
     val serverHost: String
+    val persistenceBackend: PersistenceBackend
 }
 
 class DefaultAppConfig : AppConfig {
@@ -43,4 +45,15 @@ class DefaultAppConfig : AppConfig {
     // Server settings
     override val serverPort: Int = config.getIntOrDefault("server.port", 8080)
     override val serverHost: String = config.getStringOrDefault("server.host", "127.0.0.1")
+
+    // Persistence backend selector
+    override val persistenceBackend: PersistenceBackend =
+        config.getStringOrDefault("persistence.backend", PersistenceBackend.Mongo.configValue).let { raw ->
+            PersistenceBackend.fromConfigValue(raw).getOrElse {
+                throw IllegalArgumentException(
+                    "Invalid PERSISTENCE_BACKEND value '$raw'. " +
+                        "Supported values: ${PersistenceBackend.supportedValues.joinToString(", ")}."
+                )
+            }
+        }
 }
