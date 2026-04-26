@@ -16,6 +16,7 @@ import io.mockk.slot
 import io.mockk.verify
 import io.sdkman.broker.adapter.primary.rest.AuditContext
 import io.sdkman.broker.domain.model.Audit
+import io.sdkman.broker.domain.model.JavaDistribution
 import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.domain.model.VersionError
@@ -52,11 +53,12 @@ class CandidateDownloadServiceSpec :
                     checksums = mapOf("SHA-256" to "abc123")
                 )
 
+            // service strips the distribution suffix before calling the repo
             every {
                 mockVersionRepository.findByQuery(
                     "java",
-                    "17.0.2-tem",
-                    None,
+                    "17.0.2",
+                    Some(JavaDistribution.TEMURIN),
                     Platform.DarwinARM64
                 )
             } returns Some(platformSpecificVersion).right()
@@ -72,7 +74,7 @@ class CandidateDownloadServiceSpec :
                     response.archiveType == "tar.gz"
             }
 
-            // and: audit entry persisted
+            // and: audit entry persisted with the full distribution enum name
             val auditSlot = slot<Audit>()
             verify { mockAuditRepository.save(capture(auditSlot)) }
             auditSlot.captured.apply {
@@ -81,7 +83,7 @@ class CandidateDownloadServiceSpec :
                 candidate shouldBe "java"
                 clientPlatform shouldBe "MAC_ARM64"
                 candidatePlatform shouldBe "MAC_ARM64"
-                distribution shouldBe "tem".some()
+                distribution shouldBe "TEMURIN".some()
                 host shouldBe testAuditContext.host
                 agent shouldBe testAuditContext.agent
             }
@@ -134,6 +136,40 @@ class CandidateDownloadServiceSpec :
             }
         }
 
+        should("preserve hyphenated non-Java version verbatim and audit with no distribution") {
+            // given: a non-Java version whose token contains hyphens (Business Rule 3)
+            val universalVersion =
+                Version(
+                    candidate = "groovy",
+                    version = "3.0.0-rc-1",
+                    platform = "UNIVERSAL",
+                    url = "https://example.com/groovy-3.0.0-rc-1.zip"
+                )
+            every {
+                mockVersionRepository.findByQuery("groovy", "3.0.0-rc-1", None, Platform.LinuxX64)
+            } returns None.right()
+            every {
+                mockVersionRepository.findByQuery("groovy", "3.0.0-rc-1", None, Platform.Universal)
+            } returns Some(universalVersion).right()
+            every { mockAuditRepository.save(any()) } returns Unit.right()
+
+            // when: downloading the hyphenated non-Java version
+            val result = underTest.downloadVersion("groovy", "3.0.0-rc-1", "linuxx64", testAuditContext)
+
+            // then: response succeeds without any suffix stripping
+            result shouldBeRightAnd { response ->
+                response.redirectUrl == "https://example.com/groovy-3.0.0-rc-1.zip"
+            }
+
+            // and: audit captures the verbatim version with no distribution
+            val auditSlot = slot<Audit>()
+            verify { mockAuditRepository.save(capture(auditSlot)) }
+            auditSlot.captured.apply {
+                version shouldBe "3.0.0-rc-1"
+                distribution shouldBe none()
+            }
+        }
+
         should("return InvalidPlatform error with no audit for invalid platform code") {
             // when: using invalid platform
             val result = underTest.downloadVersion("java", "17.0.2-tem", "invalidplatform", testAuditContext)
@@ -165,29 +201,44 @@ class CandidateDownloadServiceSpec :
         }
 
         should("return VersionNotFound error and record no audit when platform not found and no UNIVERSAL fallback") {
-            // given: no exact match and no UNIVERSAL fallback
+            // given: no exact match and no UNIVERSAL fallback (java suffix stripped before lookup)
             every {
-                mockVersionRepository.findByQuery("java", "17.0.2-tem", None, Platform.LinuxX64)
+                mockVersionRepository.findByQuery(
+                    "java",
+                    "17.0.2",
+                    Some(JavaDistribution.TEMURIN),
+                    Platform.LinuxX64
+                )
             } returns None.right()
             every {
-                mockVersionRepository.findByQuery("java", "17.0.2-tem", None, Platform.Universal)
+                mockVersionRepository.findByQuery(
+                    "java",
+                    "17.0.2",
+                    Some(JavaDistribution.TEMURIN),
+                    Platform.Universal
+                )
             } returns None.right()
 
             // when: downloading version for unsupported platform
             val result = underTest.downloadVersion("java", "17.0.2-tem", "linuxx64", testAuditContext)
 
-            // then: VersionNotFound error
-            result shouldBeLeft VersionError.VersionNotFound("java", "17.0.2-tem", "LINUX_64")
+            // then: VersionNotFound error carries the suffix-stripped version
+            result shouldBeLeft VersionError.VersionNotFound("java", "17.0.2", "LINUX_64")
 
             // and: record no audit
             verify(exactly = 0) { mockAuditRepository.save(any()) }
         }
 
         should("return DatabaseError and record no audit when repository fails") {
-            // given: repository error
+            // given: repository error (java suffix stripped before lookup)
             val dbError = RuntimeException("Database connection failed")
             every {
-                mockVersionRepository.findByQuery("java", "17.0.2-tem", None, Platform.DarwinARM64)
+                mockVersionRepository.findByQuery(
+                    "java",
+                    "17.0.2",
+                    Some(JavaDistribution.TEMURIN),
+                    Platform.DarwinARM64
+                )
             } returns VersionError.DatabaseError(dbError).left()
 
             // when: downloading version
