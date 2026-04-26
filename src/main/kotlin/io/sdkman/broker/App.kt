@@ -1,5 +1,6 @@
 package io.sdkman.broker
 
+import com.mongodb.client.MongoDatabase
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -14,6 +15,7 @@ import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
+import io.sdkman.broker.adapter.secondary.persistence.PostgresVersionRepository
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.MetaHealthService
 import io.sdkman.broker.application.service.MetaHealthServiceImpl
@@ -22,11 +24,24 @@ import io.sdkman.broker.application.service.MetaReleaseServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
+import io.sdkman.broker.config.PersistenceBackend
+import io.sdkman.broker.domain.repository.VersionRepository
 import io.sdkman.broker.domain.service.CandidateDownloadService
 import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 import io.sdkman.broker.domain.service.SdkmanNativeDownloadService
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import javax.sql.DataSource
+
+private fun selectVersionRepository(
+    backend: PersistenceBackend,
+    mongoDatabase: MongoDatabase,
+    postgresDataSource: DataSource
+): VersionRepository =
+    when (backend) {
+        PersistenceBackend.Mongo -> MongoVersionRepository(mongoDatabase)
+        PersistenceBackend.Postgres -> PostgresVersionRepository(postgresDataSource)
+    }
 
 object App {
     @JvmStatic
@@ -43,7 +58,7 @@ object App {
 
         // Initialize repositories
         val applicationRepository = MongoApplicationRepository(database)
-        val versionRepository = MongoVersionRepository(database)
+        val versionRepository = selectVersionRepository(config.persistenceBackend, database, postgresDataSource)
         val postgresHealthRepository = PostgresHealthRepository(postgresDataSource)
         val auditRepository = PostgresAuditRepository(postgresDataSource)
 
