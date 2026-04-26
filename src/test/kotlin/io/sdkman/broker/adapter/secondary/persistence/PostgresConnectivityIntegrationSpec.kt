@@ -7,6 +7,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.sdkman.broker.config.AppConfig
+import io.sdkman.broker.config.PersistenceBackend
 import io.sdkman.broker.support.PostgresTestListener
 import org.junit.jupiter.api.Tag
 
@@ -33,6 +34,7 @@ class PostgresConnectivityIntegrationSpec :
                     override val postgresSslMode: String = "disable"
                     override val serverPort: Int = 8080
                     override val serverHost: String = "127.0.0.1"
+                    override val persistenceBackend: PersistenceBackend = PersistenceBackend.Mongo
                 }
             val connectivity = PostgresConnectivity(config)
 
