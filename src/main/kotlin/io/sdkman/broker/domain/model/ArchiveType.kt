@@ -7,12 +7,18 @@ sealed class ArchiveType(
 
     data object TarGz : ArchiveType("tar.gz")
 
+    data object TarBz2 : ArchiveType("tar.bz2")
+
+    data object Xz : ArchiveType("xz")
+
     companion object {
         fun fromUrl(url: String): ArchiveType =
             when {
-                url.endsWith(".zip") -> Zip
                 url.endsWith(".tar.gz") || url.endsWith(".tgz") -> TarGz
-                else -> Zip // Default fallback
+                url.endsWith(".tar.bz2") -> TarBz2
+                url.endsWith(".xz") -> Xz
+                url.endsWith(".zip") -> Zip
+                else -> Zip
             }
     }
 }
