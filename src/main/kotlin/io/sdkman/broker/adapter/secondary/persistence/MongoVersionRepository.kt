@@ -14,6 +14,8 @@ import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository.Com
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository.Companion.VENDOR_FIELD
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository.Companion.VERSION_FIELD
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository.Companion.VISIBLE_FIELD
+import io.sdkman.broker.domain.model.JavaDistribution
+import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.domain.model.VersionError
 import io.sdkman.broker.domain.repository.VersionRepository
@@ -36,15 +38,20 @@ class MongoVersionRepository(
     override fun findByQuery(
         candidate: String,
         version: String,
-        platform: String
+        distribution: Option<JavaDistribution>,
+        platform: Platform
     ): Either<VersionError, Option<Version>> =
         Either
             .catch {
+                val versionToken =
+                    distribution
+                        .map { "$version-${it.shortCode}" }
+                        .getOrElse { version }
                 val filter =
                     Filters.and(
                         Filters.eq(CANDIDATE_FIELD, candidate),
-                        Filters.eq(VERSION_FIELD, version),
-                        Filters.eq(PLATFORM_FIELD, platform)
+                        Filters.eq(VERSION_FIELD, versionToken),
+                        Filters.eq(PLATFORM_FIELD, platform.persistentId)
                     )
 
                 database
