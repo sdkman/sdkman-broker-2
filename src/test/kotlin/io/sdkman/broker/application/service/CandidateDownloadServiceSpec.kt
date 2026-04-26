@@ -16,6 +16,7 @@ import io.mockk.slot
 import io.mockk.verify
 import io.sdkman.broker.adapter.primary.rest.AuditContext
 import io.sdkman.broker.domain.model.Audit
+import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.domain.model.VersionError
 import io.sdkman.broker.domain.repository.AuditRepository
@@ -55,7 +56,8 @@ class CandidateDownloadServiceSpec :
                 mockVersionRepository.findByQuery(
                     "java",
                     "17.0.2-tem",
-                    "MAC_ARM64"
+                    None,
+                    Platform.DarwinARM64
                 )
             } returns Some(platformSpecificVersion).right()
             every { mockAuditRepository.save(any()) } returns Unit.right()
@@ -95,9 +97,11 @@ class CandidateDownloadServiceSpec :
                     url = "https://example.com/groovy-4.0.0.zip",
                     checksums = mapOf("SHA-256" to "def456", "MD5" to "ghi789")
                 )
-            every { mockVersionRepository.findByQuery("groovy", "4.0.0", "LINUX_64") } returns None.right()
             every {
-                mockVersionRepository.findByQuery("groovy", "4.0.0", "UNIVERSAL")
+                mockVersionRepository.findByQuery("groovy", "4.0.0", None, Platform.LinuxX64)
+            } returns None.right()
+            every {
+                mockVersionRepository.findByQuery("groovy", "4.0.0", None, Platform.Universal)
             } returns Some(universalVersion).right()
             every { mockAuditRepository.save(any()) } returns Unit.right()
 
@@ -143,8 +147,12 @@ class CandidateDownloadServiceSpec :
 
         should("return VersionNotFound error and record no audit when no version exists") {
             // given: no version found for exact or UNIVERSAL
-            every { mockVersionRepository.findByQuery("nonexistent", "1.0.0", "LINUX_64") } returns None.right()
-            every { mockVersionRepository.findByQuery("nonexistent", "1.0.0", "UNIVERSAL") } returns None.right()
+            every {
+                mockVersionRepository.findByQuery("nonexistent", "1.0.0", None, Platform.LinuxX64)
+            } returns None.right()
+            every {
+                mockVersionRepository.findByQuery("nonexistent", "1.0.0", None, Platform.Universal)
+            } returns None.right()
 
             // when: downloading non-existent version
             val result = underTest.downloadVersion("nonexistent", "1.0.0", "linuxx64", testAuditContext)
@@ -158,8 +166,12 @@ class CandidateDownloadServiceSpec :
 
         should("return VersionNotFound error and record no audit when platform not found and no UNIVERSAL fallback") {
             // given: no exact match and no UNIVERSAL fallback
-            every { mockVersionRepository.findByQuery("java", "17.0.2-tem", "LINUX_64") } returns None.right()
-            every { mockVersionRepository.findByQuery("java", "17.0.2-tem", "UNIVERSAL") } returns None.right()
+            every {
+                mockVersionRepository.findByQuery("java", "17.0.2-tem", None, Platform.LinuxX64)
+            } returns None.right()
+            every {
+                mockVersionRepository.findByQuery("java", "17.0.2-tem", None, Platform.Universal)
+            } returns None.right()
 
             // when: downloading version for unsupported platform
             val result = underTest.downloadVersion("java", "17.0.2-tem", "linuxx64", testAuditContext)
@@ -175,7 +187,7 @@ class CandidateDownloadServiceSpec :
             // given: repository error
             val dbError = RuntimeException("Database connection failed")
             every {
-                mockVersionRepository.findByQuery("java", "17.0.2-tem", "MAC_ARM64")
+                mockVersionRepository.findByQuery("java", "17.0.2-tem", None, Platform.DarwinARM64)
             } returns VersionError.DatabaseError(dbError).left()
 
             // when: downloading version
@@ -212,10 +224,15 @@ class CandidateDownloadServiceSpec :
                     url = "https://example.com/ant-1.10.12.tgz"
                 )
 
-            every { mockVersionRepository.findByQuery("gradle", "7.0", "UNIVERSAL") } returns Some(zipVersion).right()
-            every { mockVersionRepository.findByQuery("maven", "3.8.1", "UNIVERSAL") } returns
-                Some(tarGzVersion).right()
-            every { mockVersionRepository.findByQuery("ant", "1.10.12", "UNIVERSAL") } returns Some(tgzVersion).right()
+            every {
+                mockVersionRepository.findByQuery("gradle", "7.0", None, Platform.Universal)
+            } returns Some(zipVersion).right()
+            every {
+                mockVersionRepository.findByQuery("maven", "3.8.1", None, Platform.Universal)
+            } returns Some(tarGzVersion).right()
+            every {
+                mockVersionRepository.findByQuery("ant", "1.10.12", None, Platform.Universal)
+            } returns Some(tgzVersion).right()
             every { mockAuditRepository.save(any()) } returns Unit.right()
 
             // when: downloading different archive types
@@ -239,7 +256,9 @@ class CandidateDownloadServiceSpec :
                     url = "https://example.com/kotlin-1.5.31.zip",
                     checksums = emptyMap()
                 )
-            every { mockVersionRepository.findByQuery("kotlin", "1.5.31", "UNIVERSAL") } returns Some(version).right()
+            every {
+                mockVersionRepository.findByQuery("kotlin", "1.5.31", None, Platform.Universal)
+            } returns Some(version).right()
             every { mockAuditRepository.save(any()) } returns Unit.right()
 
             // when: downloading version
@@ -265,7 +284,9 @@ class CandidateDownloadServiceSpec :
                             "md5" to "def456"
                         )
                 )
-            every { mockVersionRepository.findByQuery("scala", "2.13.8", "UNIVERSAL") } returns Some(version).right()
+            every {
+                mockVersionRepository.findByQuery("scala", "2.13.8", None, Platform.Universal)
+            } returns Some(version).right()
             every { mockAuditRepository.save(any()) } returns Unit.right()
 
             // when: downloading version
