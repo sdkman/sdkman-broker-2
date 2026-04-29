@@ -48,7 +48,8 @@ class DefaultAppConfig : AppConfig {
 
     // Persistence backend selector
     override val persistenceBackend: PersistenceBackend =
-        config.getOptionString("persistence.backend")
+        config
+            .getOptionString("persistence.backend")
             .flatMap { PersistenceBackend.fromConfigValue(it) }
             .getOrElse {
                 throw IllegalArgumentException(
