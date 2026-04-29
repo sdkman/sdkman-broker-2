@@ -126,8 +126,7 @@ class AppConfigSpec :
 
             // when/then: construction must blow up so the broker never serves traffic against an unsupported backend
             val error = shouldThrow<IllegalArgumentException> { DefaultAppConfig() }
-            error.message shouldContain "cassandra"
-            error.message shouldContain "mongo"
-            error.message shouldContain "postgres"
+            error.message shouldContain "PERSISTENCE_BACKEND value not found or incorrect."
+            error.message shouldContain "Supported values: mongo, postgres."
         }
     })

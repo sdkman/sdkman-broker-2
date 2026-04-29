@@ -1,7 +1,7 @@
 package io.sdkman.broker.config
 
 import arrow.core.Option
-import arrow.core.toOption
+import arrow.core.getOrNone
 
 enum class PersistenceBackend(
     val configValue: String
@@ -13,8 +13,6 @@ enum class PersistenceBackend(
         private val configValueToBackend: Map<String, PersistenceBackend> =
             entries.associateBy { it.configValue }
 
-        fun fromConfigValue(value: String): Option<PersistenceBackend> = configValueToBackend[value].toOption()
-
-        val supportedValues: List<String> = entries.map { it.configValue }
+        fun fromConfigValue(value: String): Option<PersistenceBackend> = configValueToBackend.getOrNone(value)
     }
 }
