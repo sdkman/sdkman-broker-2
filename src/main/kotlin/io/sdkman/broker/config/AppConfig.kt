@@ -48,12 +48,11 @@ class DefaultAppConfig : AppConfig {
 
     // Persistence backend selector
     override val persistenceBackend: PersistenceBackend =
-        config.getStringOrDefault("persistence.backend", PersistenceBackend.Mongo.configValue).let { raw ->
-            PersistenceBackend.fromConfigValue(raw).getOrElse {
+        config.getOptionString("persistence.backend")
+            .flatMap { PersistenceBackend.fromConfigValue(it) }
+            .getOrElse {
                 throw IllegalArgumentException(
-                    "Invalid PERSISTENCE_BACKEND value '$raw'. " +
-                        "Supported values: ${PersistenceBackend.supportedValues.joinToString(", ")}."
+                    "PERSISTENCE_BACKEND value not found or incorrect. Supported values: mongo, postgres."
                 )
             }
-        }
 }
