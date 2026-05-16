@@ -1,11 +1,11 @@
 plugins {
-    kotlin("jvm") version "1.9.22"
-    kotlin("plugin.serialization") version "1.9.22"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
     application
-    id("pl.allegro.tech.build.axion-release") version "1.18.18"
-    id("com.google.cloud.tools.jib") version "3.4.1"
-    id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
-    id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    alias(libs.plugins.axion.release)
+    alias(libs.plugins.jib)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
 }
 
 group = "io.sdkman"
@@ -49,53 +49,47 @@ repositories {
     maven("https://jitpack.io")
 }
 
-// Define versions for dependencies to ensure compatibility
-val kotestVersion = "5.8.0"
-val ktorVersion = "2.3.7"
-val arrowVersion = "1.2.1"
-val exposedVersion = "0.61.0"
-
 dependencies {
     // Arrow for functional programming
-    implementation("io.arrow-kt:arrow-core:$arrowVersion")
+    implementation(libs.arrow.core)
 
     // Ktor server
-    implementation("io.ktor:ktor-server-core:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("org.mongodb:mongo-java-driver:3.12.14")
-    implementation("org.postgresql:postgresql:42.7.7")
-    implementation("com.zaxxer:HikariCP:5.1.0")
-    implementation("com.typesafe:config:1.4.3")
-    implementation("ch.qos.logback:logback-classic:1.4.14")
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.mongo.java.driver)
+    implementation(libs.postgresql)
+    implementation(libs.hikaricp)
+    implementation(libs.typesafe.config)
+    implementation(libs.logback.classic)
 
     // Exposed ORM
-    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion") {
+    implementation(libs.exposed.core) {
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
     }
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion") {
+    implementation(libs.exposed.jdbc) {
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
     }
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion") {
+    implementation(libs.exposed.kotlin.datetime) {
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
     }
 
     // Testing
-    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("io.arrow-kt:arrow-core:$arrowVersion")
-    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation("io.ktor:ktor-client-okhttp:$ktorVersion")
-    testImplementation("org.testcontainers:mongodb:1.19.3")
-    testImplementation("org.testcontainers:postgresql:1.19.3")
-    testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")
-    testImplementation("io.mockk:mockk:1.13.9")
-    testImplementation("org.flywaydb:flyway-core:11.10.2")
-    testImplementation("org.flywaydb:flyway-database-postgresql:11.10.2")
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.arrow.core)
+    testImplementation(libs.ktor.server.test.host)
+    testImplementation(libs.ktor.client.okhttp)
+    testImplementation(libs.testcontainers.mongodb)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.kotest.extensions.testcontainers)
+    testImplementation(libs.mockk)
+    testImplementation(libs.flyway.core)
+    testImplementation(libs.flyway.database.postgresql)
 
-    detektPlugins("com.github.marc0der:detekt-rules:1.0.1")
-    compileOnly("com.github.marc0der:detekt-rules:1.0.1")
+    detektPlugins(libs.detekt.rules)
+    compileOnly(libs.detekt.rules)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
