@@ -21,7 +21,7 @@ kotest = "5.8.0"
 testcontainers = "1.19.3"
 kotest-extensions-testcontainers = "2.0.2"
 mockk = "1.13.9"
-flyway = "11.10.2"
+flyway = "12.6.2"
 
 # Detekt rules
 detekt-rules = "1.0.1"
