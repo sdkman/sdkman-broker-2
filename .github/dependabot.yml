@@ -5,8 +5,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "tuesday"
-    open-pull-requests-limit: 10
+      day: "monday"
+    open-pull-requests-limit: 5
     groups:
       kotlin:
         patterns:
@@ -30,5 +30,5 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "tuesday"
+      day: "monday"
     open-pull-requests-limit: 5
