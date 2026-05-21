@@ -14,7 +14,7 @@ mongo-java-driver = "3.12.14"
 postgresql = "42.7.7"
 hikaricp = "5.1.0"
 typesafe-config = "1.4.3"
-logback = "1.4.14"
+logback = "1.5.32"
 
 # Test
 kotest = "5.8.0"
