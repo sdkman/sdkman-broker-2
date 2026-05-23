@@ -4,17 +4,18 @@ import arrow.core.Either
 import io.sdkman.broker.domain.model.Audit
 import io.sdkman.broker.domain.repository.AuditRepository
 import io.sdkman.broker.domain.repository.DatabaseFailure
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.Column
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.core.java.javaUUID
+import org.jetbrains.exposed.v1.datetime.xTimestamp
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
 object AuditTable : Table("audit") {
-    val id: Column<UUID> = uuid("id")
+    val id: Column<UUID> = javaUUID("id")
     val command: Column<String> = text("command")
     val candidate: Column<String> = text("candidate")
     val version: Column<String> = text("version")
@@ -23,7 +24,7 @@ object AuditTable : Table("audit") {
     val distribution = text("distribution").nullable()
     val host = text("host").nullable()
     val agent = text("agent").nullable()
-    val timestamp = timestamp("timestamp")
+    val timestamp = xTimestamp("timestamp")
 
     override val primaryKey = PrimaryKey(id)
 }

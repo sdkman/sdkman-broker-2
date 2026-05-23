@@ -3,7 +3,7 @@ package io.sdkman.broker.adapter.secondary.persistence
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.sdkman.broker.support.PostgresTestListener
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.Tag
 import java.sql.Connection
 
