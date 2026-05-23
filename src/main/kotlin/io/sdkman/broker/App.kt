@@ -3,6 +3,7 @@ package io.sdkman.broker
 import com.mongodb.client.MongoDatabase
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationStopped
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -73,6 +74,8 @@ object App {
 
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
+            // Close the Hikari pool cleanly when the application stops (spec Business Rule 6).
+            environment.monitor.subscribe(ApplicationStopped) { postgresDataSource.close() }
             configureApp(
                 metaHealthService,
                 metaReleaseService,
