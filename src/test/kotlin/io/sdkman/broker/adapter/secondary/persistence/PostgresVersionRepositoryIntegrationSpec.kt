@@ -18,7 +18,7 @@ class PostgresVersionRepositoryIntegrationSpec :
         listeners(PostgresTestListener)
 
         val database = Database.connect(PostgresTestListener.dataSource)
-        val repository = PostgresVersionRepository(PostgresTestListener.dataSource)
+        val repository = PostgresVersionRepository(database)
 
         beforeTest { PostgresTestSupport.clearVersions(database) }
 
