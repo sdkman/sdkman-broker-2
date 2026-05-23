@@ -27,6 +27,11 @@ private val managedSystemProperties =
         "postgres.username",
         "postgres.password",
         "postgres.sslmode",
+        "postgres.pool.maxSize",
+        "postgres.pool.minIdle",
+        "postgres.pool.connectionTimeoutMs",
+        "postgres.pool.maxLifetimeMs",
+        "postgres.pool.idleTimeoutMs",
         PERSISTENCE_BACKEND_PROPERTY
     )
 
@@ -83,6 +88,80 @@ class AppConfigSpec :
             // when/then
             config.serverPort shouldBe 8080
             config.serverHost shouldBe "0.0.0.0"
+        }
+
+        should("apply default Postgres pool settings when no overrides are configured") {
+            // given: no POSTGRES_POOL_* overrides set (cleared in beforeTest) and test HOCON has no pool block
+
+            // when
+            val config = DefaultAppConfig()
+
+            // then: code-level defaults from Business Rule 1 apply
+            config.postgresPoolMaxSize shouldBe 20
+            config.postgresPoolMinIdle shouldBe 2
+            config.postgresPoolConnectionTimeoutMs shouldBe 5_000L
+            config.postgresPoolMaxLifetimeMs shouldBe 1_800_000L
+            config.postgresPoolIdleTimeoutMs shouldBe 600_000L
+        }
+
+        should("override the Postgres pool max size from configuration") {
+            // given
+            System.setProperty("postgres.pool.maxSize", "50")
+            ConfigFactory.invalidateCaches()
+
+            // when
+            val config = DefaultAppConfig()
+
+            // then
+            config.postgresPoolMaxSize shouldBe 50
+        }
+
+        should("override the Postgres pool min idle from configuration") {
+            // given
+            System.setProperty("postgres.pool.minIdle", "5")
+            ConfigFactory.invalidateCaches()
+
+            // when
+            val config = DefaultAppConfig()
+
+            // then
+            config.postgresPoolMinIdle shouldBe 5
+        }
+
+        should("override the Postgres pool connection timeout from configuration") {
+            // given
+            System.setProperty("postgres.pool.connectionTimeoutMs", "1000")
+            ConfigFactory.invalidateCaches()
+
+            // when
+            val config = DefaultAppConfig()
+
+            // then
+            config.postgresPoolConnectionTimeoutMs shouldBe 1_000L
+        }
+
+        should("override the Postgres pool max lifetime from configuration") {
+            // given
+            System.setProperty("postgres.pool.maxLifetimeMs", "900000")
+            ConfigFactory.invalidateCaches()
+
+            // when
+            val config = DefaultAppConfig()
+
+            // then
+            config.postgresPoolMaxLifetimeMs shouldBe 900_000L
+        }
+
+        should("override the Postgres pool idle timeout from configuration") {
+            // given
+            System.setProperty("postgres.pool.idleTimeoutMs", "300000")
+            ConfigFactory.invalidateCaches()
+
+            // when
+            val config = DefaultAppConfig()
+
+            // then
+            config.postgresPoolIdleTimeoutMs shouldBe 300_000L
         }
 
         should("default the persistence backend to mongo when not configured") {
