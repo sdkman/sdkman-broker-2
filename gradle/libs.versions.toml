@@ -17,10 +17,9 @@ typesafe-config = "1.4.3"
 logback = "1.5.32"
 
 # Test
-kotest = "5.8.0"
+kotest = "6.1.11"
 testcontainers = "1.21.4"
-kotest-extensions-testcontainers = "2.0.2"
-mockk = "1.13.9"
+mockk = "1.14.9"
 flyway = "12.6.2"
 
 # Detekt rules
@@ -48,7 +47,6 @@ exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datet
 
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-kotest-extensions-testcontainers = { module = "io.kotest.extensions:kotest-extensions-testcontainers", version.ref = "kotest-extensions-testcontainers" }
 
 testcontainers-mongodb = { module = "org.testcontainers:mongodb", version.ref = "testcontainers" }
 testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }

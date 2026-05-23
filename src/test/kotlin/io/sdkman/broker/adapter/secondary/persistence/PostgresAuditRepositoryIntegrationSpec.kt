@@ -21,7 +21,7 @@ import java.util.UUID
 @Tag("integration")
 class PostgresAuditRepositoryIntegrationSpec :
     ShouldSpec({
-        listeners(PostgresTestListener)
+        register(PostgresTestListener)
 
         val database = Database.connect(PostgresTestListener.dataSource)
         val repository = PostgresAuditRepository(database)

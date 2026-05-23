@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Tag
 @Tag("integration")
 class PostgresConnectivityIntegrationSpec :
     ShouldSpec({
-        listener(PostgresTestListener)
+        register(PostgresTestListener)
 
         should("successfully connect to PostgreSQL and get a data source") {
             // given
