@@ -23,8 +23,8 @@ class PostgresAuditRepositoryIntegrationSpec :
     ShouldSpec({
         listeners(PostgresTestListener)
 
-        val repository = PostgresAuditRepository(PostgresTestListener.dataSource)
         val database = Database.connect(PostgresTestListener.dataSource)
+        val repository = PostgresAuditRepository(database)
 
         context("PostgresAuditRepository Integration Tests") {
 
@@ -184,7 +184,7 @@ class PostgresAuditRepositoryIntegrationSpec :
                         "invalid-user",
                         "invalid-password"
                     )
-                val invalidRepository = PostgresAuditRepository(invalidDataSource)
+                val invalidRepository = PostgresAuditRepository(Database.connect(invalidDataSource))
 
                 val audit =
                     Audit(
@@ -211,7 +211,7 @@ class PostgresAuditRepositoryIntegrationSpec :
             should("return DatabaseConnectionFailure when connecting with invalid credentials") {
                 val invalidUser = "invalid-user"
                 val invalidDataSource = PostgresTestListener.createDataSource(invalidUser, "invalid-password")
-                val invalidRepository = PostgresAuditRepository(invalidDataSource)
+                val invalidRepository = PostgresAuditRepository(Database.connect(invalidDataSource))
 
                 val audit =
                     Audit(
