@@ -32,6 +32,11 @@ class PostgresConnectivityIntegrationSpec :
                     override val postgresUsername: Option<String> = PostgresTestListener.username.some()
                     override val postgresPassword: Option<String> = PostgresTestListener.password.some()
                     override val postgresSslMode: String = "disable"
+                    override val postgresPoolMaxSize: Int = 20
+                    override val postgresPoolMinIdle: Int = 2
+                    override val postgresPoolConnectionTimeoutMs: Long = 5_000L
+                    override val postgresPoolMaxLifetimeMs: Long = 1_800_000L
+                    override val postgresPoolIdleTimeoutMs: Long = 600_000L
                     override val serverPort: Int = 8080
                     override val serverHost: String = "127.0.0.1"
                     override val persistenceBackend: PersistenceBackend = PersistenceBackend.Mongo

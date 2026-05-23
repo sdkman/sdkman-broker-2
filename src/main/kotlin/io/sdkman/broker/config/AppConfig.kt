@@ -18,6 +18,11 @@ interface AppConfig {
     val postgresUsername: Option<String>
     val postgresPassword: Option<String>
     val postgresSslMode: String
+    val postgresPoolMaxSize: Int
+    val postgresPoolMinIdle: Int
+    val postgresPoolConnectionTimeoutMs: Long
+    val postgresPoolMaxLifetimeMs: Long
+    val postgresPoolIdleTimeoutMs: Long
     val serverPort: Int
     val serverHost: String
     val persistenceBackend: PersistenceBackend
@@ -41,6 +46,16 @@ class DefaultAppConfig : AppConfig {
     override val postgresUsername: Option<String> = config.getOptionString("postgres.username")
     override val postgresPassword: Option<String> = config.getOptionString("postgres.password")
     override val postgresSslMode: String = config.getStringOrDefault("postgres.sslmode", "disable")
+
+    // Postgres connection pool (HikariCP) settings
+    override val postgresPoolMaxSize: Int = config.getIntOrDefault("postgres.pool.maxSize", 20)
+    override val postgresPoolMinIdle: Int = config.getIntOrDefault("postgres.pool.minIdle", 2)
+    override val postgresPoolConnectionTimeoutMs: Long =
+        config.getLongOrDefault("postgres.pool.connectionTimeoutMs", 5_000L)
+    override val postgresPoolMaxLifetimeMs: Long =
+        config.getLongOrDefault("postgres.pool.maxLifetimeMs", 1_800_000L)
+    override val postgresPoolIdleTimeoutMs: Long =
+        config.getLongOrDefault("postgres.pool.idleTimeoutMs", 600_000L)
 
     // Server settings
     override val serverPort: Int = config.getIntOrDefault("server.port", 8080)
