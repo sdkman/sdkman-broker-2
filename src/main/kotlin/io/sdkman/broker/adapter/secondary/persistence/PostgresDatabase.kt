@@ -1,7 +1,7 @@
 package io.sdkman.broker.adapter.secondary.persistence
 
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.DatabaseConfig
+import org.jetbrains.exposed.v1.core.DatabaseConfig
+import org.jetbrains.exposed.v1.jdbc.Database
 import java.sql.Connection
 import javax.sql.DataSource
 

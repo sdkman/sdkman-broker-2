@@ -11,7 +11,7 @@ import io.kotest.matchers.shouldBe
 import io.sdkman.broker.config.AppConfig
 import io.sdkman.broker.config.PersistenceBackend
 import io.sdkman.broker.support.PostgresTestListener
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.Tag
 import java.util.concurrent.Callable
 import java.util.concurrent.CyclicBarrier

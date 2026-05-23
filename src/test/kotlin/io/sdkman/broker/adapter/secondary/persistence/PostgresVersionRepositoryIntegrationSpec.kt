@@ -9,7 +9,7 @@ import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.PostgresTestSupport
 import io.sdkman.broker.support.shouldBeRightAnd
-import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.v1.jdbc.Database
 import org.junit.jupiter.api.Tag
 
 @Tag("integration")
