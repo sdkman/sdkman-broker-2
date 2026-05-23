@@ -31,6 +31,18 @@ fun Config.getIntOrDefault(
         }.getOrElse { default }
 
 /**
+ * Get a long value from config with a default fallback
+ */
+fun Config.getLongOrDefault(
+    path: String,
+    default: Long
+): Long =
+    Either
+        .catch {
+            if (hasPath(path)) getLong(path) else default
+        }.getOrElse { default }
+
+/**
  * Get an optional string value from config
  */
 fun Config.getOptionString(path: String): Option<String> =
