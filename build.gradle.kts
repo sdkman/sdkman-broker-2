@@ -83,7 +83,6 @@ dependencies {
     testImplementation(libs.ktor.client.okhttp)
     testImplementation(libs.testcontainers.mongodb)
     testImplementation(libs.testcontainers.postgresql)
-    testImplementation(libs.kotest.extensions.testcontainers)
     testImplementation(libs.mockk)
     testImplementation(libs.flyway.core)
     testImplementation(libs.flyway.database.postgresql)
