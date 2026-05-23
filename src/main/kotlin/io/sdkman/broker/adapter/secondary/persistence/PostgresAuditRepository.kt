@@ -12,7 +12,6 @@ import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import java.util.UUID
-import javax.sql.DataSource
 
 object AuditTable : Table("audit") {
     val id: Column<UUID> = uuid("id")
@@ -30,10 +29,9 @@ object AuditTable : Table("audit") {
 }
 
 class PostgresAuditRepository(
-    private val dataSource: DataSource
+    private val database: Database
 ) : AuditRepository {
     private val logger = LoggerFactory.getLogger(this::class.java)
-    private val database: Database by lazy { Database.connect(dataSource) }
 
     override fun save(audit: Audit): Either<DatabaseFailure, Unit> =
         Either

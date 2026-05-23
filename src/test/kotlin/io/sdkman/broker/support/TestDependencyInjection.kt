@@ -54,7 +54,7 @@ object TestDependencyInjection {
     }
 
     val auditRepository by lazy {
-        PostgresAuditRepository(postgresDataSource)
+        PostgresAuditRepository(postgresDatabase)
     }
 
     val failingAuditRepository by lazy {

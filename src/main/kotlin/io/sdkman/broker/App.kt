@@ -62,7 +62,7 @@ object App {
         val applicationRepository = MongoApplicationRepository(database)
         val versionRepository = selectVersionRepository(config.persistenceBackend, database, postgresDatabase)
         val postgresHealthRepository = PostgresHealthRepository(postgresDataSource)
-        val auditRepository = PostgresAuditRepository(postgresDataSource)
+        val auditRepository = PostgresAuditRepository(postgresDatabase)
 
         // Initialize services
         val metaHealthService = MetaHealthServiceImpl(applicationRepository, postgresHealthRepository)
