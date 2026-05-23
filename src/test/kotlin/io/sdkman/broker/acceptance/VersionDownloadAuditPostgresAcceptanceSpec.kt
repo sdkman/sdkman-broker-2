@@ -187,7 +187,7 @@ class VersionDownloadAuditPostgresAcceptanceSpec :
 
                 savedRecord shouldBeSomeAnd { record ->
                     record[AuditTable.host] shouldBe null
-                    record[AuditTable.agent] shouldBe "Ktor client"
+                    record[AuditTable.agent] shouldBe "ktor-client"
                 }
             }
         }
