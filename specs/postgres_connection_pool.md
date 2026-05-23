@@ -249,14 +249,14 @@ private fun createDataSource(connectionString: String): DataSource =
   the Broker keeps `postgres.*` to avoid breaking deployed environment
   variables. Only the pool sub-structure, keys, defaults, and behaviour are
   aligned — not the prefix.
-- **Aligning the JDBC driver version.** The Broker is on `postgresql:42.7.7`,
+- **Aligning the JDBC driver version.** The Broker is on `postgresql:42.7.11`,
   state on `42.7.2`. Bumping is unrelated to pooling; if the teams want a
   matched driver it should be a deliberate, separate change (state catching up
   is preferable to the Broker downgrading).
-- **Migrating to a Gradle version catalog.** State declares HikariCP via
-  `libs.versions.toml`; the Broker declares it inline in `build.gradle.kts`.
-  Both already pin HikariCP `5.1.0`, so this is a build-hygiene preference, not
-  a pooling concern.
+- **Gradle dependency declaration.** Both services already declare HikariCP
+  (`5.1.0`) and the Postgres driver via a `gradle/libs.versions.toml` version
+  catalog (`libs.hikaricp` / `libs.postgresql`), so build-declaration style is
+  already consistent — nothing to change here.
 - **Fixing state's `sslMode=prefer` typo.** That lives in
   `sdkman-state`'s `ConfigExtensions.kt` and is an upstream fix; the Broker's
   correct lowercase `sslmode` handling is preserved as-is (Business Rule 7).
