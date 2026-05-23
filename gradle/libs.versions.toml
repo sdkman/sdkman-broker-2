@@ -7,7 +7,7 @@ ktlint-plugin = "14.2.0"
 detekt-plugin = "1.23.8"
 
 # Libraries
-arrow = "1.2.1"
+arrow = "2.2.2.1"
 ktor = "3.5.0"
 exposed = "0.61.0"
 mongo-java-driver = "3.12.14"
