@@ -18,7 +18,6 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.append
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import javax.sql.DataSource
 
 object VersionsTable : Table("versions") {
     val candidate = text("candidate")
@@ -47,10 +46,8 @@ private class DistributionMatches(
 }
 
 class PostgresVersionRepository(
-    dataSource: DataSource
+    private val database: Database
 ) : VersionRepository {
-    private val database: Database by lazy { Database.connect(dataSource) }
-
     override fun findByQuery(
         candidate: String,
         version: String,

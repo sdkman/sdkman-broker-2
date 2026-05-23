@@ -14,6 +14,7 @@ import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresConnectivity
+import io.sdkman.broker.adapter.secondary.persistence.PostgresDatabase
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresVersionRepository
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
@@ -31,16 +32,16 @@ import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 import io.sdkman.broker.domain.service.SdkmanNativeDownloadService
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import javax.sql.DataSource
+import org.jetbrains.exposed.sql.Database
 
 private fun selectVersionRepository(
     backend: PersistenceBackend,
     mongoDatabase: MongoDatabase,
-    postgresDataSource: DataSource
+    postgresDatabase: Database
 ): VersionRepository =
     when (backend) {
         PersistenceBackend.Mongo -> MongoVersionRepository(mongoDatabase)
-        PersistenceBackend.Postgres -> PostgresVersionRepository(postgresDataSource)
+        PersistenceBackend.Postgres -> PostgresVersionRepository(postgresDatabase)
     }
 
 object App {
@@ -55,10 +56,11 @@ object App {
         // Create Postgres connection
         val postgresConnectivity = PostgresConnectivity(config)
         val postgresDataSource = postgresConnectivity.dataSource()
+        val postgresDatabase = PostgresDatabase.connect(postgresDataSource)
 
         // Initialize repositories
         val applicationRepository = MongoApplicationRepository(database)
-        val versionRepository = selectVersionRepository(config.persistenceBackend, database, postgresDataSource)
+        val versionRepository = selectVersionRepository(config.persistenceBackend, database, postgresDatabase)
         val postgresHealthRepository = PostgresHealthRepository(postgresDataSource)
         val auditRepository = PostgresAuditRepository(postgresDataSource)
 

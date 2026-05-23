@@ -5,6 +5,7 @@ import arrow.core.left
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
+import io.sdkman.broker.adapter.secondary.persistence.PostgresDatabase
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresVersionRepository
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
@@ -25,6 +26,8 @@ object TestDependencyInjection {
 
     val postgresDataSource by lazy { PostgresTestListener.dataSource }
 
+    val postgresDatabase by lazy { PostgresDatabase.connect(postgresDataSource) }
+
     fun postgresDataSource(
         username: String,
         password: String
@@ -39,7 +42,7 @@ object TestDependencyInjection {
     }
 
     val postgresVersionRepository by lazy {
-        PostgresVersionRepository(postgresDataSource)
+        PostgresVersionRepository(postgresDatabase)
     }
 
     val postgresHealthRepository by lazy {
