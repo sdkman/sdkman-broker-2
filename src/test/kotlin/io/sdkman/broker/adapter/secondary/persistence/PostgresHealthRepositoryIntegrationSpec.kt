@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Tag
 @Tag("integration")
 class PostgresHealthRepositoryIntegrationSpec :
     ShouldSpec({
-        listeners(PostgresTestListener)
+        register(PostgresTestListener)
 
         val repository = PostgresHealthRepository(PostgresTestListener.dataSource)
 

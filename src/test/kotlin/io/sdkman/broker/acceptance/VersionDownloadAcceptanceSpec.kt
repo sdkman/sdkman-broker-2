@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Tag
 @Tag("acceptance")
 class VersionDownloadAcceptanceSpec :
     ShouldSpec({
-        listener(MongoTestListener)
+        register(MongoTestListener)
 
         should("redirect to platform-specific binary when exact match exists") {
             // given: Java version with ARM64 macOS binary

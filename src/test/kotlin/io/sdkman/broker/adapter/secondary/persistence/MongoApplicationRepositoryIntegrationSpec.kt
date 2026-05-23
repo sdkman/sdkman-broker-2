@@ -12,7 +12,7 @@ import io.sdkman.broker.support.shouldBeRight
 
 class MongoApplicationRepositoryIntegrationSpec :
     ShouldSpec({
-        listener(MongoTestListener)
+        register(MongoTestListener)
 
         val repository = MongoApplicationRepository(MongoTestListener.database)
 

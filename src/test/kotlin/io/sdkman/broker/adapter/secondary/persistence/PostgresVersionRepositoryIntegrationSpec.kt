@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Tag
 @Tag("integration")
 class PostgresVersionRepositoryIntegrationSpec :
     ShouldSpec({
-        listeners(PostgresTestListener)
+        register(PostgresTestListener)
 
         val database = Database.connect(PostgresTestListener.dataSource)
         val repository = PostgresVersionRepository(database)
