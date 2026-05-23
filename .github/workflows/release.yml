@@ -6,6 +6,12 @@ on:
     branches:
       - main
 
+# Only release the latest commit; cancel superseded runs so back-to-back
+# merges don't fail axion's aheadOfRemote check by racing each other.
+concurrency:
+  group: release-main
+  cancel-in-progress: true
+
 permissions:
   contents: write  # Needed to push Git tags
 
