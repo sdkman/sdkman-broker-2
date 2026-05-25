@@ -2,7 +2,7 @@
 # Plugins
 kotlin = "2.3.21"
 axion-release-plugin = "1.21.1"
-jib-plugin = "3.4.1"
+jib-plugin = "3.5.3"
 ktlint-plugin = "14.2.0"
 detekt-plugin = "1.23.8"
 
