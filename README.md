@@ -14,31 +14,44 @@ This application implements a health check endpoint that performs a deep health 
 
 ### Prerequisites
 
-- JDK 21 (Temurin recommended)
 - MongoDB (or use Docker)
 - Postgres (or use Docker)
-- Gradle
+- The Kotlin Toolchain (formerly Amper) — auto-provisioned by the bundled `./kotlin` wrapper. Installing it globally is optional.
 
 ### SDKMAN Setup
 
-This project uses SDKMAN to manage the JDK version:
+This project uses SDKMAN to manage the JDK and the Kotlin Toolchain CLI:
 
 ```
 sdk env
 ```
+
+That installs the JDK declared in `.sdkmanrc` and the Kotlin Toolchain CLI. Alternatively, the `./kotlin` wrapper checked into the project root auto-provisions both on first use.
 
 ### Building and Testing
 
 Build the project:
 
 ```
-./gradlew build
+./kotlin build
 ```
 
 Run tests:
 
 ```
-./gradlew check
+./kotlin test
+```
+
+Run all verification checks (detekt + ktlint):
+
+```
+./kotlin check
+```
+
+Auto-format Kotlin sources:
+
+```
+./kotlin do ktlintFormat
 ```
 
 ### Running Locally
@@ -78,7 +91,7 @@ mongosh --eval 'db.getSiblingDB("sdkman").application.insertOne({ alive: "OK", s
 Run the application:
 
 ```
-./gradlew run
+./kotlin run
 ```
 
 ## API Endpoints
@@ -138,14 +151,14 @@ This project uses GitHub Actions for CI/CD:
   - Builds a Docker image and pushes it to Digital Ocean Container Registry
   - The image is tagged with the version number, commit hash, and "latest"
 
-The version is managed by the Axion Release Plugin based on Git tags.
+The version is managed by the local `release` Kotlin Toolchain plugin (`plugins/release/`), which derives the version from Git tags.
 
 ### Checking the Current Version
 
 To check the current version of the application, run:
 
 ```
-./gradlew currentVersion
+./kotlin do currentVersion
 ```
 
-This will display the current version as determined by the Axion Release Plugin.
+This will display the current version as determined by the local release plugin.
