@@ -1,0 +1,23 @@
+tasks:
+  check:
+    action: !io.sdkman.amper.plugins.ktlint.runKtlintCheck
+      commonParameters:
+        settings: ${pluginSettings}
+        sources: ${module.kotlinJavaSources}
+        ktlintClasspath:
+          - $libs.ktlint.cli
+        rulesetClasspath: ${pluginSettings.rulesetClasspath}
+      outputReport: ${taskOutputDir}/ktlint-report.xml
+
+  format:
+    action: !io.sdkman.amper.plugins.ktlint.runKtlintFormat
+      commonParameters: ${check.action.commonParameters}
+      outputReport: ${taskOutputDir}/ktlint-format-report.xml
+
+checks:
+  - performedBy: check
+    name: ktlint
+
+commands:
+  - name: ktlintFormat
+    performedBy: format

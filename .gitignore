@@ -1,8 +1,5 @@
-# Gradle
-.gradle/
+# Kotlin Toolchain
 build/
-gradle-app.setting
-!gradle-wrapper.jar
 
 # IDE files
 .idea/

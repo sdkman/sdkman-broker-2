@@ -7,7 +7,7 @@ on:
       - main
 
 # Only release the latest commit; cancel superseded runs so back-to-back
-# merges don't fail axion's aheadOfRemote check by racing each other.
+# merges don't fail the release plugin's aheadOfRemote check by racing each other.
 concurrency:
   group: release-main
   cancel-in-progress: true
@@ -19,6 +19,8 @@ jobs:
   build:
     name: "Release"
     runs-on: ubuntu-latest
+    env:
+      KOTLIN_CLI_NO_WELCOME_BANNER: "1"
     steps:
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
@@ -33,23 +35,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v5
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: gradle
+      - name: Verify
+        run: ./kotlin check
 
-      - name: Gradle check
-        run: ./gradlew clean check
+      - name: Tag release
+        run: ./kotlin do release
 
-      - name: Gradle release
-        run: ./gradlew release
-
-      - name: Propagate current release version
+      - name: Resolve current release version
         id: tag_version
         run: |
-          current_version=$(./gradlew currentVersion -q | grep "Project version" | awk '{print $3}')
+          current_version=$(./kotlin do currentVersion 2>/dev/null | tail -n1)
           echo "Version set to: $current_version"
           echo "version=$current_version" >> $GITHUB_OUTPUT
 
@@ -57,5 +52,4 @@ jobs:
         run: |
           version="${{ steps.tag_version.outputs.version }}"
           commit_hash=$(git rev-parse --short=8 HEAD)
-          ./gradlew build jib -Djib.to.tags=$commit_hash,$version,latest
-
+          ./kotlin do jib --setting "jib.targetImage.tags=[$version,$commit_hash,latest]"
