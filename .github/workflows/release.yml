@@ -44,7 +44,7 @@ jobs:
       - name: Resolve current release version
         id: tag_version
         run: |
-          current_version=$(./kotlin do currentVersion 2>/dev/null | tail -n1)
+          current_version=$(./kotlin do currentVersion | awk '/currentVersion@release/ { v = $NF } END { print v }')
           echo "Version set to: $current_version"
           echo "version=$current_version" >> $GITHUB_OUTPUT
 
