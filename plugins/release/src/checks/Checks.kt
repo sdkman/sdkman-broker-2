@@ -1,8 +1,8 @@
-package com.example.release.checks
+package io.sdkman.kotlintoolchain.plugins.release.checks
 
-import com.example.release.Settings
-import com.example.release.git.GitRepo
-import com.example.release.version.VersionPipeline
+import io.sdkman.kotlintoolchain.plugins.release.Settings
+import io.sdkman.kotlintoolchain.plugins.release.git.GitRepo
+import io.sdkman.kotlintoolchain.plugins.release.version.VersionPipeline
 
 /**
  * Pre-release checks (axion's `verifyRelease`).

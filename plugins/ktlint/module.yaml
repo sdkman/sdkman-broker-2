@@ -3,7 +3,7 @@ product: jvm/amper-plugin
 description: A plugin to run the ktlint linter and formatter.
 
 pluginInfo:
-  settingsClass: io.sdkman.amper.plugins.ktlint.Settings
+  settingsClass: io.sdkman.kotlintoolchain.plugins.ktlint.Settings
 
 # No hard dependency on ktlint itself — resolved dynamically via Classpath in plugin.yaml.
 

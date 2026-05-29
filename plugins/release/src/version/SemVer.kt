@@ -1,4 +1,4 @@
-package com.example.release.version
+package io.sdkman.kotlintoolchain.plugins.release.version
 
 /**
  * Minimal `MAJOR.MINOR.PATCH` Semantic Versioning value class.

@@ -1,6 +1,6 @@
 tasks:
   package:
-    action: !io.sdkman.amper.plugins.pkg.packageApplication
+    action: !io.sdkman.kotlintoolchain.plugins.pkg.packageApplication
       jar: ${module.jar}
       outputJar: ${module.rootDir}/build/libs/${module.name}.jar
 

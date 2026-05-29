@@ -1,3 +1,5 @@
+package io.sdkman.kotlintoolchain.plugins.jib
+
 import org.jetbrains.amper.plugins.Configurable
 
 @Configurable

@@ -3,7 +3,7 @@ product: jvm/amper-plugin
 description: Stages the application JAR at build/libs/${module.name}.jar for CI artifact uploads.
 
 pluginInfo:
-  settingsClass: io.sdkman.amper.plugins.pkg.Settings
+  settingsClass: io.sdkman.kotlintoolchain.plugins.pkg.Settings
 
 settings:
   jvm:
