@@ -12,8 +12,9 @@ fun buildAndPush(
     baseImage: BaseImageSettings,
     targetImage: TargetImageSettings,
 ) {
-    jibContainerBuilder(runtimeClasspath, container, baseImage)
-        .containerize(Containerizer.to(targetImage.toRegistryImages()))
+    val containerizer = Containerizer.to(targetImage.toRegistryImages())
+    targetImage.effectiveTags().forEach { containerizer.withAdditionalTag(it) }
+    jibContainerBuilder(runtimeClasspath, container, baseImage).containerize(containerizer)
 }
 
 @TaskAction
@@ -74,6 +75,25 @@ private fun TargetImageSettings.toRegistryImages(): RegistryImage {
     registryImage.configureCredentials(imageReference, credHelper, auth)
     return registryImage
 }
+
+/** Env var that overrides the configured target image tags (comma-separated). */
+private const val TARGET_IMAGE_TAGS_ENV = "JIB_TARGET_IMAGE_TAGS"
+
+/**
+ * Tags to publish, honoring a `JIB_TARGET_IMAGE_TAGS` override.
+ *
+ * The toolchain pinned by `./kotlin` exposes no `--setting` flag, so environment
+ * variables are how release CI customizes the published tags, e.g.
+ * `JIB_TARGET_IMAGE_TAGS=1.2.4,<sha>,latest`. When unset or blank, the configured
+ * [TargetImageSettings.tags] are used.
+ */
+private fun TargetImageSettings.effectiveTags(): List<String> =
+    System.getenv(TARGET_IMAGE_TAGS_ENV)
+        ?.split(",")
+        ?.map { it.trim() }
+        ?.filter { it.isNotEmpty() }
+        ?.takeIf { it.isNotEmpty() }
+        ?: tags
 
 private fun RegistryImage.configureCredentials(
     imageReference: ImageReference,
