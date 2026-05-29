@@ -36,8 +36,9 @@ internal fun pickTagToPush(
     repo: GitRepo,
     settings: Settings,
     pipeline: VersionPipeline,
+    env: Map<String, String?> = System.getenv(),
 ): String {
-    val forced = System.getenv("RELEASE_FORCE_VERSION")?.takeIf { it.isNotBlank() }
+    val forced = env["RELEASE_FORCE_VERSION"]?.takeIf { it.isNotBlank() }
     if (forced != null) {
         val parsed = SemVer.parseOrNull(forced)
             ?: error("RELEASE_FORCE_VERSION='$forced' is not MAJOR.MINOR.PATCH")
