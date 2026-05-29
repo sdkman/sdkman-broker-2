@@ -1,3 +1,9 @@
+/*
+ * The release/version logic in this plugin is a Kotlin port of
+ * allegro/axion-release-plugin (https://github.com/allegro/axion-release-plugin),
+ * licensed under the Apache License 2.0.
+ */
+
 package io.sdkman.kotlintoolchain.plugins.release.version
 
 import io.sdkman.kotlintoolchain.plugins.release.Settings
