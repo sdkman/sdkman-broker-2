@@ -52,4 +52,4 @@ jobs:
         run: |
           version="${{ steps.tag_version.outputs.version }}"
           commit_hash=$(git rev-parse --short=8 HEAD)
-          ./kotlin do jib --setting "jib.targetImage.tags=[$version,$commit_hash,latest]"
+          JIB_TARGET_IMAGE_TAGS="$version,$commit_hash,latest" ./kotlin do jib
