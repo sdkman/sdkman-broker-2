@@ -1,0 +1,11 @@
+tasks:
+  package:
+    action: !io.sdkman.kotlintoolchain.plugins.pkg.packageApplication
+      jar: ${module.jar}
+      outputDir: ${module.rootDir}/build/libs
+      defaultName: ${module.name}
+      settings: ${pluginSettings}
+
+commands:
+  - name: package
+    performedBy: package

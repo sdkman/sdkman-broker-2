@@ -1,0 +1,69 @@
+product: jvm/app
+
+layout: maven-like
+
+repositories:
+  - id: jitpack
+    url: https://jitpack.io
+
+plugins:
+  release: enabled
+  jib:
+    enabled: true
+    container:
+      mainClass: io.sdkman.broker.App
+      jvmArgs: ["-Xms256m", "-Xmx512m"]
+      ports: ["8080"]
+      user: "1000"
+      environment:
+        MONGODB_URI: "mongodb://localhost:27017"
+        MONGODB_DATABASE: "sdkman"
+    baseImage:
+      fullName: eclipse-temurin:21-jre-alpine
+    targetImage:
+      name: registry.digitalocean.com/sdkman/sdkman-broker
+      tags: ["latest"]
+  detekt:
+    enabled: true
+    configFile: detekt.yml
+    buildUponDefaultConfig: true
+    rulesetClasspath:
+      - $libs.detekt.rules
+  ktlint: enabled
+  package: enabled
+
+settings:
+  jvm:
+    mainClass: io.sdkman.broker.App
+    jdk:
+      version: 21
+  kotlin:
+    serialization: json
+    freeCompilerArgs: ["-Xskip-metadata-version-check"]
+
+dependencies:
+  - $libs.arrow.core
+  - $libs.ktor.server.core
+  - $libs.ktor.server.netty
+  - $libs.ktor.server.content.negotiation
+  - $libs.ktor.serialization.kotlinx.json
+  - $libs.mongo.java.driver
+  - $libs.postgresql
+  - $libs.hikaricp
+  - $libs.typesafe.config
+  - $libs.logback.classic
+  - $libs.exposed.core
+  - $libs.exposed.jdbc
+  - $libs.exposed.kotlin.datetime
+
+test-dependencies:
+  - $libs.kotest.runner.junit5
+  - $libs.kotest.assertions.core
+  - $libs.arrow.core
+  - $libs.ktor.server.test.host
+  - $libs.ktor.client.okhttp
+  - $libs.testcontainers.mongodb
+  - $libs.testcontainers.postgresql
+  - $libs.mockk
+  - $libs.flyway.core
+  - $libs.flyway.database.postgresql

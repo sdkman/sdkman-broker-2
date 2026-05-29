@@ -8,9 +8,6 @@ updates:
       day: "monday"
     open-pull-requests-limit: 5
     groups:
-      kotlin:
-        patterns:
-          - "org.jetbrains.kotlin*"
       ktor:
         patterns:
           - "io.ktor*"
@@ -24,6 +21,21 @@ updates:
       exposed:
         patterns:
           - "org.jetbrains.exposed*"
+      detekt:
+        patterns:
+          - "io.gitlab.arturbosch.detekt*"
+          - "com.github.marc0der*"
+      ktlint:
+        patterns:
+          - "com.pinterest.ktlint*"
+      jib:
+        patterns:
+          - "com.google.cloud.tools*"
+      release-plugin:
+        patterns:
+          - "org.eclipse.jgit*"
+          - "org.bouncycastle*"
+          - "org.slf4j*"
 
   # GitHub Actions
   - package-ecosystem: "github-actions"

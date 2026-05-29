@@ -1,0 +1,55 @@
+tasks:
+  currentVersion:
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.currentVersion
+      moduleRootDir: ${module.rootDir}
+      settings: ${pluginSettings}
+
+  writeVersion:
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.writeVersion
+      moduleRootDir: ${module.rootDir}
+      outputDir: ${taskOutputDir}
+      settings: ${pluginSettings}
+
+  writeReleaseProperties:
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.writeReleaseProperties
+      moduleRootDir: ${module.rootDir}
+      outputDir: ${taskOutputDir}
+      settings: ${pluginSettings}
+
+  verifyRelease:
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.verifyRelease
+      moduleRootDir: ${module.rootDir}
+      settings: ${pluginSettings}
+
+  createRelease:
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.createRelease
+      moduleRootDir: ${module.rootDir}
+      settings: ${pluginSettings}
+
+  pushRelease:
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.pushRelease
+      moduleRootDir: ${module.rootDir}
+      settings: ${pluginSettings}
+
+  release:
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.release
+      moduleRootDir: ${module.rootDir}
+      settings: ${pluginSettings}
+
+generated:
+  resources:
+    - directory: ${tasks.writeVersion.action.outputDir}
+    - directory: ${tasks.writeReleaseProperties.action.outputDir}
+
+# Public entry points. Tasks above are an implementation detail; users
+# invoke the plugin through these commands via `./kotlin do <name>`.
+# `writeVersion` and `writeReleaseProperties` are intentionally not exposed:
+# they are build-graph contributors (their `@Output`s are wired into
+# `generated.resources`) and run automatically when something downstream needs
+# the generated files.
+commands:
+  - currentVersion
+  - verifyRelease
+  - createRelease
+  - pushRelease
+  - release

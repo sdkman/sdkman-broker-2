@@ -1,11 +1,4 @@
 [versions]
-# Plugins
-kotlin = "2.3.21"
-axion-release-plugin = "1.21.1"
-jib-plugin = "3.4.1"
-ktlint-plugin = "14.2.0"
-detekt-plugin = "1.23.8"
-
 # Libraries
 arrow = "2.2.2.1"
 ktor = "3.5.0"
@@ -22,8 +15,18 @@ testcontainers = "1.21.4"
 mockk = "1.14.9"
 flyway = "12.6.2"
 
-# Detekt rules
+# Linters
+detekt = "1.23.8"
 detekt-rules = "1.0.1"
+ktlint = "1.5.0"
+
+# Local plugin runtime
+jib-core = "0.28.1"
+jgit = "7.0.0.202409031743-r"
+# Pinned to the version contemporary with MINA SSHD 2.13.x (what jgit 7.0.0 ships against);
+# without bouncycastle on the runtime classpath, SSH push fails with NoClassDefFoundError.
+bouncycastle = "1.78.1"
+slf4j = "2.0.13"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
@@ -56,12 +59,16 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
 flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 
+detekt-cli = { module = "io.gitlab.arturbosch.detekt:detekt-cli", version.ref = "detekt" }
 detekt-rules = { module = "com.github.marc0der:detekt-rules", version.ref = "detekt-rules" }
+ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" }
 
-[plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axion-release-plugin" }
-jib = { id = "com.google.cloud.tools.jib", version.ref = "jib-plugin" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-plugin" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt-plugin" }
+jib-core = { module = "com.google.cloud.tools:jib-core", version.ref = "jib-core" }
+
+jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
+jgit-ssh-apache = { module = "org.eclipse.jgit:org.eclipse.jgit.ssh.apache", version.ref = "jgit" }
+
+bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle" }
+
+slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
