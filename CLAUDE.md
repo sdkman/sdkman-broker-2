@@ -10,6 +10,8 @@ SDKMAN Broker is a Kotlin-based Ktor application that brokers SDKMAN candidate a
 
 Built with the Kotlin Toolchain (Amper engine). The `./kotlin` wrapper auto-provisions both the JDK and the toolchain; no `setup-java` or local install required.
 
+Built-in toolchain commands (`build`, `check`, `test`, `run`, `clean`) are invoked directly as `./kotlin <command>`. Commands contributed by the local plugins under `plugins/` (e.g. `currentVersion`, `release`, `jib`, `ktlintFormat`) are invoked as `./kotlin do <command>`.
+
 - **Run service:** `./kotlin run` (starts Ktor on port 8080; requires MongoDB and PostgreSQL — see Database Setup below)
 
 ## Validation
