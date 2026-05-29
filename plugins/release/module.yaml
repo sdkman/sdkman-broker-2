@@ -14,7 +14,7 @@ dependencies:
 
 pluginInfo:
   id: release
-  settingsClass: com.example.release.Settings
+  settingsClass: io.sdkman.kotlintoolchain.plugins.release.Settings
 
 settings:
   jvm:

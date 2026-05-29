@@ -1,4 +1,4 @@
-package io.sdkman.amper.plugins.ktlint
+package io.sdkman.kotlintoolchain.plugins.ktlint
 
 import org.jetbrains.amper.plugins.Classpath
 import org.jetbrains.amper.plugins.Configurable

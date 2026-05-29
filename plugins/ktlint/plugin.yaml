@@ -1,6 +1,6 @@
 tasks:
   check:
-    action: !io.sdkman.amper.plugins.ktlint.runKtlintCheck
+    action: !io.sdkman.kotlintoolchain.plugins.ktlint.runKtlintCheck
       commonParameters:
         settings: ${pluginSettings}
         sources: ${module.kotlinJavaSources}
@@ -10,7 +10,7 @@ tasks:
       outputReport: ${taskOutputDir}/ktlint-report.xml
 
   format:
-    action: !io.sdkman.amper.plugins.ktlint.runKtlintFormat
+    action: !io.sdkman.kotlintoolchain.plugins.ktlint.runKtlintFormat
       commonParameters: ${check.action.commonParameters}
       outputReport: ${taskOutputDir}/ktlint-format-report.xml
 

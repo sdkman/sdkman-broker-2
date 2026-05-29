@@ -1,38 +1,38 @@
 tasks:
   currentVersion:
-    action: !com.example.release.tasks.currentVersion
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.currentVersion
       moduleRootDir: ${module.rootDir}
       settings: ${pluginSettings}
 
   writeVersion:
-    action: !com.example.release.tasks.writeVersion
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.writeVersion
       moduleRootDir: ${module.rootDir}
       outputDir: ${taskOutputDir}
       settings: ${pluginSettings}
 
   writeReleaseProperties:
-    action: !com.example.release.tasks.writeReleaseProperties
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.writeReleaseProperties
       moduleRootDir: ${module.rootDir}
       outputDir: ${taskOutputDir}
       settings: ${pluginSettings}
 
   verifyRelease:
-    action: !com.example.release.tasks.verifyRelease
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.verifyRelease
       moduleRootDir: ${module.rootDir}
       settings: ${pluginSettings}
 
   createRelease:
-    action: !com.example.release.tasks.createRelease
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.createRelease
       moduleRootDir: ${module.rootDir}
       settings: ${pluginSettings}
 
   pushRelease:
-    action: !com.example.release.tasks.pushRelease
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.pushRelease
       moduleRootDir: ${module.rootDir}
       settings: ${pluginSettings}
 
   release:
-    action: !com.example.release.tasks.release
+    action: !io.sdkman.kotlintoolchain.plugins.release.tasks.release
       moduleRootDir: ${module.rootDir}
       settings: ${pluginSettings}
 

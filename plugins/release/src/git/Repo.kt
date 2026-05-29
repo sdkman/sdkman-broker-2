@@ -1,4 +1,4 @@
-package com.example.release.git
+package io.sdkman.kotlintoolchain.plugins.release.git
 
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.BranchTrackingStatus

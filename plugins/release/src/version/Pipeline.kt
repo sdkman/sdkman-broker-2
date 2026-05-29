@@ -1,8 +1,8 @@
-package com.example.release.version
+package io.sdkman.kotlintoolchain.plugins.release.version
 
-import com.example.release.Settings
-import com.example.release.git.GitRepo
-import com.example.release.git.NearestTag
+import io.sdkman.kotlintoolchain.plugins.release.Settings
+import io.sdkman.kotlintoolchain.plugins.release.git.GitRepo
+import io.sdkman.kotlintoolchain.plugins.release.git.NearestTag
 
 /**
  * Where the version number originated, useful for log lines and diagnostics.
@@ -92,7 +92,7 @@ class VersionPipeline(
     }
 
     /**
-     * The next release version that [createRelease][com.example.release.tasks.createRelease]
+     * The next release version that [createRelease][io.sdkman.kotlintoolchain.plugins.release.tasks.createRelease]
      * would tag at HEAD: bare SemVer, no decoration, no `-SNAPSHOT`.
      *
      * Returns `null` when HEAD is already exactly on a release tag — in that

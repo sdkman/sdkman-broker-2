@@ -1,4 +1,4 @@
-package io.sdkman.amper.plugins.pkg
+package io.sdkman.kotlintoolchain.plugins.pkg
 
 import org.jetbrains.amper.plugins.Configurable
 

@@ -1,4 +1,4 @@
-package com.example.release
+package io.sdkman.kotlintoolchain.plugins.release
 
 import org.jetbrains.amper.plugins.Configurable
 

@@ -1,9 +1,9 @@
-package com.example.release.tasks
+package io.sdkman.kotlintoolchain.plugins.release.tasks
 
-import com.example.release.Settings
-import com.example.release.git.GitRepo
-import com.example.release.version.SemVer
-import com.example.release.version.VersionPipeline
+import io.sdkman.kotlintoolchain.plugins.release.Settings
+import io.sdkman.kotlintoolchain.plugins.release.git.GitRepo
+import io.sdkman.kotlintoolchain.plugins.release.version.SemVer
+import io.sdkman.kotlintoolchain.plugins.release.version.VersionPipeline
 import org.jetbrains.amper.plugins.Input
 import org.jetbrains.amper.plugins.TaskAction
 import java.nio.file.Path
