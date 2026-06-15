@@ -19,7 +19,7 @@ logback = "1.5.32"
 # Test
 kotest = "6.1.11"
 testcontainers = "1.21.4"
-mockk = "1.14.9"
+mockk = "1.14.11"
 flyway = "12.6.2"
 
 # Detekt rules
