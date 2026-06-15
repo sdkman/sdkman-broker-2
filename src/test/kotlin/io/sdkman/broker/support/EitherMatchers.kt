@@ -1,6 +1,8 @@
 package io.sdkman.broker.support
 
 import arrow.core.Either
+import arrow.core.getOrElse
+import arrow.core.toOption
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.should
@@ -96,4 +98,7 @@ infix fun <L, R> Either<L, R>.shouldBeRightAnd(predicate: (R) -> Boolean) = this
 infix fun <L, R> Either<L, R>.shouldBeLeftAnd(predicate: (L) -> Boolean) = this should beLeftAnd(predicate)
 
 infix fun DatabaseFailure.shouldContainMessage(content: String): Boolean =
-    this.exception.message?.contains(content) == true
+    this.exception.message
+        .toOption()
+        .map { it.contains(content) }
+        .getOrElse { false }

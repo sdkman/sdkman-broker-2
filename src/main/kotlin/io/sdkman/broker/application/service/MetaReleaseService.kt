@@ -56,5 +56,5 @@ class MetaReleaseError(
     e: Throwable
 ) : Throwable(e) {
     override val message: String
-        get() = super.message ?: "An error occurred while retrieving the release version."
+        get() = super.message.toOption().getOrElse { "An error occurred while retrieving the release version." }
 }
