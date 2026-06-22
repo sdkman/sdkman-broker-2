@@ -17,7 +17,7 @@ typesafe-config = "1.4.9"
 logback = "1.5.32"
 
 # Test
-kotest = "6.1.11"
+kotest = "6.2.1"
 testcontainers = "1.21.4"
 mockk = "1.14.11"
 flyway = "12.6.2"
