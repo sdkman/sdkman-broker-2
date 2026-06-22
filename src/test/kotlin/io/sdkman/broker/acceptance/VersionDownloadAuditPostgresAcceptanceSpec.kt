@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Tag
 @Tag("acceptance")
 class VersionDownloadAuditPostgresAcceptanceSpec :
     ShouldSpec({
-        register(MongoTestListener)
-        register(PostgresTestListener)
+        extension(MongoTestListener)
+        extension(PostgresTestListener)
         val database = Database.connect(PostgresTestListener.dataSource)
 
         beforeTest { PostgresTestSupport.clearVersions(database) }

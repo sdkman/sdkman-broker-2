@@ -14,7 +14,7 @@ import io.sdkman.broker.support.shouldBeRightAnd
 
 class MongoVersionRepositoryIntegrationSpec :
     ShouldSpec({
-        register(MongoTestListener)
+        extension(MongoTestListener)
 
         val repository = MongoVersionRepository(MongoTestListener.database)
 

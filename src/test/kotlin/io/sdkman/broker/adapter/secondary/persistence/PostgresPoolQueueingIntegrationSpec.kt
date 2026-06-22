@@ -32,7 +32,7 @@ import kotlin.concurrent.thread
 @Tag("integration")
 class PostgresPoolQueueingIntegrationSpec :
     ShouldSpec({
-        register(PostgresTestListener)
+        extension(PostgresTestListener)
 
         val maxPoolSize = 2
         val concurrentRequests = 8

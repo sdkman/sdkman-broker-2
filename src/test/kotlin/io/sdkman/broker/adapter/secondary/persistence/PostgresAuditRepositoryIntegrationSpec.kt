@@ -21,7 +21,7 @@ import kotlin.time.Clock
 @Tag("integration")
 class PostgresAuditRepositoryIntegrationSpec :
     ShouldSpec({
-        register(PostgresTestListener)
+        extension(PostgresTestListener)
 
         val database = Database.connect(PostgresTestListener.dataSource)
         val repository = PostgresAuditRepository(database)

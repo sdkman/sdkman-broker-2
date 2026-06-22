@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Tag
 @Tag("integration")
 class MongoConnectivityIntegrationSpec :
     ShouldSpec({
-        register(MongoTestListener)
+        extension(MongoTestListener)
 
         should("successfully connect to MongoDB and get a database instance") {
             // given
