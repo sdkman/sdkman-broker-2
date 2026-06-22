@@ -4,13 +4,7 @@ kotlin = "2.4.0"
 axion-release-plugin = "1.21.1"
 jib-plugin = "3.5.3"
 ktlint-plugin = "14.2.0"
-# Pinned to 1.23.8 — the latest stable detekt 1.x. Do NOT bump to 2.0.0-alpha.x:
-# detekt 2.x is alpha-only and rewrites the RuleSetProvider/Rule extension API, which would
-# break the custom `com.github.marc0der:detekt-rules` NullabilityRuleSet (built against the
-# detekt 1.x API and registered via its 1.x RuleSetProvider SPI). The trade-off is that
-# 1.23.8 triggers a plugin-internal Gradle deprecation ("ReportingExtension.file",
-# DetektPlugin.kt:28) that cannot be fixed from this build — accepted as upstream debt until
-# detekt ships a stable 2.x AND detekt-rules republishes against it.
+# Pinned to detekt 1.x; 2.x is alpha-only and breaks the custom detekt-rules NullabilityRuleSet.
 detekt-plugin = "1.23.8"
 
 # Libraries
