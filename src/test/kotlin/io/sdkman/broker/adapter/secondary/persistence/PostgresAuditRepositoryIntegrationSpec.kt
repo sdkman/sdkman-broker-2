@@ -13,15 +13,15 @@ import io.sdkman.broker.support.shouldBeLeftAnd
 import io.sdkman.broker.support.shouldBeRightAnd
 import io.sdkman.broker.support.shouldBeSomeAnd
 import io.sdkman.broker.support.shouldContainMessage
-import kotlinx.datetime.Clock
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.junit.jupiter.api.Tag
 import java.util.UUID
+import kotlin.time.Clock
 
 @Tag("integration")
 class PostgresAuditRepositoryIntegrationSpec :
     ShouldSpec({
-        register(PostgresTestListener)
+        extension(PostgresTestListener)
 
         val database = Database.connect(PostgresTestListener.dataSource)
         val repository = PostgresAuditRepository(database)

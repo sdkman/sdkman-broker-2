@@ -91,7 +91,7 @@ class MetaHealthServiceImpl(
                     is DatabaseFailure.QueryExecutionFailure ->
                         HealthCheckError.DatabaseError("PostgreSQL", databaseFailure.exception)
                 }
-            }.map { Unit }
+            }.map { }
 }
 
 enum class HealthStatus {

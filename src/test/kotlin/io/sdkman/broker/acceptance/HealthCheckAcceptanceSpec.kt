@@ -17,8 +17,8 @@ import org.junit.jupiter.api.Tag
 @Tag("acceptance")
 class HealthCheckAcceptanceSpec : ShouldSpec() {
     override suspend fun beforeSpec(spec: io.kotest.core.spec.Spec) {
-        register(MongoTestListener)
-        register(PostgresTestListener)
+        extension(MongoTestListener)
+        extension(PostgresTestListener)
     }
 
     init {

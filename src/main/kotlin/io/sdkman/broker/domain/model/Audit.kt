@@ -1,8 +1,8 @@
 package io.sdkman.broker.domain.model
 
 import arrow.core.Option
-import kotlinx.datetime.Instant
 import java.util.UUID
+import kotlin.time.Instant
 
 data class Audit(
     val id: Option<UUID>,

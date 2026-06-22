@@ -10,7 +10,7 @@ import java.sql.Connection
 @Tag("integration")
 class PostgresDatabaseIntegrationSpec :
     ShouldSpec({
-        register(PostgresTestListener)
+        extension(PostgresTestListener)
 
         should("pin READ_COMMITTED as the default transaction isolation level") {
             // given: a Database built through the shared factory

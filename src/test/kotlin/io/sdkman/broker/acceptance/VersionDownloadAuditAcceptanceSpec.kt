@@ -25,8 +25,8 @@ import org.junit.jupiter.api.Tag
 @Tag("acceptance")
 class VersionDownloadAuditAcceptanceSpec :
     ShouldSpec({
-        register(MongoTestListener)
-        register(PostgresTestListener)
+        extension(MongoTestListener)
+        extension(PostgresTestListener)
         val database = Database.connect(PostgresTestListener.dataSource)
 
         should("create audit entry for successful platform-specific download with headers") {

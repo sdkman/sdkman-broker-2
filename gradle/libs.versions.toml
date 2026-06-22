@@ -4,6 +4,7 @@ kotlin = "2.4.0"
 axion-release-plugin = "1.21.1"
 jib-plugin = "3.5.3"
 ktlint-plugin = "14.2.0"
+# Pinned to detekt 1.x; 2.x is alpha-only and breaks the custom detekt-rules NullabilityRuleSet.
 detekt-plugin = "1.23.8"
 
 # Libraries
@@ -23,7 +24,7 @@ mockk = "1.14.11"
 flyway = "12.6.2"
 
 # Detekt rules
-detekt-rules = "1.0.1"
+detekt-rules = "1.1.0"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }

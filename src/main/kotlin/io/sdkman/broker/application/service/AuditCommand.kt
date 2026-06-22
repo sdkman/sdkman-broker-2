@@ -7,8 +7,8 @@ import io.sdkman.broker.domain.model.Audit
 import io.sdkman.broker.domain.model.JavaDistribution
 import io.sdkman.broker.domain.model.Platform
 import io.sdkman.broker.domain.model.Version
-import kotlinx.datetime.Clock
 import java.util.UUID
+import kotlin.time.Clock
 
 data class AuditCommand(
     val candidate: String,

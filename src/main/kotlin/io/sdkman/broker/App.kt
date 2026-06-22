@@ -75,7 +75,7 @@ object App {
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
             // Close the Hikari pool cleanly when the application stops (spec Business Rule 6).
-            environment.monitor.subscribe(ApplicationStopped) { postgresDataSource.close() }
+            monitor.subscribe(ApplicationStopped) { postgresDataSource.close() }
             configureApp(
                 metaHealthService,
                 metaReleaseService,
