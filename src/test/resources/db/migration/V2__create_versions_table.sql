@@ -13,5 +13,5 @@ CREATE TABLE versions (
     sha_512_sum     TEXT          NULL,
     created_at      TIMESTAMP     NULL DEFAULT now(),
     last_updated_at TIMESTAMP     NULL DEFAULT now(),
-    UNIQUE (candidate, version, distribution, platform)
+    UNIQUE NULLS NOT DISTINCT (candidate, version, distribution, platform)
 );
