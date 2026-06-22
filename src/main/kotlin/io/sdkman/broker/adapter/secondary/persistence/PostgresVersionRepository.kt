@@ -84,11 +84,11 @@ private fun ResultRow.toVersion(): Version =
     )
 
 private fun ResultRow.toChecksums(): Map<String, String> =
-    listOfNotNull(
-        this[VersionsTable.md5Sum]?.let { ALGO_MD5 to it },
-        this[VersionsTable.sha256Sum]?.let { ALGO_SHA_256 to it },
-        this[VersionsTable.sha512Sum]?.let { ALGO_SHA_512 to it }
-    ).toMap()
+    listOf(
+        this[VersionsTable.md5Sum].toOption().map { ALGO_MD5 to it },
+        this[VersionsTable.sha256Sum].toOption().map { ALGO_SHA_256 to it },
+        this[VersionsTable.sha512Sum].toOption().map { ALGO_SHA_512 to it }
+    ).flatMap { it.toList() }.toMap()
 
 private const val ALGO_MD5 = "MD5"
 private const val ALGO_SHA_256 = "SHA-256"

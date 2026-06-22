@@ -1,6 +1,8 @@
 package io.sdkman.broker.adapter.primary.rest
 
 import arrow.core.Option
+import arrow.core.getOrElse
+import arrow.core.toOption
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
@@ -22,9 +24,9 @@ fun Application.downloadRoutes(
 ) {
     routing {
         get("/download/{candidate}/{version}/{platform}") {
-            val candidate = call.parameters["candidate"] ?: return@get call.respondBadRequest()
-            val version = call.parameters["version"] ?: return@get call.respondBadRequest()
-            val platform = call.parameters["platform"] ?: return@get call.respondBadRequest()
+            val candidate = call.parameters["candidate"].toOption().getOrElse { return@get call.respondBadRequest() }
+            val version = call.parameters["version"].toOption().getOrElse { return@get call.respondBadRequest() }
+            val platform = call.parameters["platform"].toOption().getOrElse { return@get call.respondBadRequest() }
 
             val auditContext =
                 AuditContext(
@@ -48,9 +50,9 @@ fun Application.downloadRoutes(
         }
 
         get("/download/sdkman/{command}/{version}/{platform}") {
-            val command = call.parameters["command"] ?: return@get call.respondBadRequest()
-            val version = call.parameters["version"] ?: return@get call.respondBadRequest()
-            val platform = call.parameters["platform"] ?: return@get call.respondBadRequest()
+            val command = call.parameters["command"].toOption().getOrElse { return@get call.respondBadRequest() }
+            val version = call.parameters["version"].toOption().getOrElse { return@get call.respondBadRequest() }
+            val platform = call.parameters["platform"].toOption().getOrElse { return@get call.respondBadRequest() }
 
             sdkmanCliDownloadService
                 .downloadSdkmanCli(command, version, platform)
@@ -64,9 +66,9 @@ fun Application.downloadRoutes(
         }
 
         get("/download/native/{command}/{version}/{platform}") {
-            val command = call.parameters["command"] ?: return@get call.respondBadRequest()
-            val version = call.parameters["version"] ?: return@get call.respondBadRequest()
-            val platform = call.parameters["platform"] ?: return@get call.respondBadRequest()
+            val command = call.parameters["command"].toOption().getOrElse { return@get call.respondBadRequest() }
+            val version = call.parameters["version"].toOption().getOrElse { return@get call.respondBadRequest() }
+            val platform = call.parameters["platform"].toOption().getOrElse { return@get call.respondBadRequest() }
 
             sdkmanNativeDownloadService
                 .downloadNativeCli(command, version, platform)
