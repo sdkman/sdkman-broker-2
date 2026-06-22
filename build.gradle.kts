@@ -29,13 +29,14 @@ tasks.register("generateReleaseProperties") {
     description = "Generates release.properties file with the current project version"
     group = "build"
 
-    inputs.property("version", version)
+    val releaseVersion = version
+    inputs.property("version", releaseVersion)
     val resourcesDir = tasks.processResources.get().destinationDir
     outputs.file(File(resourcesDir, "release.properties"))
 
     doLast {
         resourcesDir.mkdirs()
-        File(resourcesDir, "release.properties").writeText("release=${project.version}")
+        File(resourcesDir, "release.properties").writeText("release=$releaseVersion")
     }
 }
 
