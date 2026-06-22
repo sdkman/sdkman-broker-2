@@ -64,10 +64,12 @@ connection pool is configured and wired.
    overridable per environment.
 
 2. **`AppConfig` exposes the pool tunables.** The `AppConfig` interface gains
-   five members and `DefaultAppConfig` reads them with the existing
-   `getIntOrDefault` / `getLongOrDefault` helpers so absent keys fall back to
-   the defaults in Rule 1. Timeouts are `Long` (milliseconds); sizes are `Int`.
-   `PostgresConnectivity` consumes these instead of literals.
+   five members and `DefaultAppConfig` reads them directly as required values
+   (`config.getInt(...)` / `config.getLong(...)`). Per `.claude/rules/hocon.md`
+   every default lives exactly once — in `application.conf` (Rule 1) — never as
+   a duplicated Kotlin literal; a missing key is a deploy misconfiguration that
+   must fail fast at startup. Timeouts are `Long` (milliseconds); sizes are
+   `Int`. `PostgresConnectivity` consumes these instead of literals.
 
 3. **The pool is named.** `HikariConfig.poolName = "sdkman-broker-pool"`,
    mirroring state's `sdkman-state-pool`. This makes the two pools
@@ -185,15 +187,15 @@ interface AppConfig {
 }
 
 class DefaultAppConfig : AppConfig {
-    // …
-    override val postgresPoolMaxSize: Int = config.getIntOrDefault("postgres.pool.maxSize", 20)
-    override val postgresPoolMinIdle: Int = config.getIntOrDefault("postgres.pool.minIdle", 2)
+    // … defaults live in application.conf (Rule 1); reads are required and fail fast
+    override val postgresPoolMaxSize: Int = config.getInt("postgres.pool.maxSize")
+    override val postgresPoolMinIdle: Int = config.getInt("postgres.pool.minIdle")
     override val postgresPoolConnectionTimeoutMs: Long =
-        config.getLongOrDefault("postgres.pool.connectionTimeoutMs", 5_000L)
+        config.getLong("postgres.pool.connectionTimeoutMs")
     override val postgresPoolMaxLifetimeMs: Long =
-        config.getLongOrDefault("postgres.pool.maxLifetimeMs", 1_800_000L)
+        config.getLong("postgres.pool.maxLifetimeMs")
     override val postgresPoolIdleTimeoutMs: Long =
-        config.getLongOrDefault("postgres.pool.idleTimeoutMs", 600_000L)
+        config.getLong("postgres.pool.idleTimeoutMs")
 }
 ```
 

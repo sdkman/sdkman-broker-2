@@ -91,12 +91,13 @@ class AppConfigSpec :
         }
 
         should("apply default Postgres pool settings when no overrides are configured") {
-            // given: no POSTGRES_POOL_* overrides set (cleared in beforeTest) and test HOCON has no pool block
+            // given: no POSTGRES_POOL_* overrides set (cleared in beforeTest); the pool defaults come
+            // from application.conf (Business Rule 1), read as required values — no Kotlin fallback
 
             // when
             val config = DefaultAppConfig()
 
-            // then: code-level defaults from Business Rule 1 apply
+            // then: HOCON defaults from application.conf apply
             config.postgresPoolMaxSize shouldBe 20
             config.postgresPoolMinIdle shouldBe 2
             config.postgresPoolConnectionTimeoutMs shouldBe 5_000L

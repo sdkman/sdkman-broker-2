@@ -7,42 +7,6 @@ import arrow.core.none
 import com.typesafe.config.Config
 
 /**
- * Get a string value from config with a default fallback
- */
-fun Config.getStringOrDefault(
-    path: String,
-    default: String
-): String =
-    Either
-        .catch {
-            if (hasPath(path)) getString(path) else default
-        }.getOrElse { default }
-
-/**
- * Get an int value from config with a default fallback
- */
-fun Config.getIntOrDefault(
-    path: String,
-    default: Int
-): Int =
-    Either
-        .catch {
-            if (hasPath(path)) getInt(path) else default
-        }.getOrElse { default }
-
-/**
- * Get a long value from config with a default fallback
- */
-fun Config.getLongOrDefault(
-    path: String,
-    default: Long
-): Long =
-    Either
-        .catch {
-            if (hasPath(path)) getLong(path) else default
-        }.getOrElse { default }
-
-/**
  * Get an optional string value from config
  */
 fun Config.getOptionString(path: String): Option<String> =
