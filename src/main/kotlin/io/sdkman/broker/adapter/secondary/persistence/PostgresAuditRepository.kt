@@ -7,7 +7,7 @@ import io.sdkman.broker.domain.repository.DatabaseFailure
 import org.jetbrains.exposed.v1.core.Column
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.core.java.javaUUID
-import org.jetbrains.exposed.v1.datetime.xTimestamp
+import org.jetbrains.exposed.v1.datetime.timestamp
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -24,7 +24,7 @@ object AuditTable : Table("audit") {
     val distribution = text("distribution").nullable()
     val host = text("host").nullable()
     val agent = text("agent").nullable()
-    val timestamp = xTimestamp("timestamp")
+    val timestamp = timestamp("timestamp")
 
     override val primaryKey = PrimaryKey(id)
 }
