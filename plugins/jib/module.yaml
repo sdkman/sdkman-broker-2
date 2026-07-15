@@ -1,0 +1,7 @@
+product: jvm/amper-plugin
+
+pluginInfo:
+  settingsClass: io.sdkman.kotlintoolchain.plugins.jib.JibSettings
+
+dependencies:
+  - $libs.jib.core

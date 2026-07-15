@@ -1,0 +1,24 @@
+product: jvm/amper-plugin
+
+dependencies:
+  - $libs.jgit
+  - $libs.jgit.ssh.apache
+  # Apache MINA SSHD (pulled in by jgit.ssh.apache) declares BouncyCastle as
+  # optional at compile time but reaches for it at runtime to build its random
+  # factory; without it any SSH push fails with NoClassDefFoundError before a
+  # single byte hits the wire. The BouncyCastle version pin lives in the
+  # `bouncycastle` entry of `gradle/libs.versions.toml`.
+  - $libs.bouncycastle.bcprov: runtime-only
+  - $libs.bouncycastle.bcpkix: runtime-only
+  - $libs.slf4j.nop
+
+pluginInfo:
+  id: release
+  settingsClass: io.sdkman.kotlintoolchain.plugins.release.Settings
+
+settings:
+  jvm:
+    jdk:
+      version: 21
+  kotlin:
+    languageVersion: 2.1

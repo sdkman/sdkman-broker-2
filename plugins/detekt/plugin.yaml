@@ -1,0 +1,25 @@
+tasks:
+  analyze:
+    action: !org.jetbrains.amper.plugins.detekt.runDetectForOutput
+      commonParameters:
+        settings: ${pluginSettings}
+        sources: ${module.kotlinJavaSources}
+        moduleClasspath: ${module.compileClasspath}
+        detektClasspath:
+          - $libs.detekt.cli
+        rulesetClasspath: ${pluginSettings.rulesetClasspath}
+      baselineFile: ${module.rootDir}/detekt/baseline.xml
+      outputXmlReport: ${taskOutputDir}/report.xml
+
+  updateBaseline:
+    action: !org.jetbrains.amper.plugins.detekt.runDetectForBaseline
+      commonParameters: ${analyze.action.commonParameters}
+      outputBaselineFile: ${analyze.action.baselineFile}
+
+checks:
+  - performedBy: analyze
+    name: detekt
+
+commands:
+  - name: updateDetektBaseline
+    performedBy: updateBaseline

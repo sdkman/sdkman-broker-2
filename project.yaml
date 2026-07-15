@@ -1,0 +1,13 @@
+modules:
+  - plugins/detekt
+  - plugins/jib
+  - plugins/ktlint
+  - plugins/package
+  - plugins/release
+
+plugins:
+  - ./plugins/detekt
+  - ./plugins/jib
+  - ./plugins/ktlint
+  - ./plugins/package
+  - ./plugins/release
