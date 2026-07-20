@@ -2,7 +2,7 @@
 # Plugins
 kotlin = "2.4.10"
 axion-release-plugin = "1.21.2"
-jib-plugin = "3.5.3"
+jib-plugin = "3.5.4"
 ktlint-plugin = "14.2.0"
 # Pinned to detekt 1.x; 2.x is alpha-only and breaks the custom detekt-rules NullabilityRuleSet.
 detekt-plugin = "1.23.8"
