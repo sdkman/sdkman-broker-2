@@ -9,6 +9,7 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.request.header
 import io.ktor.server.response.header
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
@@ -16,6 +17,9 @@ import io.sdkman.broker.domain.model.VersionError
 import io.sdkman.broker.domain.service.CandidateDownloadService
 import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 import io.sdkman.broker.domain.service.SdkmanNativeDownloadService
+import org.slf4j.LoggerFactory
+
+private val logger = LoggerFactory.getLogger("io.sdkman.broker.adapter.primary.rest.DownloadRoutes")
 
 fun Application.downloadRoutes(
     candidateDownloadService: CandidateDownloadService,
@@ -83,15 +87,36 @@ fun Application.downloadRoutes(
     }
 }
 
-private fun ApplicationCall.handleVersionError(error: VersionError) =
+private suspend fun ApplicationCall.handleVersionError(error: VersionError) =
     when (error) {
-        is VersionError.InvalidCommand -> respondWithStatus(HttpStatusCode.BadRequest)
-        is VersionError.InvalidPlatform -> respondWithStatus(HttpStatusCode.BadRequest)
-        is VersionError.InvalidVersion -> respondWithStatus(HttpStatusCode.BadRequest)
-        is VersionError.VersionNotFound -> respondWithStatus(HttpStatusCode.NotFound)
-        is VersionError.DatabaseError -> respondWithStatus(HttpStatusCode.InternalServerError)
+        is VersionError.InvalidCommand ->
+            respondClientError(HttpStatusCode.BadRequest, "INVALID_COMMAND", "Invalid command '${error.command}'")
+        is VersionError.InvalidPlatform ->
+            respondClientError(HttpStatusCode.BadRequest, "INVALID_PLATFORM", "Invalid platform '${error.platform}'")
+        is VersionError.InvalidVersion ->
+            respondClientError(HttpStatusCode.BadRequest, "INVALID_VERSION", "Invalid version '${error.version}'")
+        is VersionError.VersionNotFound ->
+            respondClientError(
+                HttpStatusCode.NotFound,
+                "VERSION_NOT_FOUND",
+                "No ${error.candidate} version '${error.version}' available for platform '${error.platform}'"
+            )
+        is VersionError.DatabaseError -> respondServerError(error.cause)
     }
 
-private fun ApplicationCall.respondBadRequest() = respondWithStatus(HttpStatusCode.BadRequest)
+private suspend fun ApplicationCall.respondBadRequest() =
+    respondClientError(HttpStatusCode.BadRequest, "MISSING_PARAMETER", "Missing required path parameter")
 
-private fun ApplicationCall.respondWithStatus(status: HttpStatusCode) = response.status(status)
+private suspend fun ApplicationCall.respondClientError(
+    status: HttpStatusCode,
+    code: String,
+    message: String
+) {
+    logger.warn("$code: $message")
+    respond(status, ErrorResponse(code, message))
+}
+
+private suspend fun ApplicationCall.respondServerError(cause: Throwable) {
+    logger.error(INTERNAL_ERROR_MESSAGE, cause)
+    respond(HttpStatusCode.InternalServerError, internalErrorResponse())
+}
