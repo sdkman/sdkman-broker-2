@@ -9,6 +9,9 @@ import io.ktor.server.routing.routing
 import io.sdkman.broker.application.service.MetaHealthService
 import io.sdkman.broker.application.service.MetaReleaseService
 import kotlinx.serialization.Serializable
+import org.slf4j.LoggerFactory
+
+private val logger = LoggerFactory.getLogger("io.sdkman.broker.adapter.primary.rest.MetaRoutes")
 
 fun Application.metaRoutes(
     metaHealthService: MetaHealthService,
@@ -29,10 +32,8 @@ fun Application.metaRoutes(
                 .getReleaseVersion()
                 .fold(
                     { error ->
-                        call.respond(
-                            HttpStatusCode.InternalServerError,
-                            ReleaseErrorResponse("Error retrieving release: ${error.message}")
-                        )
+                        logger.error(INTERNAL_ERROR_MESSAGE, error)
+                        call.respond(HttpStatusCode.InternalServerError, internalErrorResponse())
                     },
                     { release ->
                         call.respond(HttpStatusCode.OK, ReleaseResponse(release))
@@ -45,9 +46,4 @@ fun Application.metaRoutes(
 @Serializable
 data class ReleaseResponse(
     val release: String
-)
-
-@Serializable
-data class ReleaseErrorResponse(
-    val error: String
 )
