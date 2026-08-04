@@ -68,8 +68,10 @@ class MetaReleaseEndpointAcceptanceSpec :
                 // then: the service response status is 500
                 response.status shouldBe HttpStatusCode.InternalServerError
 
-                // Verify the response contains the expected error message
-                response.body<String>().contains("Could not load release.properties") shouldBe true
+                // and: the body is the generic INTERNAL_ERROR shape, leaking no internal detail (BR-4)
+                val body = response.body<String>()
+                body.contains("\"error\": \"INTERNAL_ERROR\"") shouldBe true
+                body.contains("Could not load release.properties") shouldBe false
             }
         }
     })
