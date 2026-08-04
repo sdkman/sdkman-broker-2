@@ -1,6 +1,7 @@
 package io.sdkman.broker
 
 import com.mongodb.client.MongoDatabase
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopped
@@ -8,7 +9,11 @@ import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.response.respond
+import io.sdkman.broker.adapter.primary.rest.INTERNAL_ERROR_MESSAGE
 import io.sdkman.broker.adapter.primary.rest.downloadRoutes
+import io.sdkman.broker.adapter.primary.rest.internalErrorResponse
 import io.sdkman.broker.adapter.primary.rest.metaRoutes
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
@@ -34,6 +39,9 @@ import io.sdkman.broker.domain.service.SdkmanNativeDownloadService
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.Database
+import org.slf4j.LoggerFactory
+
+private val logger = LoggerFactory.getLogger("io.sdkman.broker.App")
 
 private fun selectVersionRepository(
     backend: PersistenceBackend,
@@ -106,6 +114,14 @@ fun Application.configureApp(
                 explicitNulls = false
             }
         )
+    }
+
+    // Safety net: any exception escaping a handler becomes a generic, bodied 500 logged with its stack trace.
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            logger.error(INTERNAL_ERROR_MESSAGE, cause)
+            call.respond(HttpStatusCode.InternalServerError, internalErrorResponse())
+        }
     }
 
     // Configure routes
