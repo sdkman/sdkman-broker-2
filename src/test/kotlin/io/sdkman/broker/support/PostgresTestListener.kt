@@ -2,7 +2,9 @@ package io.sdkman.broker.support
 
 import io.kotest.core.listeners.TestListener
 import io.kotest.core.spec.Spec
+import io.kotest.core.test.TestCase
 import org.flywaydb.core.Flyway
+import org.jetbrains.exposed.v1.jdbc.Database
 import org.postgresql.ds.PGSimpleDataSource
 import org.testcontainers.containers.PostgreSQLContainer
 import javax.sql.DataSource
@@ -35,6 +37,15 @@ object PostgresTestListener : TestListener {
         // Run migrations once per container lifecycle
         runMigrations()
     }
+
+    // Isolate every test from audit rows written by earlier tests/specs. The audit table is never
+    // otherwise cleared, and readSavedAuditRecordByVersion relies on singleOrNull(), so a stale row
+    // sharing a candidate/version/platform key would make an unrelated spec fail depending on order.
+    override suspend fun beforeTest(testCase: TestCase) {
+        PostgresTestSupport.clearAudit(auditDatabase)
+    }
+
+    private val auditDatabase: Database by lazy { Database.connect(dataSource) }
 
     private fun runMigrations() {
         val flyway =

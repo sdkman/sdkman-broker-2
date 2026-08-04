@@ -46,6 +46,12 @@ object PostgresTestSupport {
         }
     }
 
+    fun clearAudit(database: Database) {
+        transaction(database) {
+            AuditTable.deleteAll()
+        }
+    }
+
     fun readSavedAuditRecord(
         database: Database,
         id: UUID
