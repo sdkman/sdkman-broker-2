@@ -155,6 +155,16 @@ WARN — they must not remain bodiless.
 - **Log at the adapter boundary, once (BR-2).** Centralizes both invariants in one
   choke point and keeps the domain/repository layers free of logging concerns,
   per hexagonal rules.
+- **`/meta/health` keeps its richer body, but gains boundary logging.** The health
+  probe already returns a meaningful, structured `503` body
+  (`DetailedHealthErrorResponse{mongodb, postgres, reason}`) that is *more* useful to
+  operators than the generic `{error, message}` shape, so it is retained rather than
+  flattened. What was missing is the log line: `handleHealthError` now logs every
+  failure at `ERROR` (a health failure is a `503` server fault) and includes the
+  wrapped `Throwable` for the cause-carrying variants (`DatabaseUnavailable`,
+  `DatabaseError`), satisfying BR-2/BR-3. The `{error, message}` body shape therefore
+  applies to the download and `/meta/release` routes; `/meta/health` is the one
+  deliberate exception on body shape, not on logging.
 
 ## Examples
 
