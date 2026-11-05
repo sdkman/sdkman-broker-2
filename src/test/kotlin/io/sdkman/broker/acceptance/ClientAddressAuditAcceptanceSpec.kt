@@ -138,6 +138,46 @@ class ClientAddressAuditAcceptanceSpec :
             }
         }
 
+        should("audit the peer address when the left-most X-Forwarded-For entry is blank") {
+            // given
+            seedUniversalVersion("groovy", "4.0.28")
+
+            // when
+            val response =
+                download("/download/groovy/4.0.28/linuxx64", "X-Forwarded-For" to ", 45.55.42.78")
+
+            // then
+            response.status shouldBe HttpStatusCode.Found
+            PostgresTestSupport.readSavedAuditRecordByVersion(
+                database = database,
+                candidate = "groovy",
+                version = "4.0.28",
+                platform = "LINUX_X64"
+            ) shouldBeSomeAnd { record ->
+                record[AuditTable.host] shouldBe LOOPBACK_ADDRESS
+            }
+        }
+
+        should("audit the left-most X-Forwarded-For entry trimmed of whitespace") {
+            // given
+            seedUniversalVersion("ant", "1.10.15")
+
+            // when
+            val response =
+                download("/download/ant/1.10.15/linuxx64", "X-Forwarded-For" to "203.0.113.195 , 45.55.42.78")
+
+            // then
+            response.status shouldBe HttpStatusCode.Found
+            PostgresTestSupport.readSavedAuditRecordByVersion(
+                database = database,
+                candidate = "ant",
+                version = "1.10.15",
+                platform = "LINUX_X64"
+            ) shouldBeSomeAnd { record ->
+                record[AuditTable.host] shouldBe "203.0.113.195"
+            }
+        }
+
         should("redirect a download that carries a non-numeric X-Forwarded-Port") {
             // given
             seedUniversalVersion("scala", "3.7.3")
