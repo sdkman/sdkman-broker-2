@@ -18,8 +18,8 @@ downloads would be audited under the front's own address.
 before the front change.*
 
 **Key Properties:**
-- The audit host is the client address that the forwarded headers carry, the
-  same way `sdkman-state` resolves it.
+- The audit host is the client address that the forwarded headers carry,
+  resolved by the same Ktor plugin `sdkman-state` uses (see Design Decisions).
 - With forwarded headers present, the audit host is the **left-most**
   `X-Forwarded-For` entry. Proxies append to the right, so the left-most entry is
   the original client.
@@ -53,7 +53,9 @@ today and still write none.
 ## Business Rules
 
 1. **Forwarded address wins.** When a request carries `X-Forwarded-For`, the
-   audit host is its left-most entry, trimmed of whitespace.
+   audit host is its left-most entry, trimmed of whitespace. A left-most entry
+   that is blank, or a name rather than an address (`unknown`), does not count:
+   the request is audited under its peer address, as in Business Rule 2.
 2. **Peer address otherwise.** When a request carries no forwarded headers, the
    audit host is the IP address of the connection that delivered the request,
    never a host name resolved from it.
@@ -64,6 +66,39 @@ today and still write none.
    Broker authorises on it.
 5. **Agent unchanged.** The audit agent is still the `User-Agent` request
    header, as today.
+6. **Only `X-Forwarded-For` is read.** No other forwarded header changes the
+   audit row or the response, even when malformed: a download carrying a
+   non-numeric `X-Forwarded-Port` still answers `302`.
+
+## Design Decisions
+
+*Resolved in planning on 2026-11-05, so implementation has no open questions.
+Flagged for review.*
+
+- **The audit host is the request origin's remote address.** Ktor's
+  `XForwardedHeaders` copies the left-most `X-Forwarded-For` entry into the
+  origin's remote host, and into its remote address only when the entry is an
+  address rather than a name. Without forwarded headers, the remote host is a
+  reverse lookup of the peer, which Business Rule 2 forbids, while the remote
+  address is the peer's IP as connected. Reading the remote address meets
+  Business Rules 1 to 3 with no header parsing of the Broker's own. It departs
+  from `sdkman-state`, which reads the remote host, only when the left-most entry
+  is a name: the Broker then audits the peer address. Assumption: such an entry
+  only ever comes from the client itself (Business Rule 4), because every proxy
+  in front of the Broker appends addresses, so no real client address is lost.
+- **The plugin reads `X-Forwarded-For` and nothing else.** By default it also
+  reads `X-Forwarded-Host`, `X-Forwarded-Server`, `X-Forwarded-Proto`,
+  `X-Forwarded-Protocol`, `X-Forwarded-SSL`, `Front-End-Https` and
+  `X-Forwarded-Port`, and rewrites the origin's host, scheme and port from them.
+  The Broker reads none of those, and the plugin parses `X-Forwarded-Port`
+  unguarded, so a non-numeric value would turn the `302` into a `500`. Emptying
+  those header lists keeps every response byte for byte unchanged (Business
+  Rule 6).
+- **Peer-address criteria run over a real connection.** Ktor's test engine
+  reports its peer as the literal `localhost`, for the remote host and the
+  remote address alike, so it cannot tell an IP from a resolved name. The
+  criteria for Business Rules 2 and 3 are checked against a server listening on
+  `127.0.0.1`.
 
 ## Examples
 
@@ -71,6 +106,7 @@ today and still write none.
 |---|---|
 | `X-Forwarded-For: 203.0.113.195` | `203.0.113.195` |
 | `X-Forwarded-For: 203.0.113.195, 45.55.42.78, 172.68.1.1` | `203.0.113.195` |
+| `X-Forwarded-For: unknown, 45.55.42.78` | the peer address |
 | `X-Real-IP: 10.0.0.1` | the peer address |
 | none | the peer address |
 
@@ -90,7 +126,9 @@ address, then the `api.sdkman.io` droplet, then the CDN edge.
 - [ ] A candidate download with `X-Forwarded-For: 203.0.113.195` writes an audit row whose host is `203.0.113.195`.
 - [ ] A candidate download with a three-entry `X-Forwarded-For` writes the left-most entry as the host.
 - [ ] A candidate download with only `X-Real-IP` writes the peer address, not the `X-Real-IP` value.
-- [ ] A candidate download with no forwarded headers writes the peer address, never an empty host.
+- [ ] A candidate download with no forwarded headers writes the peer's IP address, never an empty host and never a name resolved from it: a client on `127.0.0.1` is audited as `127.0.0.1`, not `localhost`.
+- [ ] A candidate download whose left-most `X-Forwarded-For` entry is a name, such as `unknown`, writes the peer address.
+- [ ] A candidate download carrying a non-numeric `X-Forwarded-Port` still answers `302`.
 - [ ] The audit agent is still the request's `User-Agent`.
 - [ ] Download responses are unchanged: the existing acceptance specs for status, `Location`, checksum and archive-type headers, and error bodies pass unmodified.
 - [ ] The existing audit acceptance specs that send `X-Real-IP` now send `X-Forwarded-For` and expect the same host.
