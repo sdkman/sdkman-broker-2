@@ -57,7 +57,7 @@ class VersionDownloadAuditAcceptanceSpec :
 
                 val response =
                     client.get("/download/java/17.0.2-tem/darwinarm64") {
-                        header("X-Real-IP", "203.0.113.195")
+                        header("X-Forwarded-For", "203.0.113.195")
                         header("User-Agent", "curl/7.68.0")
                     }
 
@@ -114,7 +114,7 @@ class VersionDownloadAuditAcceptanceSpec :
 
                 val response =
                     client.get("/download/groovy/4.0.0/linuxx64") {
-                        header("X-Real-IP", "192.168.1.100")
+                        header("X-Forwarded-For", "192.168.1.100")
                         header("User-Agent", "SDKMAN/5.19.0")
                     }
 
@@ -143,50 +143,6 @@ class VersionDownloadAuditAcceptanceSpec :
             }
         }
 
-        should("create audit entry with no host when IP address header missing") {
-            setupVersion(
-                Version(
-                    candidate = "kotlin",
-                    version = "1.6.0",
-                    platform = "UNIVERSAL",
-                    url =
-                        "https://github.com/JetBrains/kotlin/releases/" +
-                            "download/v1.6.0/kotlin-compiler-1.6.0.zip",
-                    distribution = None,
-                    visible = true
-                )
-            )
-
-            testApplication {
-                application {
-                    configureAppForTesting(
-                        TestDependencyInjection.healthService,
-                        TestDependencyInjection.metaService,
-                        TestDependencyInjection.versionService
-                    )
-                }
-
-                val client = createClient { followRedirects = false }
-
-                val response = client.get("/download/kotlin/1.6.0/windowsx64")
-
-                response.status shouldBe HttpStatusCode.Found
-
-                val savedRecord =
-                    PostgresTestSupport.readSavedAuditRecordByVersion(
-                        database = database,
-                        candidate = "kotlin",
-                        version = "1.6.0",
-                        platform = "WINDOWS_X64"
-                    )
-
-                savedRecord shouldBeSomeAnd { record ->
-                    record[AuditTable.host] shouldBe null
-                    record[AuditTable.agent] shouldBe "ktor-client"
-                }
-            }
-        }
-
         should("NOT create audit entry for failed requests") {
             testApplication {
                 application {
@@ -201,7 +157,7 @@ class VersionDownloadAuditAcceptanceSpec :
 
                 val response =
                     client.get("/download/nonexistent/1.0.0/linuxx64") {
-                        header("X-Real-IP", "10.0.0.1")
+                        header("X-Forwarded-For", "10.0.0.1")
                         header("User-Agent", "TestClient/1.0")
                     }
 
@@ -233,7 +189,7 @@ class VersionDownloadAuditAcceptanceSpec :
 
                 val response =
                     client.get("/download/java/17.0.2-tem/invalidplatform") {
-                        header("X-Real-IP", "10.0.0.1")
+                        header("X-Forwarded-For", "10.0.0.1")
                         header("User-Agent", "TestClient/1.0")
                     }
 
@@ -278,7 +234,7 @@ class VersionDownloadAuditAcceptanceSpec :
 
                 val response =
                     client.get("/download/kotlin/1.6.0/linuxx64") {
-                        header("X-Real-IP", "10.0.0.1")
+                        header("X-Forwarded-For", "10.0.0.1")
                         header("User-Agent", "TestClient/1.0")
                     }
 

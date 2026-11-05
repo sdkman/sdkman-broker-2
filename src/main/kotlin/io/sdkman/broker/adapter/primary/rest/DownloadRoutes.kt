@@ -1,12 +1,14 @@
 package io.sdkman.broker.adapter.primary.rest
 
 import arrow.core.Option
+import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.toOption
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
+import io.ktor.server.plugins.origin
 import io.ktor.server.request.header
 import io.ktor.server.response.header
 import io.ktor.server.response.respond
@@ -34,7 +36,7 @@ fun Application.downloadRoutes(
 
             val auditContext =
                 AuditContext(
-                    host = Option.fromNullable(call.request.header("X-Real-IP")),
+                    host = Some(call.request.origin.remoteAddress),
                     agent = Option.fromNullable(call.request.header("User-Agent"))
                 )
 

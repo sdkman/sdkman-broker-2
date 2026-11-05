@@ -9,6 +9,8 @@ import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.forwardedheaders.XForwardedHeaders
+import io.ktor.server.plugins.forwardedheaders.XForwardedHeadersConfig
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
 import io.sdkman.broker.adapter.primary.rest.INTERNAL_ERROR_MESSAGE
@@ -52,6 +54,14 @@ private fun selectVersionRepository(
         PersistenceBackend.Mongo -> MongoVersionRepository(mongoDatabase)
         PersistenceBackend.Postgres -> PostgresVersionRepository(postgresDatabase)
     }
+
+// The Broker reads only the client address, and the plugin parses X-Forwarded-Port unguarded.
+private fun XForwardedHeadersConfig.readForwardedForOnly() {
+    hostHeaders.clear()
+    protoHeaders.clear()
+    httpsFlagHeaders.clear()
+    portHeaders.clear()
+}
 
 object App {
     @JvmStatic
@@ -104,6 +114,8 @@ fun Application.configureApp(
     sdkmanNativeDownloadService: SdkmanNativeDownloadService
 ) {
     // Install plugins
+    install(XForwardedHeaders) { readForwardedForOnly() }
+
     install(ContentNegotiation) {
         json(
             Json {

@@ -60,7 +60,7 @@ class VersionDownloadAuditPostgresAcceptanceSpec :
 
                 val response =
                     client.get("/download/java/21.0.5-tem/darwinarm64") {
-                        header("X-Real-IP", "203.0.113.195")
+                        header("X-Forwarded-For", "203.0.113.195")
                         header("User-Agent", "curl/7.68.0")
                     }
 
@@ -118,7 +118,7 @@ class VersionDownloadAuditPostgresAcceptanceSpec :
 
                 val response =
                     client.get("/download/scala/3.4.0/linuxx64") {
-                        header("X-Real-IP", "192.168.1.100")
+                        header("X-Forwarded-For", "192.168.1.100")
                         header("User-Agent", "SDKMAN/5.19.0")
                     }
 
@@ -148,7 +148,8 @@ class VersionDownloadAuditPostgresAcceptanceSpec :
             }
         }
 
-        should("write audit row with null host when X-Real-IP is absent") {
+        should("write audit row with the left-most X-Forwarded-For entry as host") {
+            // given: the request crossed the api.sdkman.io front and a CDN edge, each appending its address
             PostgresTestSupport.setupVersion(
                 database,
                 Version(
@@ -174,7 +175,10 @@ class VersionDownloadAuditPostgresAcceptanceSpec :
 
                 val client = createClient { followRedirects = false }
 
-                val response = client.get("/download/groovy/4.5.0/windowsx64")
+                val response =
+                    client.get("/download/groovy/4.5.0/windowsx64") {
+                        header("X-Forwarded-For", "203.0.113.195, 45.55.42.78, 172.68.1.1")
+                    }
 
                 response.status shouldBe HttpStatusCode.Found
 
@@ -187,8 +191,7 @@ class VersionDownloadAuditPostgresAcceptanceSpec :
                     )
 
                 savedRecord shouldBeSomeAnd { record ->
-                    record[AuditTable.host] shouldBe null
-                    record[AuditTable.agent] shouldBe "ktor-client"
+                    record[AuditTable.host] shouldBe "203.0.113.195"
                 }
             }
         }
@@ -207,7 +210,7 @@ class VersionDownloadAuditPostgresAcceptanceSpec :
 
                 val response =
                     client.get("/download/missingpg/1.0.0/linuxx64") {
-                        header("X-Real-IP", "10.0.0.1")
+                        header("X-Forwarded-For", "10.0.0.1")
                         header("User-Agent", "TestClient/1.0")
                     }
 
@@ -239,7 +242,7 @@ class VersionDownloadAuditPostgresAcceptanceSpec :
 
                 val response =
                     client.get("/download/java/21.0.5-tem/invalidplatform") {
-                        header("X-Real-IP", "10.0.0.1")
+                        header("X-Forwarded-For", "10.0.0.1")
                         header("User-Agent", "TestClient/1.0")
                     }
 
@@ -287,7 +290,7 @@ class VersionDownloadAuditPostgresAcceptanceSpec :
 
                 val response =
                     client.get("/download/kotlin/2.0.0/linuxx64") {
-                        header("X-Real-IP", "10.0.0.1")
+                        header("X-Forwarded-For", "10.0.0.1")
                         header("User-Agent", "TestClient/1.0")
                     }
 
