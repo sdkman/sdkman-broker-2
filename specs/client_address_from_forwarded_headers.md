@@ -55,7 +55,8 @@ today and still write none.
 1. **Forwarded address wins.** When a request carries `X-Forwarded-For`, the
    audit host is its left-most entry, trimmed of whitespace.
 2. **Peer address otherwise.** When a request carries no forwarded headers, the
-   audit host is the address of the connection that delivered the request.
+   audit host is the IP address of the connection that delivered the request,
+   never a host name resolved from it.
 3. **`X-Real-IP` is ignored.** A request carrying only `X-Real-IP` is audited
    under its peer address, as if the header were absent.
 4. **Not a security control.** Clients can set `X-Forwarded-For` themselves. The
