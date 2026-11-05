@@ -117,4 +117,35 @@ class ClientAddressAuditAcceptanceSpec :
                 record[AuditTable.host] shouldBe LOOPBACK_ADDRESS
             }
         }
+
+        should("audit the peer address when the left-most X-Forwarded-For entry is a name") {
+            // given
+            seedUniversalVersion("kotlin", "2.2.21")
+
+            // when
+            val response =
+                download("/download/kotlin/2.2.21/linuxx64", "X-Forwarded-For" to "unknown, 45.55.42.78")
+
+            // then
+            response.status shouldBe HttpStatusCode.Found
+            PostgresTestSupport.readSavedAuditRecordByVersion(
+                database = database,
+                candidate = "kotlin",
+                version = "2.2.21",
+                platform = "LINUX_X64"
+            ) shouldBeSomeAnd { record ->
+                record[AuditTable.host] shouldBe LOOPBACK_ADDRESS
+            }
+        }
+
+        should("redirect a download that carries a non-numeric X-Forwarded-Port") {
+            // given
+            seedUniversalVersion("scala", "3.7.3")
+
+            // when
+            val response = download("/download/scala/3.7.3/linuxx64", "X-Forwarded-Port" to "abc")
+
+            // then
+            response.status shouldBe HttpStatusCode.Found
+        }
     })
