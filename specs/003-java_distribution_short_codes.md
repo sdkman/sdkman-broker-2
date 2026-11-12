@@ -1,6 +1,6 @@
 # Java Distribution Short-Code Mapping (Derived)
 
-The parent spec `postgres_version_repository.md` requires that, for `candidate
+The parent spec `001-postgres_version_repository.md` requires that, for `candidate
 = java`, the Broker strip the `-{short-code}` suffix from the URL `version`
 token and translate the short code to the **full distribution enum name** used
 in the Postgres `versions.distribution` column and the audit row. The parent
