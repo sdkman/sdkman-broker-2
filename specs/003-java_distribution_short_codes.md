@@ -1,3 +1,11 @@
+---
+id: "003"
+title: "Java Distribution Short-Code Mapping (Derived)"
+status: implemented
+created: 2026-04-22
+depends_on: ["001"]
+---
+
 # Java Distribution Short-Code Mapping (Derived)
 
 The parent spec `001-postgres_version_repository.md` requires that, for `candidate

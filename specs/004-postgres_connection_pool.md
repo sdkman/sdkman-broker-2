@@ -1,3 +1,10 @@
+---
+id: "004"
+title: "PostgreSQL Connection Pool Configuration (HikariCP)"
+status: implemented
+created: 2026-05-23
+---
+
 # PostgreSQL Connection Pool Configuration (HikariCP)
 
 The Broker already pools its PostgreSQL connections with HikariCP, but the pool

@@ -1,3 +1,10 @@
+---
+id: "001"
+title: "Candidate Download — Postgres-backed Version Resolution"
+status: implemented
+created: 2026-04-21
+---
+
 # Candidate Download — Postgres-backed Version Resolution
 
 The Broker currently resolves candidate-download requests against a MongoDB
