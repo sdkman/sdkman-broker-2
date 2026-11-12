@@ -1,3 +1,10 @@
+---
+id: "006"
+title: "Client Address from Forwarded Headers"
+status: implemented
+created: 2026-10-30
+---
+
 # Client Address from Forwarded Headers
 
 The Broker records the client's address on every candidate-download audit row

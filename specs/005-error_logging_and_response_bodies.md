@@ -1,3 +1,10 @@
+---
+id: "005"
+title: "Error Logging & Response Bodies"
+status: implemented
+created: 2026-08-04
+---
+
 # Error Logging & Response Bodies
 
 The Broker currently answers failed requests with a **bodiless** HTTP error and,

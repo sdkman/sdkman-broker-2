@@ -1,3 +1,11 @@
+---
+id: "002"
+title: "Postgres `versions` Table Schema (Derived)"
+status: implemented
+created: 2026-04-22
+depends_on: ["001"]
+---
+
 # Postgres `versions` Table Schema (Derived)
 
 The parent spec `001-postgres_version_repository.md` says the `versions` table is
