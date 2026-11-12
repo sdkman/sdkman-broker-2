@@ -1,6 +1,6 @@
 # Postgres `versions` Table Schema (Derived)
 
-The parent spec `postgres_version_repository.md` says the `versions` table is
+The parent spec `001-postgres_version_repository.md` says the `versions` table is
 owned by `sdkman-state` and is read-only from the Broker's perspective, but it
 does not define the DDL. This document pins the column shape the Broker reads
 against, so the test Flyway migration and the `PostgresVersionRepository`

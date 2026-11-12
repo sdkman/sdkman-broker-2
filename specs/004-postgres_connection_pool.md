@@ -17,7 +17,7 @@ The scope here is **connection pooling and Exposed wiring only**. The Broker's
 query logic, the Mongo backend, the `postgres.*` config namespace, and the
 read-only contract with `sdkman-state` are all unchanged.
 
-*Reference: `sdkman-state/specs/concurrency-optimisations.md` (R1, R2, R9 and
+*Reference: `sdkman-state/specs/007-concurrency-optimisations.md` (R1, R2, R9 and
 the "Extra Considerations" notes on isolation level) — the upstream spec that
 established this standard.*
 
@@ -38,7 +38,7 @@ is wired through a single `Database.connect` that sets
 shares that one `Database` rather than connecting independently.
 
 None of this is observable to a download client. The HTTP contract in
-`postgres_version_repository.md` is unchanged; this spec only changes how the
+`001-postgres_version_repository.md` is unchanged; this spec only changes how the
 connection pool is configured and wired.
 
 ## Business Rules

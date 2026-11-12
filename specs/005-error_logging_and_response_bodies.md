@@ -128,7 +128,7 @@ WARN — they must not remain bodiless.
    response body.
 5. **Success is untouched.** `2xx`/`3xx` responses gain no body and no error log.
    The `302` redirect, its headers, and the best-effort audit side effect are
-   exactly as specified in `postgres_version_repository.md`.
+   exactly as specified in `001-postgres_version_repository.md`.
 6. **Unhandled exceptions are caught, logged, and bodied.** A `StatusPages`
    (or equivalent) safety net converts any exception that escapes a handler into
    a `500` `INTERNAL_ERROR` body, logged at `ERROR` with the stack trace — so
@@ -136,7 +136,7 @@ WARN — they must not remain bodiless.
    branch anticipated.
 7. **Status codes are stable.** The HTTP status for each error is unchanged from
    current behaviour. This spec adds observability, it does not alter the API's
-   status contract (see `postgres_version_repository.md` §Response).
+   status contract (see `001-postgres_version_repository.md` §Response).
 
 ## Design Decisions
 
@@ -211,7 +211,7 @@ Feature: Observable Broker error responses
 
 - Changing any HTTP **status code** — only bodies and logging are added.
 - The success-path `302` contract, headers, checksums, and audit side effect
-  (owned by `postgres_version_repository.md`).
+  (owned by `001-postgres_version_repository.md`).
 - The root-cause of the cutover incident itself (a suspected missing `SELECT`
   grant on the `versions` table for the Broker's read-only role). That is an
   **operational/provisioning** fix tracked in the rollout plan's Phase-0
