@@ -53,8 +53,8 @@ A new public route:
 `darwinarm64`, `universal`, …), matched without regard to case.
 
 On success the answer is `200`, `Content-Type: text/plain; charset=UTF-8`, and
-a body holding the version exactly as stored, with no trailing newline: `5.19.0`,
-or a bash beta's `latest+b8d230b`.
+a body holding the version exactly as stored, with no trailing newline: `5.24.0`,
+or a bash beta's `latest+5dbdea5`.
 
 The front maps the legacy URLs like this:
 
@@ -69,6 +69,20 @@ The front maps the legacy URLs like this:
 
 That mapping is configuration in `sdkman-ansible`, not Broker code. It is listed
 here so the route's callers are known.
+
+### Matching the legacy broker
+
+Through that mapping, every legacy URL answers what the legacy broker answers
+today (checked against live `api.sdkman.io/2/broker` on 2026-11-19): the same
+fallbacks, the same body byte for byte, and an empty body with no `Content-Type`
+on an error. The legacy broker has a single native version for every platform;
+reading it from `linuxx64` gives the same value, because native tags move
+together. Two differences are accepted, neither visible to an installed CLI:
+
+- **`Content-Type` spacing.** The legacy broker sends `text/plain;charset=UTF-8`;
+  the Broker sends Ktor's `text/plain; charset=UTF-8`. CLIs read only the body.
+- **Caching.** The legacy broker sends no `Cache-Control`, so a tag move shows at
+  once. Here it can take up to the cache lifetime (Business Rule 6).
 
 ## Business Rules
 
@@ -126,10 +140,10 @@ questions.*
 
 | Request | Status | Body |
 |---|---|---|
-| `/version/sdkcli/stable/universal` | `200` | `5.19.0` |
-| `/version/sdkcli/beta/UNIVERSAL` | `200` | `latest+b8d230b` |
-| `/version/sdkrs/stable/linuxx64` | `200` | `0.7.4` |
-| `/version/sdkrs/stable/linuxarm64` | `200` | `0.7.4` |
+| `/version/sdkcli/stable/universal` | `200` | `5.24.0` |
+| `/version/sdkcli/beta/UNIVERSAL` | `200` | `latest+5dbdea5` |
+| `/version/sdkrs/stable/linuxx64` | `200` | `0.8.0` |
+| `/version/sdkrs/stable/linuxarm64` | `200` | `0.8.0` |
 | `/version/sdkrs/stable/universal` | `404` | empty |
 | `/version/sdkcli/stable/linuxarm64` | `404` | empty |
 | `/version/sdkcli/nightly/universal` | `404` | empty |
@@ -149,7 +163,7 @@ questions.*
 ## Acceptance Criteria
 
 - [ ] `/version/sdkcli/stable/universal` answers `200`, `text/plain; charset=UTF-8`, and the version carrying `stable` on `UNIVERSAL`, with no trailing newline.
-- [ ] A version with a `+` (`latest+b8d230b`) comes back byte for byte.
+- [ ] A version with a `+` (`latest+5dbdea5`) comes back byte for byte.
 - [ ] `/version/sdkrs/beta/linuxx64` answers the `sdkrs` version tagged `beta` on `LINUX_X64`.
 - [ ] Platform codes match without regard to case.
 - [ ] A platform with no tagged row answers `404`, even when a `universal` row carries the tag: `/version/sdkcli/stable/linuxarm64` is `404`.
