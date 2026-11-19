@@ -74,7 +74,10 @@ here so the route's callers are known.
 
 1. **The tag decides.** The answer is the version of the row that carries the
    tag for that candidate and platform, with no distribution. Whether the row is
-   visible makes no difference, as in State's own tag lookup.
+   visible makes no difference, as in State's own tag lookup. The platform must
+   match exactly: unlike candidate downloads, there is no fallback to
+   `universal`. `sdkcli` only ever has `universal` rows, and `sdkrs` has a row on
+   each native platform or none, so a fallback could only give a wrong answer.
 2. **CLI candidates only.** The route answers for `sdkcli` and `sdkrs` and for
    no other candidate. Any other candidate is `404`, as if it had no such tag.
    New clients that want a tag's version use State's JSON tag lookup.
@@ -126,7 +129,9 @@ questions.*
 | `/version/sdkcli/stable/universal` | `200` | `5.19.0` |
 | `/version/sdkcli/beta/UNIVERSAL` | `200` | `latest+b8d230b` |
 | `/version/sdkrs/stable/linuxx64` | `200` | `0.7.4` |
+| `/version/sdkrs/stable/linuxarm64` | `200` | `0.7.4` |
 | `/version/sdkrs/stable/universal` | `404` | empty |
+| `/version/sdkcli/stable/linuxarm64` | `404` | empty |
 | `/version/sdkcli/nightly/universal` | `404` | empty |
 | `/version/gradle/stable/universal` | `404` | empty |
 | `/version/sdkcli/stable/bogus` | `400` | empty |
@@ -147,6 +152,7 @@ questions.*
 - [ ] A version with a `+` (`latest+b8d230b`) comes back byte for byte.
 - [ ] `/version/sdkrs/beta/linuxx64` answers the `sdkrs` version tagged `beta` on `LINUX_X64`.
 - [ ] Platform codes match without regard to case.
+- [ ] A platform with no tagged row answers `404`, even when a `universal` row carries the tag: `/version/sdkcli/stable/linuxarm64` is `404`.
 - [ ] A tagged row that is not visible still answers `200`.
 - [ ] A candidate other than `sdkcli` or `sdkrs` answers `404`, even when it carries the tag.
 - [ ] A tag the candidate does not carry on that platform answers `404`.
