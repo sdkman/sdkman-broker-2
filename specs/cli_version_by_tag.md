@@ -11,12 +11,12 @@ exist.
 
 Phase 3 switches the legacy broker off, and the two CLIs become State candidates:
 `sdkcli` (bash, one `UNIVERSAL` row per release) and `sdkrs` (native, one row per
-release per native platform), each tagged `stable` and `beta`, with semver versions
-on both channels (`sdkcli` stable `5.18.0`, beta `5.24.0`). **Precondition:**
-`sdkman-state` lets `sdkcli` and `sdkrs` carry `stable` and `beta`, both on one
-row if need be. `non-java-version-rules.md` allows one tag per non-java row,
-`stable` or `latest`, so a State spec exempting the two CLI candidates ships
-before plan step 5.
+release per native platform), each tagged `stable` and `latest`, with semver
+versions on both channels (`sdkcli` stable `5.18.0`, beta `5.24.0`). `latest`
+carries the beta channel. **Precondition:** `sdkman-state`'s non-java version
+rules (`022-non_java_version_rules.md`) ship before plan step 5. They let a row
+carry `stable` and `latest` together, so promoting a beta never leaves the beta
+channel without an answer.
 
 The Broker gains a route that resolves such a tag to its version and answers it
 as plain text. The `api.sdkman.io` and `beta.sdkman.io` nginx fronts translate
@@ -68,11 +68,11 @@ The front maps the legacy URLs like this:
 | Legacy URL (under `/2/broker`) | Broker URL |
 |---|---|
 | `/version/sdkman/native/stable` | `/version/sdkrs/stable/linuxx64` |
-| `/version/sdkman/native/{anything else}` | `/version/sdkrs/beta/linuxx64` |
+| `/version/sdkman/native/{anything else}` | `/version/sdkrs/latest/linuxx64` |
 | `/version/sdkman/{anything else}/stable` | `/version/sdkcli/stable/universal` |
-| `/version/sdkman/{anything else}/{anything else}` | `/version/sdkcli/beta/universal` |
+| `/version/sdkman/{anything else}/{anything else}` | `/version/sdkcli/latest/universal` |
 | `/download/sdkman/version/stable` | `/version/sdkcli/stable/universal` |
-| `/download/sdkman/version/{anything else}` | `/version/sdkcli/beta/universal` |
+| `/download/sdkman/version/{anything else}` | `/version/sdkcli/latest/universal` |
 
 That mapping is configuration in `sdkman-ansible`, not Broker code. It is listed
 here so the route's callers are known.
@@ -156,7 +156,7 @@ questions.*
 | Request | Status | Body |
 |---|---|---|
 | `/version/sdkcli/stable/universal` | `200` | `5.18.0` |
-| `/version/sdkcli/beta/UNIVERSAL` | `200` | `5.24.0` |
+| `/version/sdkcli/latest/UNIVERSAL` | `200` | `5.24.0` |
 | `/version/sdkrs/stable/linuxx64` | `200` | `0.7.19` |
 | `/version/sdkrs/stable/linuxarm64` | `200` | `0.7.19` |
 | `/version/sdkrs/stable/universal` | `404` | empty |
@@ -179,7 +179,7 @@ questions.*
 ## Acceptance Criteria
 
 - [ ] `/version/sdkcli/stable/universal` answers `200`, `text/plain; charset=UTF-8`, and the version carrying `stable` on `UNIVERSAL`, with no trailing newline.
-- [ ] `/version/sdkrs/beta/linuxx64` answers the `sdkrs` version tagged `beta` on `LINUX_X64`.
+- [ ] `/version/sdkrs/latest/linuxx64` answers the `sdkrs` version tagged `latest` on `LINUX_X64`.
 - [ ] Platform codes match without regard to case.
 - [ ] A platform with no tagged row answers `404`, even when a `universal` row carries the tag: `/version/sdkcli/stable/linuxarm64` is `404`.
 - [ ] A tagged row that is not visible still answers `200`.
