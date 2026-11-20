@@ -2,8 +2,8 @@
 
 Every installed bash CLI asks the legacy broker for the current CLI version
 before it self-updates. `sdk selfupdate` fetches
-`api.sdkman.io/2/broker/version/sdkman/{script|native}/{stable|beta}` and
-compares the bare text it gets back with its local version. CLIs from before
+`api.sdkman.io/2/broker/version/sdkman/{script|native}/{stable|beta}`
+(`beta.sdkman.io` for beta-channel builds) and compares the bare text it gets back with its local version. CLIs from before
 March 2023 also fetch the deprecated `/2/broker/download/sdkman/version/{channel}`
 for a daily check. Both URLs are baked into CLIs already installed, so something
 has to keep answering them with a bare version string for as long as those CLIs
@@ -11,9 +11,16 @@ exist.
 
 Phase 3 switches the legacy broker off, and the two CLIs become State candidates:
 `sdkcli` (bash, one `UNIVERSAL` row per release) and `sdkrs` (native, one row per
-release per native platform), each tagged `stable` and `beta`. The Broker gains a
-route that resolves such a tag to its version and answers it as plain text. The
-`api.sdkman.io` nginx front translates both legacy URLs onto it.
+release per native platform), each tagged `stable` and `beta`, with semver versions
+on both channels (`sdkcli` stable `5.18.0`, beta `5.24.0`). **Precondition:**
+`sdkman-state` lets `sdkcli` and `sdkrs` carry `stable` and `beta`, both on one
+row if need be. `non-java-version-rules.md` allows one tag per non-java row,
+`stable` or `latest`, so a State spec exempting the two CLI candidates ships
+before plan step 5.
+
+The Broker gains a route that resolves such a tag to its version and answers it
+as plain text. The `api.sdkman.io` and `beta.sdkman.io` nginx fronts translate
+both legacy URLs onto it.
 
 The Broker is the **anti-corruption layer** between the legacy CLI contract and
 State's model. The plain-text shape lives here, not in `sdkman-state`, whose API
@@ -40,6 +47,7 @@ them.
 - `.claude/rules/clean-code.md`: intention-revealing names, small functions.
 - `.claude/rules/kotest.md`: outside-in acceptance/integration/unit layering.
 - `.claude/rules/quality-gates.md`: no suppressing detekt/ktlint/tests to pass the build.
+- `.claude/rules/hocon.md`: the cache lifetime's default lives once, in `application.conf`, with an environment override.
 
 **If this spec conflicts with the rules, THE RULES WIN.**
 
@@ -53,8 +61,7 @@ A new public route:
 `darwinarm64`, `universal`, …), matched without regard to case.
 
 On success the answer is `200`, `Content-Type: text/plain; charset=UTF-8`, and
-a body holding the version exactly as stored, with no trailing newline: `5.24.0`,
-or a bash beta's `latest+5dbdea5`.
+a body holding the version exactly as stored, with no trailing newline: `5.18.0`.
 
 The front maps the legacy URLs like this:
 
@@ -75,9 +82,12 @@ here so the route's callers are known.
 Through that mapping, every legacy URL answers what the legacy broker answers
 today (checked against live `api.sdkman.io/2/broker` on 2026-11-19): the same
 fallbacks, the same body byte for byte, and an empty body with no `Content-Type`
-on an error. The legacy broker has a single native version for every platform;
-reading it from `linuxx64` gives the same value, because native tags move
-together. Two differences are accepted, neither visible to an installed CLI:
+on an error. Today's bash beta answer, `latest+5dbdea5`, gives way to a semver
+version once the release workflows publish semver (plan step 6). The legacy
+broker has a single native version for every platform; reading it from `linuxx64` gives the same value, because native tags move
+together. Two differences are accepted. The first is invisible to an installed
+CLI. The second is visible for up to the cache lifetime after a tag move:
+`sdk selfupdate` can miss a new release, or offer one a rollback has withdrawn.
 
 - **`Content-Type` spacing.** The legacy broker sends `text/plain;charset=UTF-8`;
   the Broker sends Ktor's `text/plain; charset=UTF-8`. CLIs read only the body.
@@ -98,12 +108,17 @@ together. Two differences are accepted, neither visible to an installed CLI:
 3. **Any tag.** The route does not restrict the tag. A tag the candidate does not
    carry on that platform is `404`.
 4. **Unknown platform is a client error.** A platform code outside the download
-   routes' set is `400`.
+   routes' set is `400`. The platform is checked before the candidate:
+   `/version/gradle/stable/bogus` is `400`.
 5. **Errors are empty.** Every answer other than `200` (`400`, `404`, `500`) has
    an empty body and no `Content-Type`. Errors are logged as on the other routes.
    CLIs from before March 2023 treat an empty or HTML answer as "no news" and keep
    their own version, but they would read a JSON error body as a new version and
-   nag on every command.
+   nag on every command. This route is the one exception to
+   `error_logging_and_response_bodies.md` BR-1 and BR-6. An exception escaping
+   its handler is also answered `500` with an empty body, no `Content-Type` and
+   `Cache-Control: no-store`, and logged at ERROR with its stack trace. 4xx are
+   logged at WARN, without the JSON body the download routes' helpers send.
 6. **Success is cacheable, errors are not.** A `200` carries
    `Cache-Control: max-age` with the same lifetime as State's public reads (600
    seconds today), configurable. Every error carries `Cache-Control: no-store`, so
@@ -128,7 +143,7 @@ questions.*
 - **Path, not query.** The route mirrors the download routes' path shape and
   platform codes, so the Broker's public face keeps one vocabulary.
 - **The read widens the Postgres exception.** The Broker reads `version_tags`
-  joined to `versions`, over the same read-only connection. The role gains
+  joined to `versions`, over the same connection, which reads `versions` and writes `audit`. The role gains
   `SELECT` on `version_tags`, granted out of band like the existing grant on
   `versions`, before this ships.
 - **The edge caches it.** Cloudflare caches an extensionless path only under a
@@ -140,15 +155,16 @@ questions.*
 
 | Request | Status | Body |
 |---|---|---|
-| `/version/sdkcli/stable/universal` | `200` | `5.24.0` |
-| `/version/sdkcli/beta/UNIVERSAL` | `200` | `latest+5dbdea5` |
-| `/version/sdkrs/stable/linuxx64` | `200` | `0.8.0` |
-| `/version/sdkrs/stable/linuxarm64` | `200` | `0.8.0` |
+| `/version/sdkcli/stable/universal` | `200` | `5.18.0` |
+| `/version/sdkcli/beta/UNIVERSAL` | `200` | `5.24.0` |
+| `/version/sdkrs/stable/linuxx64` | `200` | `0.7.19` |
+| `/version/sdkrs/stable/linuxarm64` | `200` | `0.7.19` |
 | `/version/sdkrs/stable/universal` | `404` | empty |
 | `/version/sdkcli/stable/linuxarm64` | `404` | empty |
 | `/version/sdkcli/nightly/universal` | `404` | empty |
 | `/version/gradle/stable/universal` | `404` | empty |
 | `/version/sdkcli/stable/bogus` | `400` | empty |
+| `/version/gradle/stable/bogus` | `400` | empty |
 
 ## Out of Scope
 
@@ -163,7 +179,6 @@ questions.*
 ## Acceptance Criteria
 
 - [ ] `/version/sdkcli/stable/universal` answers `200`, `text/plain; charset=UTF-8`, and the version carrying `stable` on `UNIVERSAL`, with no trailing newline.
-- [ ] A version with a `+` (`latest+5dbdea5`) comes back byte for byte.
 - [ ] `/version/sdkrs/beta/linuxx64` answers the `sdkrs` version tagged `beta` on `LINUX_X64`.
 - [ ] Platform codes match without regard to case.
 - [ ] A platform with no tagged row answers `404`, even when a `universal` row carries the tag: `/version/sdkcli/stable/linuxarm64` is `404`.
@@ -172,6 +187,7 @@ questions.*
 - [ ] A tag the candidate does not carry on that platform answers `404`.
 - [ ] An unknown platform code answers `400`.
 - [ ] Every `400`, `404` and `500` has an empty body, no `Content-Type` and `Cache-Control: no-store`.
+- [ ] An exception escaping the handler answers an empty `500` with `Cache-Control: no-store`.
 - [ ] Every `200` carries `Cache-Control: max-age=600` by default, and the lifetime is configurable.
 - [ ] A lookup writes no audit row.
 - [ ] Download routes are unchanged: their existing acceptance specs pass unmodified, and they carry no `Cache-Control`.
