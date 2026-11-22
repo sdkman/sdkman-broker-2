@@ -1,3 +1,11 @@
+---
+id: "007"
+title: "CLI Version by Tag"
+status: draft
+created: 2026-11-19
+depends_on: ["001", "005"]
+---
+
 # CLI Version by Tag
 
 Every installed bash CLI asks the legacy broker for the current CLI version
@@ -115,7 +123,7 @@ CLI. The second is visible for up to the cache lifetime after a tag move:
    CLIs from before March 2023 treat an empty or HTML answer as "no news" and keep
    their own version, but they would read a JSON error body as a new version and
    nag on every command. This route is the one exception to
-   `error_logging_and_response_bodies.md` BR-1 and BR-6. An exception escaping
+   `005-error_logging_and_response_bodies.md` BR-1 and BR-6. An exception escaping
    its handler is also answered `500` with an empty body, no `Content-Type` and
    `Cache-Control: no-store`, and logged at ERROR with its stack trace. 4xx are
    logged at WARN, without the JSON body the download routes' helpers send.
