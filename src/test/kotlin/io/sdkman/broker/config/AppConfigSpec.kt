@@ -32,6 +32,7 @@ private val managedSystemProperties =
         "postgres.pool.connectionTimeoutMs",
         "postgres.pool.maxLifetimeMs",
         "postgres.pool.idleTimeoutMs",
+        "version.cache.maxAgeSeconds",
         PERSISTENCE_BACKEND_PROPERTY
     )
 
@@ -162,6 +163,18 @@ class AppConfigSpec :
 
             // then
             config.postgresPoolIdleTimeoutMs shouldBe 300_000L
+        }
+
+        should("override the version cache max age from configuration") {
+            // given
+            System.setProperty("version.cache.maxAgeSeconds", "60")
+            ConfigFactory.invalidateCaches()
+
+            // when
+            val config = DefaultAppConfig()
+
+            // then
+            config.versionCacheMaxAgeSeconds shouldBe 60
         }
 
         should("default the persistence backend to mongo when not configured") {
