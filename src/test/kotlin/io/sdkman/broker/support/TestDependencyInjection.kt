@@ -8,11 +8,13 @@ import io.sdkman.broker.adapter.secondary.persistence.PostgresAuditRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresDatabase
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresVersionRepository
+import io.sdkman.broker.adapter.secondary.persistence.PostgresVersionTagRepository
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.MetaHealthServiceImpl
 import io.sdkman.broker.application.service.MetaReleaseServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
+import io.sdkman.broker.application.service.VersionTagServiceImpl
 import io.sdkman.broker.domain.model.Audit
 import io.sdkman.broker.domain.repository.AuditRepository
 import io.sdkman.broker.domain.repository.DatabaseFailure
@@ -98,5 +100,9 @@ object TestDependencyInjection {
 
     val sdkmanNativeDownloadService by lazy {
         SdkmanNativeDownloadServiceImpl()
+    }
+
+    val versionTagService by lazy {
+        VersionTagServiceImpl(PostgresVersionTagRepository(postgresDatabase))
     }
 }
