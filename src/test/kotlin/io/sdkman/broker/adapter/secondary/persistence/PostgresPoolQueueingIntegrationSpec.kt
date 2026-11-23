@@ -122,5 +122,6 @@ private fun poolConfig(maxPoolSize: Int): AppConfig =
         override val postgresPoolIdleTimeoutMs: Long = 600_000L
         override val serverPort: Int = 8080
         override val serverHost: String = "127.0.0.1"
+        override val versionCacheMaxAgeSeconds: Int = 60
         override val persistenceBackend: PersistenceBackend = PersistenceBackend.Mongo
     }
