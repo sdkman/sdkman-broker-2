@@ -10,8 +10,6 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.sdkman.broker.adapter.primary.rest.INTERNAL_ERROR_MESSAGE
@@ -20,6 +18,7 @@ import io.sdkman.broker.domain.service.VersionTagService
 import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.configureAppForTesting
+import io.sdkman.broker.support.shouldBeEmptyUncacheableError
 import org.junit.jupiter.api.Tag
 import org.slf4j.LoggerFactory
 
@@ -51,13 +50,6 @@ private fun whenRequestedWith(
 ) = testApplication {
     application { configureAppForTesting(versionTagService = service) }
     then(client.get(path))
-}
-
-private suspend fun HttpResponse.shouldBeEmptyUncacheableError(expected: HttpStatusCode) {
-    status shouldBe expected
-    bodyAsText() shouldBe ""
-    headers.contains(HttpHeaders.ContentType) shouldBe false
-    headers[HttpHeaders.CacheControl] shouldBe "no-store"
 }
 
 @Tag("acceptance")
