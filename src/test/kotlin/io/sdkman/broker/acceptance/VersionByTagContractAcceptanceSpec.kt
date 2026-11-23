@@ -3,7 +3,6 @@ package io.sdkman.broker.acceptance
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -15,6 +14,7 @@ import io.sdkman.broker.support.PostgresTestSupport
 import io.sdkman.broker.support.TestDependencyInjection
 import io.sdkman.broker.support.cliVersion
 import io.sdkman.broker.support.configureAppForTesting
+import io.sdkman.broker.support.shouldBeEmptyUncacheableError
 import io.sdkman.broker.support.whenRequested
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -22,13 +22,6 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.Tag
 
 private fun auditRowCount(database: Database): Long = transaction(database) { AuditTable.selectAll().count() }
-
-private suspend fun HttpResponse.shouldBeEmptyUncacheableError(expected: HttpStatusCode) {
-    status shouldBe expected
-    bodyAsText() shouldBe ""
-    headers.contains(HttpHeaders.ContentType) shouldBe false
-    headers[HttpHeaders.CacheControl] shouldBe "no-store"
-}
 
 @Tag("acceptance")
 class VersionByTagContractAcceptanceSpec :
