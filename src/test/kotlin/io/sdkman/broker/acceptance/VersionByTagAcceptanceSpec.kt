@@ -2,39 +2,15 @@ package io.sdkman.broker.acceptance
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.testApplication
-import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.PostgresTestSupport
-import io.sdkman.broker.support.configureAppForTesting
+import io.sdkman.broker.support.cliVersion
+import io.sdkman.broker.support.whenRequested
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.junit.jupiter.api.Tag
-
-private fun whenRequested(
-    path: String,
-    then: suspend (HttpResponse) -> Unit
-) = testApplication {
-    application { configureAppForTesting() }
-    then(client.get(path))
-}
-
-private fun cliVersion(
-    candidate: String,
-    version: String,
-    platform: String,
-    visible: Boolean = true
-) = Version(
-    candidate = candidate,
-    version = version,
-    platform = platform,
-    url = "https://example.com/$candidate-$version-$platform.zip",
-    visible = visible
-)
 
 @Tag("acceptance")
 class VersionByTagAcceptanceSpec :
