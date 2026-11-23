@@ -4,6 +4,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.toOption
 import io.sdkman.broker.adapter.secondary.persistence.AuditTable
+import io.sdkman.broker.adapter.secondary.persistence.VersionTagsTable
 import io.sdkman.broker.adapter.secondary.persistence.VersionsTable
 import io.sdkman.broker.domain.model.Version
 import org.jetbrains.exposed.v1.core.ResultRow
@@ -26,22 +27,45 @@ object PostgresTestSupport {
         version: Version
     ) {
         transaction(database) {
-            VersionsTable.insert {
-                it[candidate] = version.candidate
-                it[VersionsTable.version] = version.version
-                it[distribution] = version.distribution.getOrNull()
-                it[platform] = version.platform
-                it[visible] = version.visible
-                it[url] = version.url
-                it[md5Sum] = version.checksums[ALGO_MD5]
-                it[sha256Sum] = version.checksums[ALGO_SHA_256]
-                it[sha512Sum] = version.checksums[ALGO_SHA_512]
+            insertVersionRow(version)
+        }
+    }
+
+    fun setupTaggedVersion(
+        database: Database,
+        version: Version,
+        tags: List<String>
+    ) {
+        transaction(database) {
+            val versionId = insertVersionRow(version)
+            tags.forEach { tagName ->
+                VersionTagsTable.insert {
+                    it[candidate] = version.candidate
+                    it[tag] = tagName
+                    it[distribution] = version.distribution.getOrNull()
+                    it[platform] = version.platform
+                    it[VersionTagsTable.versionId] = versionId
+                }
             }
         }
     }
 
+    private fun insertVersionRow(version: Version): Int =
+        VersionsTable.insert {
+            it[candidate] = version.candidate
+            it[VersionsTable.version] = version.version
+            it[distribution] = version.distribution.getOrNull()
+            it[platform] = version.platform
+            it[visible] = version.visible
+            it[url] = version.url
+            it[md5Sum] = version.checksums[ALGO_MD5]
+            it[sha256Sum] = version.checksums[ALGO_SHA_256]
+            it[sha512Sum] = version.checksums[ALGO_SHA_512]
+        }[VersionsTable.id]
+
     fun clearVersions(database: Database) {
         transaction(database) {
+            VersionTagsTable.deleteAll()
             VersionsTable.deleteAll()
         }
     }
