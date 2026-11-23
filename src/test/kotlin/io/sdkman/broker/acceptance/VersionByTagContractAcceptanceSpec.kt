@@ -9,36 +9,17 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.sdkman.broker.adapter.secondary.persistence.AuditTable
-import io.sdkman.broker.domain.model.Version
 import io.sdkman.broker.support.MongoTestListener
 import io.sdkman.broker.support.PostgresTestListener
 import io.sdkman.broker.support.PostgresTestSupport
 import io.sdkman.broker.support.TestDependencyInjection
+import io.sdkman.broker.support.cliVersion
 import io.sdkman.broker.support.configureAppForTesting
+import io.sdkman.broker.support.whenRequested
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.Tag
-
-private fun whenRequested(
-    path: String,
-    then: suspend (HttpResponse) -> Unit
-) = testApplication {
-    application { configureAppForTesting() }
-    then(client.get(path))
-}
-
-private fun cliVersion(
-    candidate: String,
-    version: String,
-    platform: String
-) = Version(
-    candidate = candidate,
-    version = version,
-    platform = platform,
-    url = "https://example.com/$candidate-$version-$platform.zip",
-    visible = true
-)
 
 private fun auditRowCount(database: Database): Long = transaction(database) { AuditTable.selectAll().count() }
 
