@@ -21,6 +21,7 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 object VersionsTable : Table("versions") {
+    val id = integer("id").autoIncrement()
     val candidate = text("candidate")
     val version = text("version")
     val distribution = text("distribution").nullable()
@@ -30,6 +31,8 @@ object VersionsTable : Table("versions") {
     val md5Sum = text("md5_sum").nullable()
     val sha256Sum = text("sha_256_sum").nullable()
     val sha512Sum = text("sha_512_sum").nullable()
+
+    override val primaryKey = PrimaryKey(id)
 }
 
 private class DistributionMatches(
