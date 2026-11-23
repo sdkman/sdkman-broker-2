@@ -17,6 +17,7 @@ import io.sdkman.broker.adapter.primary.rest.INTERNAL_ERROR_MESSAGE
 import io.sdkman.broker.adapter.primary.rest.downloadRoutes
 import io.sdkman.broker.adapter.primary.rest.internalErrorResponse
 import io.sdkman.broker.adapter.primary.rest.metaRoutes
+import io.sdkman.broker.adapter.primary.rest.versionRoutes
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.MongoVersionRepository
@@ -25,6 +26,7 @@ import io.sdkman.broker.adapter.secondary.persistence.PostgresConnectivity
 import io.sdkman.broker.adapter.secondary.persistence.PostgresDatabase
 import io.sdkman.broker.adapter.secondary.persistence.PostgresHealthRepository
 import io.sdkman.broker.adapter.secondary.persistence.PostgresVersionRepository
+import io.sdkman.broker.adapter.secondary.persistence.PostgresVersionTagRepository
 import io.sdkman.broker.application.service.CandidateDownloadServiceImpl
 import io.sdkman.broker.application.service.MetaHealthService
 import io.sdkman.broker.application.service.MetaHealthServiceImpl
@@ -32,12 +34,14 @@ import io.sdkman.broker.application.service.MetaReleaseService
 import io.sdkman.broker.application.service.MetaReleaseServiceImpl
 import io.sdkman.broker.application.service.SdkmanCliDownloadServiceImpl
 import io.sdkman.broker.application.service.SdkmanNativeDownloadServiceImpl
+import io.sdkman.broker.application.service.VersionTagServiceImpl
 import io.sdkman.broker.config.DefaultAppConfig
 import io.sdkman.broker.config.PersistenceBackend
 import io.sdkman.broker.domain.repository.VersionRepository
 import io.sdkman.broker.domain.service.CandidateDownloadService
 import io.sdkman.broker.domain.service.SdkmanCliDownloadService
 import io.sdkman.broker.domain.service.SdkmanNativeDownloadService
+import io.sdkman.broker.domain.service.VersionTagService
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.Database
@@ -89,6 +93,7 @@ object App {
         val candidateDownloadService = CandidateDownloadServiceImpl(versionRepository, auditRepository)
         val sdkmanCliDownloadService = SdkmanCliDownloadServiceImpl()
         val sdkmanNativeDownloadService = SdkmanNativeDownloadServiceImpl()
+        val versionTagService = VersionTagServiceImpl(PostgresVersionTagRepository(postgresDatabase))
 
         // Start Ktor server
         embeddedServer(Netty, port = config.serverPort, host = config.serverHost) {
@@ -99,7 +104,9 @@ object App {
                 metaReleaseService,
                 candidateDownloadService,
                 sdkmanCliDownloadService,
-                sdkmanNativeDownloadService
+                sdkmanNativeDownloadService,
+                versionTagService,
+                config.versionCacheMaxAgeSeconds
             )
         }.start(wait = true)
     }
@@ -111,7 +118,9 @@ fun Application.configureApp(
     metaReleaseService: MetaReleaseService,
     candidateDownloadService: CandidateDownloadService,
     sdkmanCliDownloadService: SdkmanCliDownloadService,
-    sdkmanNativeDownloadService: SdkmanNativeDownloadService
+    sdkmanNativeDownloadService: SdkmanNativeDownloadService,
+    versionTagService: VersionTagService,
+    versionCacheMaxAgeSeconds: Int
 ) {
     // Install plugins
     install(XForwardedHeaders) { readForwardedForOnly() }
@@ -139,4 +148,5 @@ fun Application.configureApp(
     // Configure routes
     metaRoutes(metaHealthService, metaReleaseService)
     downloadRoutes(candidateDownloadService, sdkmanCliDownloadService, sdkmanNativeDownloadService)
+    versionRoutes(versionTagService, versionCacheMaxAgeSeconds)
 }
