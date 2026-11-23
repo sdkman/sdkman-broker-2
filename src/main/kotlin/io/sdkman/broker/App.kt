@@ -16,7 +16,9 @@ import io.ktor.server.response.respond
 import io.sdkman.broker.adapter.primary.rest.INTERNAL_ERROR_MESSAGE
 import io.sdkman.broker.adapter.primary.rest.downloadRoutes
 import io.sdkman.broker.adapter.primary.rest.internalErrorResponse
+import io.sdkman.broker.adapter.primary.rest.isVersionLookup
 import io.sdkman.broker.adapter.primary.rest.metaRoutes
+import io.sdkman.broker.adapter.primary.rest.respondEmptyError
 import io.sdkman.broker.adapter.primary.rest.versionRoutes
 import io.sdkman.broker.adapter.secondary.persistence.MongoApplicationRepository
 import io.sdkman.broker.adapter.secondary.persistence.MongoConnectivity
@@ -137,11 +139,16 @@ fun Application.configureApp(
         )
     }
 
-    // Safety net: any exception escaping a handler becomes a generic, bodied 500 logged with its stack trace.
+    // Safety net: any exception escaping a handler becomes a generic 500 logged with its stack trace.
+    // The version route answers it empty, because the CLIs that call it read any body as a version.
     install(StatusPages) {
         exception<Throwable> { call, cause ->
             logger.error(INTERNAL_ERROR_MESSAGE, cause)
-            call.respond(HttpStatusCode.InternalServerError, internalErrorResponse())
+            if (call.isVersionLookup) {
+                call.respondEmptyError(HttpStatusCode.InternalServerError)
+            } else {
+                call.respond(HttpStatusCode.InternalServerError, internalErrorResponse())
+            }
         }
     }
 
