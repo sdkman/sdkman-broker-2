@@ -25,6 +25,7 @@ interface AppConfig {
     val postgresPoolIdleTimeoutMs: Long
     val serverPort: Int
     val serverHost: String
+    val versionCacheMaxAgeSeconds: Int
     val persistenceBackend: PersistenceBackend
 }
 
@@ -60,6 +61,9 @@ class DefaultAppConfig : AppConfig {
     // Server settings
     override val serverPort: Int = config.getInt("server.port")
     override val serverHost: String = config.getString("server.host")
+
+    // Version route cache settings
+    override val versionCacheMaxAgeSeconds: Int = config.getInt("version.cache.maxAgeSeconds")
 
     // Persistence backend selector
     override val persistenceBackend: PersistenceBackend =
