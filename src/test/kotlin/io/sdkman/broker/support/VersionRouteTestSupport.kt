@@ -8,13 +8,15 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.sdkman.broker.domain.model.Version
+import io.sdkman.broker.domain.service.VersionTagService
 
 fun whenRequested(
     path: String,
+    versionTagService: VersionTagService = TestDependencyInjection.versionTagService,
     then: suspend (HttpResponse) -> Unit
 ): Unit =
     testApplication {
-        application { configureAppForTesting() }
+        application { configureAppForTesting(versionTagService = versionTagService) }
         then(client.get(path))
     }
 
